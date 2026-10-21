@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [CreateAssetMenu(menuName = "Artifact/Shining Carrot", fileName = "ShiningCarrot")]
 public class ShiningCarrotSO : ArtifactSO
@@ -9,7 +9,7 @@ public class ShiningCarrotSO : ArtifactSO
 }
 
 /// <summary>
-/// ´ë½¬ Áß ¹«Àû Áö¼Ó½Ã°£ Áõ°¡
+/// ëŒ€ì‰¬ ì¤‘ ë¬´ì  ì§€ì†ì‹œê°„ ì¦ê°€
 /// </summary>
 public class Artifact_ShiningCarrot : ArtifactEffect
 {

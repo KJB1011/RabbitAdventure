@@ -1,25 +1,25 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// EnemyÁß BossÀÇ Çàµ¿À» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
-/// Ã¼·ÂÀÌ 50%ÀÌÇÏ·Î ³»·Á°¡¸é 2ÆäÀÌÁî°¡ µÇ¸ç,
-/// 1ÆäÀÌÁî´Â 4°³, 2ÆäÀÌÁî´Â 2°³ ´õ ´õÇÏ¿© ÃÑ 6°³ÀÇ ÆĞÅÏÀÌ ÀÖ´Ù.
+/// Enemyì¤‘ Bossì˜ í–‰ë™ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
+/// ì²´ë ¥ì´ 50%ì´í•˜ë¡œ ë‚´ë ¤ê°€ë©´ 2í˜ì´ì¦ˆê°€ ë˜ë©°,
+/// 1í˜ì´ì¦ˆëŠ” 4ê°œ, 2í˜ì´ì¦ˆëŠ” 2ê°œ ë” ë”í•˜ì—¬ ì´ 6ê°œì˜ íŒ¨í„´ì´ ìˆë‹¤.
 /// </summary>
 public class Enemy_Boss : EnemyController
 {
-    [Header("Phase ¼³Á¤")]
+    [Header("Phase ì„¤ì •")]
     [SerializeField] int _phase1BulletCount = 12;
     [SerializeField] int _phase2BulletCount = 20;
     [SerializeField] float _phase2Threshold = 0.5f;
 
-    [Header("Phase 2 ÀüÈ¯ ¿¬Ãâ")]
+    [Header("Phase 2 ì „í™˜ ì—°ì¶œ")]
     [SerializeField] SpriteRenderer _bodySprite;
     [SerializeField] float _phase2ScaleMultiplier = 1.2f;
     [SerializeField] float _phase2FlashDuration = 0.15f;
     [SerializeField] int _phase2FlashCount = 5;
 
-    [Header("¿şÀÌÆ÷ÀÎÆ®")]
+    [Header("ì›¨ì´í¬ì¸íŠ¸")]
     [SerializeField]
     Vector2[] _waypoints = new Vector2[]
     {
@@ -29,27 +29,27 @@ public class Enemy_Boss : EnemyController
         new Vector2( 5f,  0f),
     };
 
-    [Header("³ª¼±Çü ÆĞÅÏ")]
+    [Header("ë‚˜ì„ í˜• íŒ¨í„´")]
     [SerializeField] int _spiralArms = 3;
     [SerializeField] int _spiralRounds = 3;
     [SerializeField] float _spiralRotateSpeed = 180f;
     [SerializeField] float _spiralFireInterval = 0.05f;
 
-    [Header("ÁıÁß ¹ß»ç ÆĞÅÏ")]
+    [Header("ì§‘ì¤‘ ë°œì‚¬ íŒ¨í„´")]
     [SerializeField] int _focusShotCount = 7;
     [SerializeField] float _focusSpreadAngle = 30f;
     [SerializeField] int _focusWaveCount = 3;
     [SerializeField] float _focusWaveDelay = 0.4f;
     [SerializeField] float _focusBulletSpeed = 7f;
 
-    [Header("È¸Àü ·¹ÀÌÀú (Phase 2)")]
+    [Header("íšŒì „ ë ˆì´ì € (Phase 2)")]
     [SerializeField] int _laserCount = 4;
     [SerializeField] float _laserRotateSpeed = 90f;
     [SerializeField] float _laserDuration = 4f;
     [SerializeField] float _laserFireInterval = 0.06f;
     [SerializeField] float _laserBulletSpeed = 6f;
 
-    [Header("¹üÀ§ °ø°İ ÆĞÅÏ")]
+    [Header("ë²”ìœ„ ê³µê²© íŒ¨í„´")]
     [SerializeField] Vector2 _areaSize = new Vector2(3f, 3f);
     [SerializeField] Vector2 _areaLargeSize = new Vector2(5f, 5f);
 
@@ -95,7 +95,7 @@ public class Enemy_Boss : EnemyController
         }
     }
 
-    // ¦¡¦¡ ÆĞÅÏ 1: ¿şÀÌÆ÷ÀÎÆ® ¹æ»çÇü ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íŒ¨í„´ 1: ì›¨ì´í¬ì¸íŠ¸ ë°©ì‚¬í˜• â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternRadial()
     {
@@ -115,7 +115,7 @@ public class Enemy_Boss : EnemyController
         }
     }
 
-    // ¦¡¦¡ ÆĞÅÏ 2: ³ª¼±Çü Åº¸· ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íŒ¨í„´ 2: ë‚˜ì„ í˜• íƒ„ë§‰ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternSpiral()
     {
@@ -147,7 +147,7 @@ public class Enemy_Boss : EnemyController
         yield return new WaitForSeconds(0.5f);
     }
 
-    // ¦¡¦¡ ÆĞÅÏ 3: ÁıÁß ¹ß»ç ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íŒ¨í„´ 3: ì§‘ì¤‘ ë°œì‚¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternFocus()
     {
@@ -183,7 +183,7 @@ public class Enemy_Boss : EnemyController
         yield return new WaitForSeconds(0.5f);
     }
 
-    // ¦¡¦¡ ÆĞÅÏ 4: Æ÷À§ ¹üÀ§ °ø°İ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íŒ¨í„´ 4: í¬ìœ„ ë²”ìœ„ ê³µê²© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternSurroundArea()
     {
@@ -194,7 +194,7 @@ public class Enemy_Boss : EnemyController
 
         Vector3 pPos = PlayerTF.position;
 
-        // ÇÃ·¹ÀÌ¾î ¹Ù±ùÂÊ 4°÷¿¡ ¹üÀ§ °ø°İ
+        // í”Œë ˆì´ì–´ ë°”ê¹¥ìª½ 4ê³³ì— ë²”ìœ„ ê³µê²©
         Vector3[] outerPositions = new Vector3[]
         {
             pPos + Vector3.right  * 4f,
@@ -209,13 +209,13 @@ public class Enemy_Boss : EnemyController
 
         yield return new WaitForSeconds(0.1f);
 
-        // ÇÃ·¹ÀÌ¾î ¹Ù·Î À§Ä¡¿¡ Å« ¹üÀ§ °ø°İ
+        // í”Œë ˆì´ì–´ ë°”ë¡œ ìœ„ì¹˜ì— í° ë²”ìœ„ ê³µê²©
         bool finalDone = false;
         _attack.FireAreaAttack(PlayerTF.position, _areaLargeSize, 0f, () => finalDone = true);
         yield return new WaitUntil(() => finalDone);
     }
 
-    // ¦¡¦¡ ÆĞÅÏ 5: È¸Àü ·¹ÀÌÀú (Phase 2) ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íŒ¨í„´ 5: íšŒì „ ë ˆì´ì € (Phase 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternLaser()
     {
@@ -224,12 +224,12 @@ public class Enemy_Boss : EnemyController
 
         float angle = 0f;
         float elapsed = 0f;
-        float soundTimer = 0f; // »ç¿îµå Å¸ÀÌ¸Ó
+        float soundTimer = 0f; // ì‚¬ìš´ë“œ íƒ€ì´ë¨¸
 
         while (elapsed < _laserDuration)
         {
             soundTimer += _laserFireInterval;
-            // 0.25ÃÊ¸¶´Ù »ç¿îµå Àç»ı
+            // 0.25ì´ˆë§ˆë‹¤ ì‚¬ìš´ë“œ ì¬ìƒ
             if (soundTimer >= 0.25f)
             {
                 SoundManager.Instance?.PlaySFX("SFX/BulletFire");
@@ -253,19 +253,19 @@ public class Enemy_Boss : EnemyController
         yield return new WaitForSeconds(0.8f);
     }
 
-    // ¦¡¦¡ ÆĞÅÏ 6: °İÀÚ Æø°İ (Phase 2) ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
-    // ¸ÊÀ» °İÀÚ·Î ³ª´²¼­ ¼ø¼­´ë·Î Æø¹ß
+    // â”€â”€ íŒ¨í„´ 6: ê²©ì í­ê²© (Phase 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ë§µì„ ê²©ìë¡œ ë‚˜ëˆ ì„œ ìˆœì„œëŒ€ë¡œ í­ë°œ
 
     IEnumerator PatternGridBomb()
     {
         yield return StartCoroutine(MoveToPosition(new Vector2(0f, 4f)));
         yield return new WaitForSeconds(0.2f);
 
-        // 5¿­ x 3Çà
+        // 5ì—´ x 3í–‰
         float[] colX = { -8f, -4f, 0f, 4f, 8f };
         float[] rowY = { -3f, 0f, 3f };
 
-        // ¿­ ¼ø¼­ ¼ÅÇÃ
+        // ì—´ ìˆœì„œ ì…”í”Œ
         int[] colOrder = { 0, 1, 2, 3, 4 };
         for (int i = colOrder.Length - 1; i > 0; i--)
         {
@@ -273,7 +273,7 @@ public class Enemy_Boss : EnemyController
             (colOrder[i], colOrder[j]) = (colOrder[j], colOrder[i]);
         }
 
-        // ¿­ ´ÜÀ§·Î ¼øÂ÷ ¹ß»ç - °°Àº ¿­ÀÇ 3°³´Â µ¿½Ã¿¡
+        // ì—´ ë‹¨ìœ„ë¡œ ìˆœì°¨ ë°œì‚¬ - ê°™ì€ ì—´ì˜ 3ê°œëŠ” ë™ì‹œì—
         foreach (int col in colOrder)
         {
             foreach (float y in rowY)
@@ -282,15 +282,15 @@ public class Enemy_Boss : EnemyController
                 _attack.FireAreaAttack(pos, _areaSize, 0f);
             }
 
-            // ´ÙÀ½ ¿­ ¹ß»ç±îÁö ÅÒ
+            // ë‹¤ìŒ ì—´ ë°œì‚¬ê¹Œì§€ í…€
             yield return new WaitForSeconds(0.5f);
         }
 
-        // ¸¶Áö¸· ¿­ Æø¹ßÀº ´ÙÀ½ ÆĞÅÏ°ú °ãÃÄ ÁøÇàµÊ (°ø°İ ¿ÀºêÁ§Æ®´Â º¸½º¿Í ºĞ¸®µÇ¾î ÀÖ¾î ÀÌµ¿ÇØµµ ¹«°ü)
+        // ë§ˆì§€ë§‰ ì—´ í­ë°œì€ ë‹¤ìŒ íŒ¨í„´ê³¼ ê²¹ì³ ì§„í–‰ë¨ (ê³µê²© ì˜¤ë¸Œì íŠ¸ëŠ” ë³´ìŠ¤ì™€ ë¶„ë¦¬ë˜ì–´ ìˆì–´ ì´ë™í•´ë„ ë¬´ê´€)
         yield return new WaitForSeconds(0.5f);
     }
 
-    // ¦¡¦¡ Phase 2 ÀüÈ¯ ¿¬Ãâ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ Phase 2 ì „í™˜ ì—°ì¶œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private IEnumerator Phase2EntranceRoutine()
     {
@@ -317,9 +317,9 @@ public class Enemy_Boss : EnemyController
             col.enabled = true;
 
         _isPhase2 = true;
-        Debug.Log("[Boss] Phase 2 ½ÃÀÛ!");
+        Debug.Log("[Boss] Phase 2 ì‹œì‘!");
     }
-    // Phase 2 ÁøÀÔ Àü¿¡´Â HP°¡ ÀÓ°è°ª(50%) ¾Æ·¡·Î ¾È ³»·Á°¨
+    // Phase 2 ì§„ì… ì „ì—ëŠ” HPê°€ ì„ê³„ê°’(50%) ì•„ë˜ë¡œ ì•ˆ ë‚´ë ¤ê°
     protected override int ClampHp(int hp)
     {
         if (_isPhase2) return Mathf.Max(hp, 0);

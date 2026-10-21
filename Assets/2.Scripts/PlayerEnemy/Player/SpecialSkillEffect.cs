@@ -1,22 +1,22 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SpecialSkillEffect : MonoBehaviour
 {
-    [Header("½º³À¼¦ ÆĞ³Î")]
-    [SerializeField] RectTransform _topRect;      // À§ÂÊÀ¸·Î °¥¶óÁú ÆĞ³Î
-    [SerializeField] RawImage _topImage;      // À§ÂÊ ÀÌ¹ÌÁö
-    [SerializeField] RectTransform _bottomRect;   // ¾Æ·¡ÂÊÀ¸·Î °¥¶óÁú ÆĞ³Î
-    [SerializeField] RawImage _bottomImage;   // ¾Æ·¡ÂÊ ÀÌ¹ÌÁö
+    [Header("ìŠ¤ëƒ…ìƒ· íŒ¨ë„")]
+    [SerializeField] RectTransform _topRect;      // ìœ„ìª½ìœ¼ë¡œ ê°ˆë¼ì§ˆ íŒ¨ë„
+    [SerializeField] RawImage _topImage;      // ìœ„ìª½ ì´ë¯¸ì§€
+    [SerializeField] RectTransform _bottomRect;   // ì•„ë˜ìª½ìœ¼ë¡œ ê°ˆë¼ì§ˆ íŒ¨ë„
+    [SerializeField] RawImage _bottomImage;   // ì•„ë˜ìª½ ì´ë¯¸ì§€
 
-    [Header("¿¬Ãâ ¼³Á¤")]
-    [SerializeField] float _splitDuration = 0.3f;   // °¥¶óÁö´Â ½Ã°£
-    [SerializeField] float _holdDuration = 0.5f;   // °¥¶óÁø Ã¤·Î À¯Áö
-    [SerializeField] float _closeDuration = 0.2f;   // ´İÈ÷´Â ½Ã°£
-    [SerializeField] float _splitDistance = 600f;   // °¥¶óÁö´Â °Å¸® (px)
+    [Header("ì—°ì¶œ ì„¤ì •")]
+    [SerializeField] float _splitDuration = 0.3f;   // ê°ˆë¼ì§€ëŠ” ì‹œê°„
+    [SerializeField] float _holdDuration = 0.5f;   // ê°ˆë¼ì§„ ì±„ë¡œ ìœ ì§€
+    [SerializeField] float _closeDuration = 0.2f;   // ë‹«íˆëŠ” ì‹œê°„
+    [SerializeField] float _splitDistance = 600f;   // ê°ˆë¼ì§€ëŠ” ê±°ë¦¬ (px)
 
-    // ÀÌµ¿ ¹æÇâ - À§ ÆĞ³ÎÀº ÁÂ»ó´Ü, ¾Æ·¡ ÆĞ³ÎÀº ¿ìÇÏ´Ü
+    // ì´ë™ ë°©í–¥ - ìœ„ íŒ¨ë„ì€ ì¢Œìƒë‹¨, ì•„ë˜ íŒ¨ë„ì€ ìš°í•˜ë‹¨
     static readonly Vector2 TopDir = new Vector2(-3f, 1f).normalized;
     static readonly Vector2 BottomDir = new Vector2(3f, -1f).normalized;
 
@@ -34,12 +34,12 @@ public class SpecialSkillEffect : MonoBehaviour
 
         _topRect.anchoredPosition = Vector2.zero;
         _bottomRect.anchoredPosition = Vector2.zero;
-        gameObject.SetActive(true); // ¿¬Ãâ¿ë Äµ¹ö½º ¼ÒÈ¯
+        gameObject.SetActive(true); // ì—°ì¶œìš© ìº”ë²„ìŠ¤ ì†Œí™˜
 
         SoundManager.Instance.PlaySFX("SFX/StrongSword");
-        Time.timeScale = 0f; // ¿¬Ãâµ¿¾È Àá±ñ °ÔÀÓ ¸ØÃç³õ±â
+        Time.timeScale = 0f; // ì—°ì¶œë™ì•ˆ ì ê¹ ê²Œì„ ë©ˆì¶°ë†“ê¸°
 
-        // »ìÂ¦ °¥¶óÁö´Â ¿¬Ãâ
+        // ì‚´ì§ ê°ˆë¼ì§€ëŠ” ì—°ì¶œ
         _topRect.anchoredPosition = TopDir * 10;
         _bottomRect.anchoredPosition = BottomDir * 10;
 
@@ -47,7 +47,7 @@ public class SpecialSkillEffect : MonoBehaviour
         onDamage?.Invoke();
         yield return new WaitForSecondsRealtime(_closeDuration);
 
-        // °¥¶óÁø È­¸éÀ» ¹ÛÀ¸·Î ¹Ğ¾î³»´Â ¿¬Ãâ
+        // ê°ˆë¼ì§„ í™”ë©´ì„ ë°–ìœ¼ë¡œ ë°€ì–´ë‚´ëŠ” ì—°ì¶œ
         SoundManager.Instance.PlaySFX("SFX/GlassBreaking");
         Time.timeScale = 1f;
         float elapsed = 0f;
@@ -60,10 +60,10 @@ public class SpecialSkillEffect : MonoBehaviour
             yield return null;
         }
 
-        // º¢²ÉÀÙ VFX°¡ Àß º¸ÀÌ°Ô ½Ã°£ ¹ú¾îÁÖ±â
+        // ë²šê½ƒì VFXê°€ ì˜ ë³´ì´ê²Œ ì‹œê°„ ë²Œì–´ì£¼ê¸°
         yield return new WaitForSecondsRealtime(0.5f);
 
-        // ÃÊ±âÈ­
+        // ì´ˆê¸°í™”
         _topRect.anchoredPosition = Vector2.zero;
         _bottomRect.anchoredPosition = Vector2.zero;
         gameObject.SetActive(false);

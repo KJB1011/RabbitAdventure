@@ -1,13 +1,13 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// µ¥¹ÌÁö, ¾ÆÀÌÅÛ È¹µæ µî ¸ğµç ¶°¿À¸£´Â ÅØ½ºÆ® ¿¬ÃâÀ» ´ã´çÇÕ´Ï´Ù.
+/// ë°ë¯¸ì§€, ì•„ì´í…œ íšë“ ë“± ëª¨ë“  ë– ì˜¤ë¥´ëŠ” í…ìŠ¤íŠ¸ ì—°ì¶œì„ ë‹´ë‹¹í•©ë‹ˆë‹¤.
 /// </summary>
 public class FloatingText : MonoBehaviour
 {
-    [Header("¿¬Ãâ ±âº»°ª")]
+    [Header("ì—°ì¶œ ê¸°ë³¸ê°’")]
     [SerializeField] float _floatHeight = 1.2f;
     [SerializeField] float _floatDuration = 0.6f;
     [SerializeField] float _fadeDuration = 0.4f;
@@ -57,7 +57,7 @@ public class FloatingText : MonoBehaviour
 
     public void PushUp(float offset)
     {
-        // ÇöÀç À§Ä¡¿¡¼­ offset¸¸Å­ À§·Î ÀÌµ¿
+        // í˜„ì¬ ìœ„ì¹˜ì—ì„œ offsetë§Œí¼ ìœ„ë¡œ ì´ë™
         transform.position += Vector3.up * offset;
     }
 }

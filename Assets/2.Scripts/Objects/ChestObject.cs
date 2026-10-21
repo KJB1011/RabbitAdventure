@@ -1,21 +1,21 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// »óÀÚ ¿ÀºêÁ§Æ®¸¦ °ü¸®ÇÏ´Â ½ºÅ©¸³Æ®.
+/// ìƒì ì˜¤ë¸Œì íŠ¸ë¥¼ ê´€ë¦¬í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸.
 /// </summary>
 public class ChestObject : MonoBehaviour
 {
     [SerializeField] private int _hp = 3;
 
-    [Header("¾ÆÀÌÅÛ µå·Ó ¼³Á¤")]
+    [Header("ì•„ì´í…œ ë“œë¡­ ì„¤ì •")]
     [SerializeField] GameObject _itemPrefab;
     [SerializeField] int _minDropCount = 3;
     [SerializeField] int _maxDropCount = 5;
 
-    [Header("ÆÄ±« ¿¬Ãâ")]
+    [Header("íŒŒê´´ ì—°ì¶œ")]
     [SerializeField] SpriteRenderer _spriteRenderer;
 
-    // ¾ÆÀÌÅÛº° µå·Ó °¡ÁßÄ¡ (GOLD, HP, ATKUP, RANGEUP, CRITRATEUP)
+    // ì•„ì´í…œë³„ ë“œë¡­ ê°€ì¤‘ì¹˜ (GOLD, HP, ATKUP, RANGEUP, CRITRATEUP)
     readonly int[] _weights = { 60, 10, 10, 10, 10 };
 
     public event System.Action OnBroken;
@@ -50,7 +50,7 @@ public class ChestObject : MonoBehaviour
     {
         if (_itemPrefab == null)
         {
-            Debug.LogWarning("[ChestObject] _itemPrefabÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogWarning("[ChestObject] _itemPrefabì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -64,14 +64,14 @@ public class ChestObject : MonoBehaviour
             GameObject go = Instantiate(_itemPrefab,
                 (Vector2)transform.position + offset, Quaternion.identity);
 
-            // ¾ÆÀÌÅÛ Å¸ÀÔ ¼¼ÆÃ
+            // ì•„ì´í…œ íƒ€ì… ì„¸íŒ…
             var pickup = go.GetComponent<ItemPickup>();
             if (pickup != null)
                 pickup.SetItemType(itemType);
         }
     }
 
-    // °¡ÁßÄ¡ ±â¹İ ·£´ı ¾ÆÀÌÅÛ ¼±ÅÃ
+    // ê°€ì¤‘ì¹˜ ê¸°ë°˜ ëœë¤ ì•„ì´í…œ ì„ íƒ
     private Defines.ITEM GetRandomItemType()
     {
         int total = 0;

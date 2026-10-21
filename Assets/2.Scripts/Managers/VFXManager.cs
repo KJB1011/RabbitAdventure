@@ -1,35 +1,35 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using static Defines;
 
 /// <summary>
-/// VFX / ÅºÈ¯ Àç»ıÀ» ´ã´çÇÏ´Â ¸Å´ÏÀú.
-/// Resources/VFX/ Æú´õ¿¡¼­ ÇÁ¸®ÆÕÀ» ·ÎµåÇÕ´Ï´Ù.
+/// VFX / íƒ„í™˜ ì¬ìƒì„ ë‹´ë‹¹í•˜ëŠ” ë§¤ë‹ˆì €.
+/// Resources/VFX/ í´ë”ì—ì„œ í”„ë¦¬íŒ¹ì„ ë¡œë“œí•©ë‹ˆë‹¤.
 /// </summary>
 public class VFXManager : MonoBehaviour
 {
     public static VFXManager Instance { get; private set; }
 
-    [Header("Ç® ¼³Á¤")]
+    [Header("í’€ ì„¤ì •")]
     [SerializeField] private int _vfxDefaultCapacity = 10;
     [SerializeField] private int _vfxMaxSize = 50;
     [SerializeField] private int _bulletDefaultCapacity = 32;
     [SerializeField] private int _bulletMaxSize = 200;
 
-    [Header("¼º´É ºñ±³¿ë")]
-    [Tooltip("²ô¸é Ç®¸µ ¾øÀÌ ¸Å¹ø Instantiate/Destroy·Î »ı¼ºÇÕ´Ï´Ù. GC Alloc ºñ±³ ÃøÁ¤¿ë.")]
+    [Header("ì„±ëŠ¥ ë¹„êµìš©")]
+    [Tooltip("ë„ë©´ í’€ë§ ì—†ì´ ë§¤ë²ˆ Instantiate/Destroyë¡œ ìƒì„±í•©ë‹ˆë‹¤. GC Alloc ë¹„êµ ì¸¡ì •ìš©.")]
     [SerializeField] private bool _usePooling = true;
 
-    // ÇÁ¸®ÆÕ Ä³½Ì (SoundManagerÀÇ clipCache¿Í µ¿ÀÏÇÑ ±¸Á¶)
+    // í”„ë¦¬íŒ¹ ìºì‹± (SoundManagerì˜ clipCacheì™€ ë™ì¼í•œ êµ¬ì¡°)
     private Dictionary<string, GameObject> _prefabCache = new();
 
-    // Ç®
+    // í’€
     private Dictionary<string, ObjectPool<PooledVFX>> _vfxPools = new();
     private Dictionary<string, ObjectPool<PooledBullet>> _bulletPools = new();
 
-    // ÀÌÆåÆ® ÃÖ´ë Áö¼Ó ½Ã°£
+    // ì´í™íŠ¸ ìµœëŒ€ ì§€ì† ì‹œê°„
     float _lifetime = 3f;
 
     void Awake()
@@ -38,7 +38,7 @@ public class VFXManager : MonoBehaviour
         Instance = this;
     }
 
-    // ¦¡¦¡ VFX ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ VFX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public PooledVFX Play(string id, Vector3 position, Quaternion rotation = default)
     {
@@ -56,13 +56,13 @@ public class VFXManager : MonoBehaviour
         return instance;
     }
 
-    /// <summary>Ç® ¾øÀÌ ¸Å¹ø »õ·Î »ı¼º/ÆÄ±« (ºñ±³ ÃøÁ¤¿ë)</summary>
+    /// <summary>í’€ ì—†ì´ ë§¤ë²ˆ ìƒˆë¡œ ìƒì„±/íŒŒê´´ (ë¹„êµ ì¸¡ì •ìš©)</summary>
     private PooledVFX PlayDirect(string id, Vector3 position, Quaternion rotation)
     {
         var prefab = LoadPrefab($"VFX/{id}");
         if (prefab == null)
         {
-            Debug.LogWarning($"[VFXManager] ÇÁ¸®ÆÕÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù: Resources/VFX/{id}");
+            Debug.LogWarning($"[VFXManager] í”„ë¦¬íŒ¹ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: Resources/VFX/{id}");
             return null;
         }
 
@@ -79,7 +79,7 @@ public class VFXManager : MonoBehaviour
         var prefab = LoadPrefab(path);
         if (prefab == null)
         {
-            Debug.LogWarning($"[VFXManager] ÇÁ¸®ÆÕÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù: Resources/{path}");
+            Debug.LogWarning($"[VFXManager] í”„ë¦¬íŒ¹ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: Resources/{path}");
             return null;
         }
 
@@ -96,7 +96,7 @@ public class VFXManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î¿¡°Ô ºÙ¾î¼­ Àç»ıµÇ´Â VFX
+    /// í”Œë ˆì´ì–´ì—ê²Œ ë¶™ì–´ì„œ ì¬ìƒë˜ëŠ” VFX
     /// </summary>
     public PooledVFX PlayAttached(string id, Transform target, Vector3 localOffset = default)
     {
@@ -149,7 +149,7 @@ public class VFXManager : MonoBehaviour
         return instance;
     }
 
-    // ¦¡¦¡ ÅºÈ¯ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íƒ„í™˜ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public PooledBullet FireBullet(string id, Vector3 position, Vector2 velocity, float lifetime = 5f)
     {
@@ -172,7 +172,7 @@ public class VFXManager : MonoBehaviour
         var prefab = LoadPrefab(id);
         if (prefab == null)
         {
-            Debug.LogWarning($"[VFXManager] ÅºÈ¯ ÇÁ¸®ÆÕÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù: Resources/VFX/{id}");
+            Debug.LogWarning($"[VFXManager] íƒ„í™˜ í”„ë¦¬íŒ¹ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: Resources/VFX/{id}");
             return null;
         }
 
@@ -190,7 +190,7 @@ public class VFXManager : MonoBehaviour
         var prefab = LoadPrefab(path);
         if (prefab == null)
         {
-            Debug.LogWarning($"[VFXManager] ÅºÈ¯ ÇÁ¸®ÆÕÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù: Resources/VFX/{path}");
+            Debug.LogWarning($"[VFXManager] íƒ„í™˜ í”„ë¦¬íŒ¹ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: Resources/VFX/{path}");
             return null;
         }
 
@@ -214,7 +214,7 @@ public class VFXManager : MonoBehaviour
                 b.ReleaseSelf();
     }
 
-    // ¦¡¦¡ À¯Æ¿ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ìœ í‹¸ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private GameObject LoadPrefab(string path)
     {

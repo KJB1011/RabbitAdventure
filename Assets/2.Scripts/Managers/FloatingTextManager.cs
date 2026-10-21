@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// µ¥¹ÌÁö¸¦ Á¦¿ÜÇÑ HUD ÅØ½ºÆ®µéÀ» °ü¸®ÇÕ´Ï´Ù.
+/// ë°ë¯¸ì§€ë¥¼ ì œì™¸í•œ HUD í…ìŠ¤íŠ¸ë“¤ì„ ê´€ë¦¬í•©ë‹ˆë‹¤.
 /// </summary>
 public class FloatingTextManager : MonoBehaviour
 {
@@ -11,27 +11,27 @@ public class FloatingTextManager : MonoBehaviour
     [SerializeField] GameObject _prefab;
     [SerializeField] int _prewarmCount = 15;
 
-    [Header("ÇÃ·¹ÀÌ¾î ÇÇ°İ")]
+    [Header("í”Œë ˆì´ì–´ í”¼ê²©")]
     [SerializeField] Color _damageColor = Color.red;
     [SerializeField] float _damageFontSize = 3f;
 
-    [Header("¾ÆÀÌÅÛ È¹µæ")]
+    [Header("ì•„ì´í…œ íšë“")]
     [SerializeField] Color _itemColor = new Color(0.4f, 1f, 0.4f);
     [SerializeField] float _itemFontSize = 2.5f;
 
-    [Header("°ãÄ§ ¹æÁö")]
-    [SerializeField] float _stackOffset = 0.5f; // À§·Î ¹Ğ¾î¿Ã¸®´Â °Å¸®
+    [Header("ê²¹ì¹¨ ë°©ì§€")]
+    [SerializeField] float _stackOffset = 0.5f; // ìœ„ë¡œ ë°€ì–´ì˜¬ë¦¬ëŠ” ê±°ë¦¬
 
     Queue<FloatingText> _pool = new();
-    List<FloatingText> _activeList = new(); // ÇöÀç È°¼ºÈ­µÈ ÅØ½ºÆ® ÃßÀû
+    List<FloatingText> _activeList = new(); // í˜„ì¬ í™œì„±í™”ëœ í…ìŠ¤íŠ¸ ì¶”ì 
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        if (_prefab == null) { Debug.LogError("[FloatingTextManager] _prefab ¹Ì¿¬°á"); return; }
-        if (_prefab.GetComponent<FloatingText>() == null) { Debug.LogError("[FloatingTextManager] FloatingText ÄÄÆ÷³ÍÆ® ¾øÀ½"); return; }
+        if (_prefab == null) { Debug.LogError("[FloatingTextManager] _prefab ë¯¸ì—°ê²°"); return; }
+        if (_prefab.GetComponent<FloatingText>() == null) { Debug.LogError("[FloatingTextManager] FloatingText ì»´í¬ë„ŒíŠ¸ ì—†ìŒ"); return; }
 
         for (int i = 0; i < _prewarmCount; i++)
             _pool.Enqueue(CreateNew());
@@ -60,7 +60,7 @@ public class FloatingTextManager : MonoBehaviour
 
     private void PlayText(string content, Color color, float fontSize, Vector3 worldPos)
     {
-        // ±âÁ¸ È°¼º ÅØ½ºÆ®µéÀ» À§·Î ¹Ğ¾î¿Ã¸²
+        // ê¸°ì¡´ í™œì„± í…ìŠ¤íŠ¸ë“¤ì„ ìœ„ë¡œ ë°€ì–´ì˜¬ë¦¼
         foreach (var active in _activeList)
             active.PushUp(_stackOffset);
 

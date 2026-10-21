@@ -1,9 +1,9 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// ¾ÀÀ» ¿Å±æ¶§ °®°í ÀÖ¾î¾ß ÇÒ Á¤º¸µéÀ» ÀúÀåÇÏ´Â ¿ëµµÀÔ´Ï´Ù.
+/// ì”¬ì„ ì˜®ê¸¸ë•Œ ê°–ê³  ìˆì–´ì•¼ í•  ì •ë³´ë“¤ì„ ì €ì¥í•˜ëŠ” ìš©ë„ì…ë‹ˆë‹¤.
 /// </summary>
 public class RememberManager : MonoBehaviour
 {

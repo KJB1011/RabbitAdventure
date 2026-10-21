@@ -1,25 +1,25 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// µ¥¹ÌÁö ¼ıÀÚ ÇÏ³ªÀÇ ¿¬ÃâÀ» ´ã´çÇÕ´Ï´Ù.
+/// ë°ë¯¸ì§€ ìˆ«ì í•˜ë‚˜ì˜ ì—°ì¶œì„ ë‹´ë‹¹í•©ë‹ˆë‹¤.
 /// </summary>
 public class DamageText : MonoBehaviour
 {
-    [Header("ÀÏ¹İ Å¸°İ")]
+    [Header("ì¼ë°˜ íƒ€ê²©")]
     [SerializeField] float _normalSize = 3f;
     [SerializeField] Color _normalColor = Color.white;
 
-    [Header("Ä¡¸íÅ¸")]
+    [Header("ì¹˜ëª…íƒ€")]
     [SerializeField] float _critSize = 4.5f;
-    [SerializeField] Color _critColor = new Color(1f, 0.8f, 0f); // ³ë¶õ»ö
+    [SerializeField] Color _critColor = new Color(1f, 0.8f, 0f); // ë…¸ë€ìƒ‰
 
-    [Header("¿¬Ãâ")]
-    [SerializeField] float _floatHeight = 1.5f;   // À§·Î ¶°¿À¸£´Â °Å¸®
-    [SerializeField] float _floatDuration = 0.6f; // ¶°¿À¸£´Â ½Ã°£
-    [SerializeField] float _fadeDuration = 0.4f;  // »ç¶óÁö´Â ½Ã°£
-    [SerializeField] float _fadeDelay = 0.3f;     // »ç¶óÁö±â ½ÃÀÛ±îÁö ´ë±â
+    [Header("ì—°ì¶œ")]
+    [SerializeField] float _floatHeight = 1.5f;   // ìœ„ë¡œ ë– ì˜¤ë¥´ëŠ” ê±°ë¦¬
+    [SerializeField] float _floatDuration = 0.6f; // ë– ì˜¤ë¥´ëŠ” ì‹œê°„
+    [SerializeField] float _fadeDuration = 0.4f;  // ì‚¬ë¼ì§€ëŠ” ì‹œê°„
+    [SerializeField] float _fadeDelay = 0.3f;     // ì‚¬ë¼ì§€ê¸° ì‹œì‘ê¹Œì§€ ëŒ€ê¸°
 
     TextMeshPro _text;
     System.Action<DamageText> _releaseCallback;
@@ -85,7 +85,7 @@ public class DamageText : MonoBehaviour
                      .SetEase(Ease.OutCubic)
         );
         _sequence.Join(
-            transform.DOPunchScale(Vector3.one * 0.5f, 0.3f, 5, 0.5f) // ÀÓÆÑÆ® °­Á¶
+            transform.DOPunchScale(Vector3.one * 0.5f, 0.3f, 5, 0.5f) // ì„íŒ©íŠ¸ ê°•ì¡°
         );
         _sequence.Insert(
             _fadeDelay,
@@ -94,7 +94,7 @@ public class DamageText : MonoBehaviour
         _sequence.OnComplete(() => _releaseCallback?.Invoke(this));
     }
 
-    // Ç®·Î ¹İ³³µÉ ¶§ Á¤¸®
+    // í’€ë¡œ ë°˜ë‚©ë  ë•Œ ì •ë¦¬
     public void ReturnCleanup()
     {
         _sequence?.Kill();

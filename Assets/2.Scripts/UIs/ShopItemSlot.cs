@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// »óÁ¡¿¡¼­ ÆÇ¸ÅÇÏ´Â ¾ÆÀÌÅÛ ÇÏ³ªÀÇ µ¥ÀÌÅÍ.
+/// ìƒì ì—ì„œ íŒë§¤í•˜ëŠ” ì•„ì´í…œ í•˜ë‚˜ì˜ ë°ì´í„°.
 /// </summary>
 [System.Serializable]
 public class ShopItemData
@@ -14,7 +14,7 @@ public class ShopItemData
 }
 
 /// <summary>
-/// »óÁ¡ UIÀÇ ¾ÆÀÌÅÛ ½½·Ô ÇÏ³ª.
+/// ìƒì  UIì˜ ì•„ì´í…œ ìŠ¬ë¡¯ í•˜ë‚˜.
 /// </summary>
 public class ShopItemSlot : MonoBehaviour
 {
@@ -42,6 +42,6 @@ public class ShopItemSlot : MonoBehaviour
     public void SetSoldOut()
     {
         _buyButton.interactable = false;
-        if (_nameText != null) _nameText.text = "Ç°Àı";
+        if (_nameText != null) _nameText.text = "í’ˆì ˆ";
     }
 }

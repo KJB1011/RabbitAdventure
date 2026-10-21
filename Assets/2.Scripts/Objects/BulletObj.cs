@@ -1,7 +1,7 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// Åº¸· ÀÚµ¿¼Ò¸ê ½ºÅ©¸³Æ®
+/// íƒ„ë§‰ ìë™ì†Œë©¸ ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class BulletObj : MonoBehaviour
 {

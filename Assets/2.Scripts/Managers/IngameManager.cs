@@ -1,13 +1,13 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// ÀÎ°ÔÀÓ³»¿¡¼­ °ÔÀÓÀÇ ÀüÃ¼ÀûÀÎ ÁøÇàÀ» ´ã´çÇÕ´Ï´Ù.
-/// Á¤ÇØÁ®ÀÖ´Â ¼ø¼­ÀÇ ³ëµå°¡ ÀÖ°í ±× ³ëµåÀÇ ¼ø¼­¿¡ ¸Â°Ô °ÔÀÓÀÌ ÁøÇàµË´Ï´Ù.
-/// ÇöÀç Æ÷Æ®Æú¸®¿À ³»¿¡¼­´Â : ÀüÅõ -> »óÀÚ -> ÀüÅõ -> »óÀÚ -> »óÁ¡ -> º¸½º  ¼øÀ¸·Î ÁøÇàµË´Ï´Ù.
+/// ì¸ê²Œì„ë‚´ì—ì„œ ê²Œì„ì˜ ì „ì²´ì ì¸ ì§„í–‰ì„ ë‹´ë‹¹í•©ë‹ˆë‹¤.
+/// ì •í•´ì ¸ìˆëŠ” ìˆœì„œì˜ ë…¸ë“œê°€ ìˆê³  ê·¸ ë…¸ë“œì˜ ìˆœì„œì— ë§ê²Œ ê²Œì„ì´ ì§„í–‰ë©ë‹ˆë‹¤.
+/// í˜„ì¬ í¬íŠ¸í´ë¦¬ì˜¤ ë‚´ì—ì„œëŠ” : ì „íˆ¬ -> ìƒì -> ì „íˆ¬ -> ìƒì -> ìƒì  -> ë³´ìŠ¤  ìˆœìœ¼ë¡œ ì§„í–‰ë©ë‹ˆë‹¤.
 /// </summary>
 public class IngameManager : MonoBehaviour
 {
@@ -15,7 +15,7 @@ public class IngameManager : MonoBehaviour
 
     [SerializeField] NodeBase[] _nodes;
 
-    [Header("³ëµå ÀüÈ¯")]
+    [Header("ë…¸ë“œ ì „í™˜")]
     [SerializeField] float _nodeTransitionDelay = 5f;
     [SerializeField] GameObject _resultUI;
     [SerializeField] GameObject _gameoverUI;
@@ -30,16 +30,16 @@ public class IngameManager : MonoBehaviour
     [Header("HP Bar")]
     [SerializeField] UIHPBar _uiHpBar;
 
-    [Header("°ñµå")]
+    [Header("ê³¨ë“œ")]
     [SerializeField] TextMeshProUGUI _goldText;
     public int Gold { get; set; } = 0;
 
-    [Header("ÀÎÆ®·Î ¿¬Ãâ")]
-    [SerializeField] CanvasGroup _gameUICanvas;    // ÀÎ°ÔÀÓ ÀüÃ¼ UIÀÇ CanvasGroup
-    [SerializeField] float _uiFadeDuration = 2f;   // UI ÆäÀÌµå ÀÎ ½Ã°£
-    [SerializeField] float _playerEnterTime = 1.2f; // ÇÃ·¹ÀÌ¾î µîÀå ½Ã°£
-    [SerializeField] Vector2 _playerStartPos = new Vector2(-5f, 0f); // ÃÖÁ¾ À§Ä¡
-    [SerializeField] Vector2 _playerOffscreen = new Vector2(-20f, 0f); // ½ÃÀÛ À§Ä¡ (È­¸é ¹Û)
+    [Header("ì¸íŠ¸ë¡œ ì—°ì¶œ")]
+    [SerializeField] CanvasGroup _gameUICanvas;    // ì¸ê²Œì„ ì „ì²´ UIì˜ CanvasGroup
+    [SerializeField] float _uiFadeDuration = 2f;   // UI í˜ì´ë“œ ì¸ ì‹œê°„
+    [SerializeField] float _playerEnterTime = 1.2f; // í”Œë ˆì´ì–´ ë“±ì¥ ì‹œê°„
+    [SerializeField] Vector2 _playerStartPos = new Vector2(-5f, 0f); // ìµœì¢… ìœ„ì¹˜
+    [SerializeField] Vector2 _playerOffscreen = new Vector2(-20f, 0f); // ì‹œì‘ ìœ„ì¹˜ (í™”ë©´ ë°–)
     PlayerController _player;
 
     int _currentIndex = 0;
@@ -99,7 +99,7 @@ public class IngameManager : MonoBehaviour
         var prefab = Resources.Load<GameObject>("Player");
         if (prefab == null)
         {
-            Debug.LogError("[IngameManager] Resources/Player ÇÁ¸®ÆÕÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogError("[IngameManager] Resources/Player í”„ë¦¬íŒ¹ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -108,28 +108,28 @@ public class IngameManager : MonoBehaviour
 
         if (_player == null)
         {
-            Debug.LogError("[IngameManager] Player ÇÁ¸®ÆÕ¿¡ PlayerController°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogError("[IngameManager] Player í”„ë¦¬íŒ¹ì— PlayerControllerê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // ArtifactManager¿¡µµ ÇÃ·¹ÀÌ¾î ¿¬°á
+        // ArtifactManagerì—ë„ í”Œë ˆì´ì–´ ì—°ê²°
         if (ArtifactManager.Instance != null)
             ArtifactManager.Instance.SetPlayer(_player);
 
         _player.SetInitChar(RememberManager.Instance._nickname);
     }
 
-    // ¦¡¦¡ ÀÎÆ®·Î ¿¬Ãâ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì¸íŠ¸ë¡œ ì—°ì¶œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private IEnumerator IntroRoutine()
     {
         if (_player != null)
         {
             _player.transform.position = _playerOffscreen;
             _player.SetControllable(false);
-            _player.SetBoundary(false); // ¡ç °æ°è ²ô±â
+            _player.SetBoundary(false); // â† ê²½ê³„ ë„ê¸°
         }
 
-        // UI ÆäÀÌµå ÀÎ
+        // UI í˜ì´ë“œ ì¸
         if (_gameUICanvas != null)
         {
             _gameUICanvas.alpha = 0f;
@@ -140,15 +140,15 @@ public class IngameManager : MonoBehaviour
         else
             yield return new WaitForSeconds(_uiFadeDuration);
 
-        // ÇÃ·¹ÀÌ¾î µîÀå
+        // í”Œë ˆì´ì–´ ë“±ì¥
         if (_player != null)
             yield return StartCoroutine(
                 PlayerEnterFromLeft(_playerOffscreen, _playerStartPos, _playerEnterTime));
 
-        // µîÀå ¿Ï·á ÈÄ °æ°è ´Ù½Ã ÄÑ±â
+        // ë“±ì¥ ì™„ë£Œ í›„ ê²½ê³„ ë‹¤ì‹œ ì¼œê¸°
         if (_player != null)
         {
-            _player.SetBoundary(true);  // ¡ç °æ°è ÄÑ±â
+            _player.SetBoundary(true);  // â† ê²½ê³„ ì¼œê¸°
             _player.SetControllable(true);
         }
 
@@ -171,7 +171,7 @@ public class IngameManager : MonoBehaviour
         _player.transform.position = to;
     }
 
-    // ¦¡¦¡ ³ëµå ÀüÈ¯ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ë…¸ë“œ ì „í™˜ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void OnNodeComplete()
     {
         bool isBattle = _isBattle;
@@ -184,7 +184,7 @@ public class IngameManager : MonoBehaviour
     {
         _isTransitioning = true;
 
-        // Áß°£ °á°úÃ¢ Ç¥½Ã
+        // ì¤‘ê°„ ê²°ê³¼ì°½ í‘œì‹œ
         _countdownPanel.Show();
 
         float remaining = isBattle ? _nodeTransitionDelay : 3f;
@@ -192,27 +192,27 @@ public class IngameManager : MonoBehaviour
         if (_maxDamageText != null && isBattle)
         {
             _maxDamageText.enabled = true;
-            _maxDamageText.text = $"ÃÖ°í µ¥¹ÌÁö : {_maxDamageInNode}";
+            _maxDamageText.text = $"ìµœê³  ë°ë¯¸ì§€ : {_maxDamageInNode}";
         }
         if (_avgDPSText != null && isBattle && _totalBattleTime > 0)
         {
             _avgDPSText.enabled = true;
-            _avgDPSText.text = $"Æò±Õ DPS : {(_totalDamage / _totalBattleTime):F1}";
+            _avgDPSText.text = $"í‰ê·  DPS : {(_totalDamage / _totalBattleTime):F1}";
         }
 
         while (remaining > 0f)
         {
             if (_countdownText != null)
-                _countdownText.text = $"´ÙÀ½ ±¸¿ª±îÁö {Mathf.CeilToInt(remaining)}ÃÊ";
+                _countdownText.text = $"ë‹¤ìŒ êµ¬ì—­ê¹Œì§€ {Mathf.CeilToInt(remaining)}ì´ˆ";
             remaining -= Time.deltaTime;
             yield return null;
         }
 
-        // ÇÃ·¹ÀÌ¾î °­Á¦·Î ¿ŞÂÊÀ¸·Î ÀÌµ¿
+        // í”Œë ˆì´ì–´ ê°•ì œë¡œ ì™¼ìª½ìœ¼ë¡œ ì´ë™
         if (_player != null)
             yield return StartCoroutine(_player.MoveToPositionRoutine(_playerStartPos));
 
-        // Áß°£ °á°úÃ¢ ºñÈ°¼ºÈ­ ¹× ÃÊ±âÈ­
+        // ì¤‘ê°„ ê²°ê³¼ì°½ ë¹„í™œì„±í™” ë° ì´ˆê¸°í™”
         bool hideDone = false;
         _countdownPanel.Hide(() => hideDone = true);
         yield return new WaitUntil(() => hideDone);
@@ -236,15 +236,15 @@ public class IngameManager : MonoBehaviour
         }
     }
 
-    // ´Ù¸¥ ³ëµå(½ºÅ×ÀÌÁö)·Î ÀüÈ¯
+    // ë‹¤ë¥¸ ë…¸ë“œ(ìŠ¤í…Œì´ì§€)ë¡œ ì „í™˜
     private void ActivateNode(int index)
     {
         _nodes[index].gameObject.SetActive(true);
         _nodes[index].StartNode(OnNodeComplete);
-        Debug.Log($"[IngameManager] Node {index} ½ÃÀÛ: {_nodes[index].GetType().Name}");
+        Debug.Log($"[IngameManager] Node {index} ì‹œì‘: {_nodes[index].GetType().Name}");
     }
 
-    // ÇöÀç ³ëµå Àç½ÃÀÛ
+    // í˜„ì¬ ë…¸ë“œ ì¬ì‹œì‘
     public void RestartCurrentNode()
     {
         _gameoverPanel?.Hide();
@@ -283,7 +283,7 @@ public class IngameManager : MonoBehaviour
 
         ActivateNode(_currentIndex);
     }
-    // ¦¡¦¡ °ñµå ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ê³¨ë“œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void AddGold(int amount)
     {
         Gold += amount;
@@ -298,7 +298,7 @@ public class IngameManager : MonoBehaviour
         return true;
     }
 
-    // ¦¡¦¡ ÀüÅõ Åë°è ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì „íˆ¬ í†µê³„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void AddDamage(int damage)
     {
         _totalDamage += damage;
@@ -306,7 +306,7 @@ public class IngameManager : MonoBehaviour
             _maxDamageInNode = damage;
     }
 
-    // ¦¡¦¡ ±âÅ¸ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ê¸°íƒ€ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void ShowResult()
     {
         _resultPanel.Show();

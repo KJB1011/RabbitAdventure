@@ -1,19 +1,19 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// »óÀÚ¿¡¼­ ³ª¿Â ¾ÆÀÌÅÛµéÀÌ ÀÚµ¿À¸·Î ¸Ô¾îÁö´Â ½ºÅ©¸³Æ®
+/// ìƒìì—ì„œ ë‚˜ì˜¨ ì•„ì´í…œë“¤ì´ ìë™ìœ¼ë¡œ ë¨¹ì–´ì§€ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class ItemPickup : MonoBehaviour
 {
-    [Header("ÀÌµ¿ ¼³Á¤")]
+    [Header("ì´ë™ ì„¤ì •")]
     [SerializeField] float _delay = 1f;
     [SerializeField] float _initialSpeed = 2f;
     [SerializeField] float _acceleration = 8f;
     [SerializeField] float _maxSpeed = 20f;
     [SerializeField] float _pickupRadius = 0.4f;
 
-    [Header("¾ÆÀÌÅÛ Ç¥½Ã")]
+    [Header("ì•„ì´í…œ í‘œì‹œ")]
     [SerializeField] SpriteRenderer _spriteRenderer;
     [SerializeField] Sprite _goldSprite;
     [SerializeField] Sprite _hpSprite;
@@ -52,22 +52,22 @@ public class ItemPickup : MonoBehaviour
         _currentSpeed = _initialSpeed;
         _isMoving = false;
 
-        // FindWithTag·Î ÇÃ·¹ÀÌ¾î ·çÆ® ¿ÀºêÁ§Æ® Ã£±â
+        // FindWithTagë¡œ í”Œë ˆì´ì–´ ë£¨íŠ¸ ì˜¤ë¸Œì íŠ¸ ì°¾ê¸°
         var playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
         {
             _playerTF = playerObj.transform;
-            // ·çÆ®¿¡ ¾øÀ¸¸é ÀÚ½Ä/ºÎ¸ğ±îÁö Å½»ö
+            // ë£¨íŠ¸ì— ì—†ìœ¼ë©´ ìì‹/ë¶€ëª¨ê¹Œì§€ íƒìƒ‰
             _player = playerObj.GetComponent<PlayerController>()
                    ?? playerObj.GetComponentInChildren<PlayerController>()
                    ?? playerObj.GetComponentInParent<PlayerController>();
 
             if (_player == null)
-                Debug.LogWarning("[ItemPickup] PlayerController¸¦ Ã£Áö ¸øÇß½À´Ï´Ù. Player ÅÂ±× ¿ÀºêÁ§Æ®¸¦ È®ÀÎÇØÁÖ¼¼¿ä.");
+                Debug.LogWarning("[ItemPickup] PlayerControllerë¥¼ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤. Player íƒœê·¸ ì˜¤ë¸Œì íŠ¸ë¥¼ í™•ì¸í•´ì£¼ì„¸ìš”.");
         }
         else
         {
-            Debug.LogWarning("[ItemPickup] 'Player' ÅÂ±×¸¦ °¡Áø ¿ÀºêÁ§Æ®°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogWarning("[ItemPickup] 'Player' íƒœê·¸ë¥¼ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
         }
 
         StartCoroutine(DelayedMove());
@@ -92,7 +92,7 @@ public class ItemPickup : MonoBehaviour
 
         if (Vector2.Distance(transform.position, _playerTF.position) < _pickupRadius)
         {
-            // ApplyEffect ¸ÕÀú È£Ãâ ÈÄ ºñÈ°¼ºÈ­
+            // ApplyEffect ë¨¼ì € í˜¸ì¶œ í›„ ë¹„í™œì„±í™”
             ApplyEffect();
             SoundManager.Instance.PlaySFX("SFX/DropCoin");
             gameObject.SetActive(false);
@@ -118,21 +118,21 @@ public class ItemPickup : MonoBehaviour
 
             case Defines.ITEM.ATKUP:
                 if (_player != null) _player.AddAtk(1f);
-                effectText = "°ø°İ·Â + 1";
+                effectText = "ê³µê²©ë ¥ + 1";
                 break;
 
             case Defines.ITEM.RANGEUP:
                 if (_player != null) _player.AddRange(0.1f);
-                effectText = "°ø°İ¹üÀ§ + 0.1";
+                effectText = "ê³µê²©ë²”ìœ„ + 0.1";
                 break;
 
             case Defines.ITEM.CRITRATEUP:
                 if (_player != null) _player.AddCritRate(1f);
-                effectText = "Ä¡¸íÅ¸ È®·ü + 1%";
+                effectText = "ì¹˜ëª…íƒ€ í™•ë¥  + 1%";
                 break;
         }
 
-        // ÅØ½ºÆ®´Â _player null ¿©ºÎ¿Í ¹«°üÇÏ°Ô Ç¥½Ã
+        // í…ìŠ¤íŠ¸ëŠ” _player null ì—¬ë¶€ì™€ ë¬´ê´€í•˜ê²Œ í‘œì‹œ
         if (!string.IsNullOrEmpty(effectText) && _playerTF != null)
             FloatingTextManager.Instance.ShowItemEffect(effectText, _playerTF.position);
     }

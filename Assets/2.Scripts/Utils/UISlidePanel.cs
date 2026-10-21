@@ -1,44 +1,44 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// UI ÆĞ³ÎÀ» È­¸é À§ÂÊ¿¡¼­ Áß¾ÓÀ¸·Î ½½¶óÀÌµå ÀÎ/¾Æ¿ô ÇÕ´Ï´Ù.
+/// UI íŒ¨ë„ì„ í™”ë©´ ìœ„ìª½ì—ì„œ ì¤‘ì•™ìœ¼ë¡œ ìŠ¬ë¼ì´ë“œ ì¸/ì•„ì›ƒ í•©ë‹ˆë‹¤.
 /// </summary>
 [RequireComponent(typeof(RectTransform))]
 public class UISlidePanel : MonoBehaviour
 {
-    [Header("¾Ö´Ï¸ŞÀÌ¼Ç ¼³Á¤")]
+    [Header("ì• ë‹ˆë©”ì´ì…˜ ì„¤ì •")]
     [SerializeField] private float _duration = 0.4f;
     [SerializeField] private Ease _ease = Ease.InOutQuad;
 
-    [Header("¿ÀÇÁ¼Â (È­¸é ¹Û ½ÃÀÛ/³¡ À§Ä¡)")]
-    [Tooltip("È­¸é ³ôÀÌ ´ëºñ ¾ó¸¶³ª À§¿¡¼­ ½ÃÀÛÇÒÁö (1 = È­¸é ³ôÀÌ¸¸Å­ À§)")]
+    [Header("ì˜¤í”„ì…‹ (í™”ë©´ ë°– ì‹œì‘/ë ìœ„ì¹˜)")]
+    [Tooltip("í™”ë©´ ë†’ì´ ëŒ€ë¹„ ì–¼ë§ˆë‚˜ ìœ„ì—ì„œ ì‹œì‘í• ì§€ (1 = í™”ë©´ ë†’ì´ë§Œí¼ ìœ„)")]
     [SerializeField] private float _offscreenMultiplier = 1.2f;
 
     private RectTransform _rect;
-    private Vector2 _centerPos;  // ¿ø·¡ Áß¾Ó À§Ä¡
-    private Vector2 _offscreenPos; // È­¸é ¹Û À§Ä¡
+    private Vector2 _centerPos;  // ì›ë˜ ì¤‘ì•™ ìœ„ì¹˜
+    private Vector2 _offscreenPos; // í™”ë©´ ë°– ìœ„ì¹˜
     private Tweener _tween;
 
     void Awake()
     {
         _rect = GetComponent<RectTransform>();
 
-        // ÇöÀç À§Ä¡¸¦ Áß¾Ó(¸ñÇ¥) À§Ä¡·Î ÀúÀå
+        // í˜„ì¬ ìœ„ì¹˜ë¥¼ ì¤‘ì•™(ëª©í‘œ) ìœ„ì¹˜ë¡œ ì €ì¥
         _centerPos = _rect.anchoredPosition;
 
-        // È­¸é ³ôÀÌ¸¸Å­ À§¸¦ ¿ÀÇÁ½ºÅ©¸° À§Ä¡·Î ¼³Á¤
+        // í™”ë©´ ë†’ì´ë§Œí¼ ìœ„ë¥¼ ì˜¤í”„ìŠ¤í¬ë¦° ìœ„ì¹˜ë¡œ ì„¤ì •
         float screenHeight = Screen.height;
         _offscreenPos = _centerPos + Vector2.up * screenHeight * _offscreenMultiplier;
 
-        // ½ÃÀÛ ½Ã È­¸é ¹Û¿¡¼­ ´ë±â
+        // ì‹œì‘ ì‹œ í™”ë©´ ë°–ì—ì„œ ëŒ€ê¸°
         _rect.anchoredPosition = _offscreenPos;
         gameObject.SetActive(false);
     }
 
     /// <summary>
-    /// È­¸é À§¿¡¼­ Áß¾ÓÀ¸·Î ½½¶óÀÌµå ÀÎ
+    /// í™”ë©´ ìœ„ì—ì„œ ì¤‘ì•™ìœ¼ë¡œ ìŠ¬ë¼ì´ë“œ ì¸
     /// </summary>
     public void Show(System.Action onComplete = null)
     {
@@ -48,12 +48,12 @@ public class UISlidePanel : MonoBehaviour
         _tween?.Kill();
         _tween = _rect.DOAnchorPos(_centerPos, _duration)
                       .SetEase(_ease)
-                      .SetUpdate(true) // timeScale ¿µÇâ ¹ŞÁö ¾ÊÀ½
+                      .SetUpdate(true) // timeScale ì˜í–¥ ë°›ì§€ ì•ŠìŒ
                       .OnComplete(() => onComplete?.Invoke());
     }
 
     /// <summary>
-    /// Áß¾Ó¿¡¼­ È­¸é À§·Î ½½¶óÀÌµå ¾Æ¿ô
+    /// ì¤‘ì•™ì—ì„œ í™”ë©´ ìœ„ë¡œ ìŠ¬ë¼ì´ë“œ ì•„ì›ƒ
     /// </summary>
     public void Hide(System.Action onComplete = null)
     {

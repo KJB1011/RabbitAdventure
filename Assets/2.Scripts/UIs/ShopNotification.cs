@@ -1,18 +1,18 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// »óÁ¡ Canvas À§¿¡¼­ µ¿ÀÛÇÏ´Â ±¸¸Å ¾Ë¸² ÅØ½ºÆ®.
-/// FloatingText°¡ WorldCanvas¶ó¼­ »óÁ¡¿¡¼­µµ »ç¿ëÇÒ ¼ö ÀÖ°Ô ÇÏ±â À§ÇÑ ÄÚµå
+/// ìƒì  Canvas ìœ„ì—ì„œ ë™ì‘í•˜ëŠ” êµ¬ë§¤ ì•Œë¦¼ í…ìŠ¤íŠ¸.
+/// FloatingTextê°€ WorldCanvasë¼ì„œ ìƒì ì—ì„œë„ ì‚¬ìš©í•  ìˆ˜ ìˆê²Œ í•˜ê¸° ìœ„í•œ ì½”ë“œ
 /// </summary>
 public class ShopNotification : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _text;
     [SerializeField] private RectTransform _rect;
 
-    [Header("¾Ö´Ï¸ŞÀÌ¼Ç")]
-    [SerializeField] private float _floatDistance = 80f;  // À§·Î ¿Ã¶ó°¡´Â °Å¸® (px)
+    [Header("ì• ë‹ˆë©”ì´ì…˜")]
+    [SerializeField] private float _floatDistance = 80f;  // ìœ„ë¡œ ì˜¬ë¼ê°€ëŠ” ê±°ë¦¬ (px)
     [SerializeField] private float _moveDuration = 0.7f;
     [SerializeField] private float _fadeDuration = 0.4f;
     [SerializeField] private float _fadeDelay = 0.3f;
@@ -25,7 +25,7 @@ public class ShopNotification : MonoBehaviour
         if (_text == null) _text = GetComponentInChildren<TextMeshProUGUI>();
 
         if (_text == null)
-            Debug.LogError("[ShopNotification] TextMeshProUGUI°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogError("[ShopNotification] TextMeshProUGUIê°€ ì—†ìŠµë‹ˆë‹¤.");
 
         gameObject.SetActive(false);
     }
@@ -41,11 +41,11 @@ public class ShopNotification : MonoBehaviour
         c.a = 1f;
         _text.color = c;
 
-        // ½ºÅ©¸° ÁÂÇ¥ ¡æ Canvas ³» ·ÎÄÃ ÁÂÇ¥ º¯È¯
+        // ìŠ¤í¬ë¦° ì¢Œí‘œ â†’ Canvas ë‚´ ë¡œì»¬ ì¢Œí‘œ ë³€í™˜
         Canvas canvas = GetComponentInParent<Canvas>();
         if (canvas == null)
         {
-            Debug.LogWarning("[ShopNotification] ºÎ¸ğ Canvas¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogWarning("[ShopNotification] ë¶€ëª¨ Canvasë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 

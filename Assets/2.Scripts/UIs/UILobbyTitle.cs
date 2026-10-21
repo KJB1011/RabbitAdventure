@@ -1,8 +1,8 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
-/// Ã¹ ·ÎºñÀÇ Àü¹ÝÀûÀÎ Èå¸§°ú ¿¬ÃâÀ» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
+/// ì²« ë¡œë¹„ì˜ ì „ë°˜ì ì¸ íë¦„ê³¼ ì—°ì¶œì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UILobbyTitle : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class UILobbyTitle : MonoBehaviour
     [SerializeField] GameObject _uiOptionWindow;
     [SerializeField] GameObject _uiCharSelectWindow;
 
-    [Header("ÆäÀÌÁö ÀüÈ¯ ¼³Á¤")]
+    [Header("íŽ˜ì´ì§€ ì „í™˜ ì„¤ì •")]
     [SerializeField] float _slideOffset = 800f;
     [SerializeField] float _outDuration = 0.35f;
     [SerializeField] float _inDuration = 0.4f;
@@ -53,14 +53,14 @@ public class UILobbyTitle : MonoBehaviour
         });
     }
 
-    // ¦¡¦¡ ¹öÆ° °øÅë ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ë²„íŠ¼ ê³µí†µ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void PlayButtonSFX()
     {
         SoundManager.Instance?.PlaySFX("SFX/Button");
     }
 
-    // ¦¡¦¡ ÆäÀÌÁö ÀüÈ¯ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ íŽ˜ì´ì§€ ì „í™˜ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void SlideOutToUp(GameObject targetUI, System.Action onComplete = null)
     {
@@ -110,7 +110,7 @@ public class UILobbyTitle : MonoBehaviour
               .OnComplete(() => onComplete?.Invoke());
     }
 
-    // ¦¡¦¡ ¹öÆ° ÀÌº¥Æ® ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ë²„íŠ¼ ì´ë²¤íŠ¸ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public void ClickPlayButton()
     {

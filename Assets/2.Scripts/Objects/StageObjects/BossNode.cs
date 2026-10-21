@@ -1,18 +1,18 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// BossEnemy°¡ µîÀåÇÏ´Â ³ëµå
+/// BossEnemyê°€ ë“±ì¥í•˜ëŠ” ë…¸ë“œ
 /// </summary>
 public class BossNode : NodeBase
 {
-    [Header("º¸½º ÇÁ¸®ÆÕ")]
+    [Header("ë³´ìŠ¤ í”„ë¦¬íŒ¹")]
     [SerializeField] GameObject _bossPrefab;
     [SerializeField] Vector3 _spawnPosition = Vector3.zero;
 
-    [Header("¹è°æ ¿¬Ãâ")]
+    [Header("ë°°ê²½ ì—°ì¶œ")]
     [SerializeField] SpriteRenderer _background;
-    [SerializeField] Color _bossBGColor = new Color(1f, 0.5f, 0.5f); // Èò»ö+»¡°£»ö Áß°£
+    [SerializeField] Color _bossBGColor = new Color(1f, 0.5f, 0.5f); // í°ìƒ‰+ë¹¨ê°„ìƒ‰ ì¤‘ê°„
     [SerializeField] float _colorFadeTime = 1.5f;
 
     Color _originalColor;
@@ -30,14 +30,14 @@ public class BossNode : NodeBase
 
         IngameManager.Instance._isBattle = true;
 
-        // ÇÁ¸®ÆÕ ½ºÆù
+        // í”„ë¦¬íŒ¹ ìŠ¤í°
         var go = Instantiate(_bossPrefab, _spawnPosition, Quaternion.identity);
         go.SetActive(true);
 
         _boss = go.GetComponent<EnemyController>();
         if (_boss == null)
         {
-            Debug.LogError("[BossNode] ÇÁ¸®ÆÕ¿¡ EnemyController °è¿­ ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogError("[BossNode] í”„ë¦¬íŒ¹ì— EnemyController ê³„ì—´ ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -51,7 +51,7 @@ public class BossNode : NodeBase
     {
         _boss.OnDied -= HandleBossDied;
 
-        // º¸½º Ã³Ä¡ ½Ã ¹è°æ»ö ¿øº¹
+        // ë³´ìŠ¤ ì²˜ì¹˜ ì‹œ ë°°ê²½ìƒ‰ ì›ë³µ
         if (_background != null)
             _background.DOColor(_originalColor, _colorFadeTime).SetEase(Ease.InOutSine);
 

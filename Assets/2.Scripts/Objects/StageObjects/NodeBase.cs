@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// ¸ğµç ³ëµå(ÀüÅõ/»óÀÚ/»óÁ¡/º¸½º)ÀÇ ±âº»ÇüÅÂ
-/// GameManager°¡ StartNode()¸¦ È£ÃâÇÏ°í, ³ëµå°¡ ³¡³ª¸é _onComplete()¸¦ ºÒ·¯¼­ ´ÙÀ½À¸·Î ³Ñ¾î°©´Ï´Ù.
+/// ëª¨ë“  ë…¸ë“œ(ì „íˆ¬/ìƒì/ìƒì /ë³´ìŠ¤)ì˜ ê¸°ë³¸í˜•íƒœ
+/// GameManagerê°€ StartNode()ë¥¼ í˜¸ì¶œí•˜ê³ , ë…¸ë“œê°€ ëë‚˜ë©´ _onComplete()ë¥¼ ë¶ˆëŸ¬ì„œ ë‹¤ìŒìœ¼ë¡œ ë„˜ì–´ê°‘ë‹ˆë‹¤.
 /// </summary>
 public abstract class NodeBase : MonoBehaviour
 {
@@ -14,10 +14,10 @@ public abstract class NodeBase : MonoBehaviour
         OnNodeStart();
     }
 
-    // °¢ ³ëµå°¡ ¹İµå½Ã ±¸ÇöÇØ¾ß ÇÏ´Â ½ÃÀÛ ·ÎÁ÷
+    // ê° ë…¸ë“œê°€ ë°˜ë“œì‹œ êµ¬í˜„í•´ì•¼ í•˜ëŠ” ì‹œì‘ ë¡œì§
     protected abstract void OnNodeStart();
 
-    // ³ëµå ¿Ï·á ½Ã È£Ãâ (°¢ ³ëµå ³»ºÎ¿¡¼­ Á¶°Ç ´Ş¼º ½Ã È£Ãâ)
+    // ë…¸ë“œ ì™„ë£Œ ì‹œ í˜¸ì¶œ (ê° ë…¸ë“œ ë‚´ë¶€ì—ì„œ ì¡°ê±´ ë‹¬ì„± ì‹œ í˜¸ì¶œ)
     protected void Complete()
     {
         _onComplete?.Invoke();

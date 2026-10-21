@@ -1,9 +1,9 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ¿É¼Ç UI¸¦ ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
+/// ì˜µì…˜ UIë¥¼ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UIOptionWindow : MonoBehaviour
 {

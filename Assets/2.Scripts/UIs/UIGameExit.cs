@@ -1,7 +1,7 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// °ÔÀÓ Á¾·áÃ¢ UI ½ºÅ©¸³Æ®
+/// ê²Œì„ ì¢…ë£Œì°½ UI ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UIGameExit : MonoBehaviour
 {

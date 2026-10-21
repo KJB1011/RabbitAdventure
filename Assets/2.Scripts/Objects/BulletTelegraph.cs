@@ -1,54 +1,54 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// Åº¸· ¹ß»ç Àü ±ËÀûÀ» ±ä »ç°¢ÇüÀ¸·Î Ç¥½ÃÇÕ´Ï´Ù.
+/// íƒ„ë§‰ ë°œì‚¬ ì „ ê¶¤ì ì„ ê¸´ ì‚¬ê°í˜•ìœ¼ë¡œ í‘œì‹œí•©ë‹ˆë‹¤.
 /// </summary>
 public class BulletTelegraph : MonoBehaviour
 {
-    [Header("¶óÀÎ ºñÁÖ¾ó")]
+    [Header("ë¼ì¸ ë¹„ì£¼ì–¼")]
     [SerializeField] private SpriteRenderer _lineSprite;
 
-    [Header("¶óÀÎ ¼³Á¤")]
-    [SerializeField] private float _lineLength = 12f;  // ±ËÀû ±æÀÌ
-    [SerializeField] private float _lineWidth = 0.08f; // ±ËÀû µÎ²²
+    [Header("ë¼ì¸ ì„¤ì •")]
+    [SerializeField] private float _lineLength = 12f;  // ê¶¤ì  ê¸¸ì´
+    [SerializeField] private float _lineWidth = 0.08f; // ê¶¤ì  ë‘ê»˜
 
-    [Header("»ö»ó")]
-    [SerializeField] private Color _startColor = new Color(1f, 0.3f, 0.3f, 0f);   // ½ÃÀÛ: Åõ¸í
-    [SerializeField] private Color _visibleColor = new Color(1f, 0.3f, 0.3f, 0.5f); // Ç¥½Ã »ö
+    [Header("ìƒ‰ìƒ")]
+    [SerializeField] private Color _startColor = new Color(1f, 0.3f, 0.3f, 0f);   // ì‹œì‘: íˆ¬ëª…
+    [SerializeField] private Color _visibleColor = new Color(1f, 0.3f, 0.3f, 0.5f); // í‘œì‹œ ìƒ‰
     [SerializeField] private float _fadeInTime = 0.15f;
 
     void Awake()
     {
         if (_lineSprite != null)
         {
-            // ±æ°í ¾ãÀº »ç°¢ÇüÀ¸·Î Å©±â ¼³Á¤
+            // ê¸¸ê³  ì–‡ì€ ì‚¬ê°í˜•ìœ¼ë¡œ í¬ê¸° ì„¤ì •
             transform.localScale = new Vector3(_lineLength, _lineWidth, 1f);
             _lineSprite.color = _startColor;
         }
     }
 
     /// <summary>
-    /// ÁöÁ¤ À§Ä¡¿¡¼­ ÁöÁ¤ ¹æÇâÀ¸·Î ±ËÀûÀ» Ç¥½ÃÇÕ´Ï´Ù.
-    /// origin: ¹ß»ç À§Ä¡, direction: ¹ß»ç ¹æÇâ
+    /// ì§€ì • ìœ„ì¹˜ì—ì„œ ì§€ì • ë°©í–¥ìœ¼ë¡œ ê¶¤ì ì„ í‘œì‹œí•©ë‹ˆë‹¤.
+    /// origin: ë°œì‚¬ ìœ„ì¹˜, direction: ë°œì‚¬ ë°©í–¥
     /// </summary>
     public void Show(Vector3 origin, Vector2 direction)
     {
-        // ¹æÇâÀ¸·Î È¸Àü
+        // ë°©í–¥ìœ¼ë¡œ íšŒì „
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // À§Ä¡: ¹ß»ç À§Ä¡¿¡¼­ ¹æÇâÀ¸·Î ¹İ¸¸Å­ ÀÌµ¿ (Áß½ÉÁ¡ ¸ÂÃß±â)
+        // ìœ„ì¹˜: ë°œì‚¬ ìœ„ì¹˜ì—ì„œ ë°©í–¥ìœ¼ë¡œ ë°˜ë§Œí¼ ì´ë™ (ì¤‘ì‹¬ì  ë§ì¶”ê¸°)
         transform.position = (Vector2)origin + direction.normalized * (_lineLength * 0.5f);
 
         gameObject.SetActive(true);
 
-        // ÆäÀÌµå ÀÎ
+        // í˜ì´ë“œ ì¸
         _lineSprite?.DOColor(_visibleColor, _fadeInTime);
     }
 
     /// <summary>
-    /// ±ËÀû Ç¥½Ã¸¦ ¼û±é´Ï´Ù.
+    /// ê¶¤ì  í‘œì‹œë¥¼ ìˆ¨ê¹ë‹ˆë‹¤.
     /// </summary>
     public void Hide(System.Action onComplete = null)
     {

@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -15,36 +15,36 @@ public class PlayerController : MonoBehaviour
     [SerializeField] TextMeshProUGUI _hpTxt;
     [SerializeField] TextMeshProUGUI _nameTxt;
 
-    [Header("Ä³¸¯ÅÍ ´É·ÂÄ¡")]
+    [Header("ìºë¦­í„° ëŠ¥ë ¥ì¹˜")]
     [SerializeField] float _speed = 1f;
     [SerializeField] int _hp = 10;
     [SerializeField] int _maxHp = 10;
     [SerializeField] float _atk;
     [SerializeField] float _critRate;
     [SerializeField] float _critDamageRate;
-    [SerializeField] float _rangeMultiplier = 1.0f; // PlayerAttack¿¡¼­ ÀÌµ¿
+    [SerializeField] float _rangeMultiplier = 1.0f; // PlayerAttackì—ì„œ ì´ë™
 
-    [Header("Äğ´Ù¿î (ÃÊ)")]
+    [Header("ì¿¨ë‹¤ìš´ (ì´ˆ)")]
     [SerializeField] float _mainSkillCooldownDuration = 0.5f;
     [SerializeField] float _subSkillCooldownDuration = 2f;
     [SerializeField] float _superSkillCooldownDuration = 8f;
     [SerializeField] float _specialSkillCooldownDuration = 15f;
 
-    [Header("ÇÇ°İ ¹«Àû")]
+    [Header("í”¼ê²© ë¬´ì ")]
     [SerializeField] float _invisibleTime = 1.5f;
     [SerializeField] float _blinkInterval = 0.1f;
 
-    [Header("ÇÊ»ì±â (Special)")]
+    [Header("í•„ì‚´ê¸° (Special)")]
     [SerializeField] float _specialDamageMultiplier = 30f;
     [SerializeField] float _specialInvincibleDelay = 1.0f;
     [SerializeField] SpecialSkillEffect _specialSkillEffect;
 
-    [Header("³ëµå ÀÌµ¿")]
-    [SerializeField] float _nodeMoveDuration = 1f; // ÀÌµ¿ ½Ã°£
+    [Header("ë…¸ë“œ ì´ë™")]
+    [SerializeField] float _nodeMoveDuration = 1f; // ì´ë™ ì‹œê°„
 
-    [Header("¸Ê °æ°è")]
-    [SerializeField] Vector2 _mapMin = new Vector2(-9f, -5f); // ¿ŞÂÊ ÇÏ´Ü
-    [SerializeField] Vector2 _mapMax = new Vector2(9f, 5f); // ¿À¸¥ÂÊ »ó´Ü
+    [Header("ë§µ ê²½ê³„")]
+    [SerializeField] Vector2 _mapMin = new Vector2(-9f, -5f); // ì™¼ìª½ í•˜ë‹¨
+    [SerializeField] Vector2 _mapMax = new Vector2(9f, 5f); // ì˜¤ë¥¸ìª½ ìƒë‹¨
 
     TrailRenderer _trailRenderer;
     SpriteRenderer _spriteRenderer;
@@ -65,12 +65,12 @@ public class PlayerController : MonoBehaviour
     float _superSkillCooldown;
     float _specialSkillCooldown;
 
-    float _atkMultiplierBonus = 0f;       // ¿ÜºÎ(¾ÆÆ¼ÆÑÆ®¡¤¹öÇÁ) °ø°İ·Â ¹èÀ² º¸³Ê½º
-    float _specialDamageBonus = 0f;       // ¿ÜºÎ ÇÊ»ì±â µ¥¹ÌÁö º¸³Ê½º
-    float _extraDashInvincibleTime = 0f;  // ¿ÜºÎ ´ë½¬ Ãß°¡ ¹«Àû ½Ã°£
+    float _atkMultiplierBonus = 0f;       // ì™¸ë¶€(ì•„í‹°íŒ©íŠ¸Â·ë²„í”„) ê³µê²©ë ¥ ë°°ìœ¨ ë³´ë„ˆìŠ¤
+    float _specialDamageBonus = 0f;       // ì™¸ë¶€ í•„ì‚´ê¸° ë°ë¯¸ì§€ ë³´ë„ˆìŠ¤
+    float _extraDashInvincibleTime = 0f;  // ì™¸ë¶€ ëŒ€ì‰¬ ì¶”ê°€ ë¬´ì  ì‹œê°„
 
     public event System.Action OnDashStarted;
-    public event System.Action<EnemyBase, AttackType> OnAttackHit;   // ¸ÂÀº Àû + °ø°İ Á¾·ù
+    public event System.Action<EnemyBase, AttackType> OnAttackHit;   // ë§ì€ ì  + ê³µê²© ì¢…ë¥˜
 
     public bool IsInvincible => _invincibleCount > 0;
     public int CurrentHp => _hp;
@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
     public float SuperSkillCooldownRatio => _superSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_superSkillCooldown / _superSkillCooldownDuration);
     public float SpecialSkillCooldownRatio => _specialSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_specialSkillCooldown / _specialSkillCooldownDuration);
     
-    // ¿ÜºÎ È¿°ú(¾ÆÆ¼ÆÑÆ®¡¤¹öÇÁ)¿ë ½ºÅÈ º¯°æ
+    // ì™¸ë¶€ íš¨ê³¼(ì•„í‹°íŒ©íŠ¸Â·ë²„í”„)ìš© ìŠ¤íƒ¯ ë³€ê²½
     public void AddAtkMultiplier(float bonus) => _atkMultiplierBonus += bonus;
     public void RemoveAtkMultiplier(float bonus) => _atkMultiplierBonus -= bonus;
     public void AddSpecialDamageBonus(float bonus) => _specialDamageBonus += bonus;
@@ -93,24 +93,24 @@ public class PlayerController : MonoBehaviour
     public int GetBaseAtk() => (int)_atk;
 
 
-    // EnemyHitbox ¿¡¼­ ÇÃ·¹ÀÌ¾î °ø°İ ÀûÁß ½Ã È£Ãâ
+    // EnemyHitbox ì—ì„œ í”Œë ˆì´ì–´ ê³µê²© ì ì¤‘ ì‹œ í˜¸ì¶œ
     public void NotifyAttackHit(EnemyBase target, AttackType type) => OnAttackHit?.Invoke(target, type);
     public AttackType GetAttackType(Collider2D attackCollider) => _playerAttack.GetAttackType(attackCollider);
 
-    // Q ½ºÅ³ ÄğÅ¸ÀÓ °¨¼Ò (¿ÜºÎ È¿°ú¿ë)
+    // Q ìŠ¤í‚¬ ì¿¨íƒ€ì„ ê°ì†Œ (ì™¸ë¶€ íš¨ê³¼ìš©)
     public void ReduceSuperSkillCooldown(float amount)
     {
         _superSkillCooldown = Mathf.Max(0, _superSkillCooldown - amount);
-        _uiPlayerSkill.SetCoolDown(SKILL.SUPER, SuperSkillCooldownRatio);   // 0ÀÌ µÇ¸é Update°¡ °»½ÅÇÏÁö ¾ÊÀ¸¹Ç·Î Á÷Á¢ °»½Å
+        _uiPlayerSkill.SetCoolDown(SKILL.SUPER, SuperSkillCooldownRatio);   // 0ì´ ë˜ë©´ Updateê°€ ê°±ì‹ í•˜ì§€ ì•Šìœ¼ë¯€ë¡œ ì§ì ‘ ê°±ì‹ 
     }
 
-    // ÇÃ·¹ÀÌ¾î ¿òÁ÷ÀÓ Á¦¾î ÇÔ¼ö
+    // í”Œë ˆì´ì–´ ì›€ì§ì„ ì œì–´ í•¨ìˆ˜
     public void SetControllable(bool value)
     {
         _isControllable = value;
     }
 
-    // Ä³¸¯ÅÍ ¸Ê Á¦ÇÑ Á¦¾î ÇÔ¼ö
+    // ìºë¦­í„° ë§µ ì œí•œ ì œì–´ í•¨ìˆ˜
     public void SetBoundary(bool enabled)
     {
         _boundaryEnabled = enabled;
@@ -183,7 +183,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Á¶ÀÛÀº InputActionSystemÀ» È°¿ë
+    // ì¡°ì‘ì€ InputActionSystemì„ í™œìš©
     void OnMove(InputValue iValue) => _dir = iValue.Get<Vector2>();
 
     void OnAttack()
@@ -233,7 +233,7 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(SpecialSkillRoutine());
     }
 
-    // ÇÃ·¹ÀÌ¾î¿¡ Ç¥½ÃµÇ´Â ÅØ½ºÆ® ÃÊ±âÈ­ ¹× ÇÊ»ì±â ¿¬Ãâ Äµ¹ö½º ¿¬°á
+    // í”Œë ˆì´ì–´ì— í‘œì‹œë˜ëŠ” í…ìŠ¤íŠ¸ ì´ˆê¸°í™” ë° í•„ì‚´ê¸° ì—°ì¶œ ìº”ë²„ìŠ¤ ì—°ê²°
     public void SetInitChar(string name)
     {
         _hpTxt.text = _maxHp.ToString();
@@ -244,15 +244,15 @@ public class PlayerController : MonoBehaviour
     }
     public IEnumerator MoveToPositionRoutine(Vector2 target)
     {
-        // ÁøÇà ÁßÀÎ ½ºÅ³ °­Á¦ Áß´Ü + »óÅÂ ÃÊ±âÈ­
-        StopAllCoroutines(); // ½´ÆÛ½ºÅ³, ´ë½¬ µî ¸ğµç ÄÚ·çÆ¾ Áß´Ü
+        // ì§„í–‰ ì¤‘ì¸ ìŠ¤í‚¬ ê°•ì œ ì¤‘ë‹¨ + ìƒíƒœ ì´ˆê¸°í™”
+        StopAllCoroutines(); // ìŠˆí¼ìŠ¤í‚¬, ëŒ€ì‰¬ ë“± ëª¨ë“  ì½”ë£¨í‹´ ì¤‘ë‹¨
         _playerAttack.ForceStop();
 
         _isAttack = false;
         _isDashing = false;
         _damageMultiplier = 1f;
 
-        // Time.timeScaleÀÌ 0ÀÏ °æ¿ì ´ëºñ º¹±¸
+        // Time.timeScaleì´ 0ì¼ ê²½ìš° ëŒ€ë¹„ ë³µêµ¬
         if (Time.timeScale == 0f)
             Time.timeScale = 1f;
 
@@ -271,14 +271,14 @@ public class PlayerController : MonoBehaviour
 
         transform.position = target;
 
-        // ¹«Àû/È÷Æ®¹Ú½º »óÅÂµµ ÃÊ±âÈ­
+        // ë¬´ì /íˆíŠ¸ë°•ìŠ¤ ìƒíƒœë„ ì´ˆê¸°í™”
         _invincibleCount = 0;
         _playerHitBox.enabled = true;
         _spriteRenderer.enabled = true;
 
         SetControllable(true);
     }
-    // Áö¼Ó½Ã°£µ¿¾È ¹«Àû ºÎ¿©
+    // ì§€ì†ì‹œê°„ë™ì•ˆ ë¬´ì  ë¶€ì—¬
     public void StartInvincible(float duration)
     {
         StartCoroutine(ExternalInvincibleRoutine(duration));
@@ -295,7 +295,7 @@ public class PlayerController : MonoBehaviour
         if (_invincibleCount <= 0)
             _playerHitBox.enabled = true;
     }
-    // ³ëµå Àç½ÃÀÛ¿ë ÃÊ±âÈ­
+    // ë…¸ë“œ ì¬ì‹œì‘ìš© ì´ˆê¸°í™”
     public void ResetState()
     {
         _hp = _maxHp;
@@ -309,7 +309,7 @@ public class PlayerController : MonoBehaviour
         _spriteRenderer.enabled = true;
         _trailRenderer.enabled = false;
 
-        // Äğ´Ù¿î ÃÊ±âÈ­
+        // ì¿¨ë‹¤ìš´ ì´ˆê¸°í™”
         _mainSkillCooldown = 0f;
         _subSkillCooldown = 0f;
         _superSkillCooldown = 0f;
@@ -319,13 +319,13 @@ public class PlayerController : MonoBehaviour
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SUPER, 0f);
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SPECIAL, 0f);
 
-        // HP ÅØ½ºÆ® °»½Å
+        // HP í…ìŠ¤íŠ¸ ê°±ì‹ 
         if (_hpTxt != null)
             _hpTxt.text = _hp.ToString();
 
         SetControllable(true);
     }
-    // ¦¡¦¡ ¾ÆÀÌÅÛ È¿°ú Àû¿ë ¸Ş¼­µå ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì•„ì´í…œ íš¨ê³¼ ì ìš© ë©”ì„œë“œ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void RecoverHp(int amount)
     {
         _hp = Mathf.Min(_hp + amount, _maxHp);
@@ -348,7 +348,7 @@ public class PlayerController : MonoBehaviour
         _critRate += amount;
     }
 
-    // ¦¡¦¡ ÇÊ»ì±â ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ í•„ì‚´ê¸° â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     IEnumerator SpecialSkillRoutine()
     {
         _isAttack = true;
@@ -359,7 +359,7 @@ public class PlayerController : MonoBehaviour
         VFXManager.Instance.PlayAttached("SpecialCharge", transform);
         yield return new WaitForSecondsRealtime(_specialInvincibleDelay);
 
-        // PlayerController(Ç×»ó È°¼º)¿¡¼­ ½º³À¼¦ Âï±â
+        // PlayerController(í•­ìƒ í™œì„±)ì—ì„œ ìŠ¤ëƒ…ìƒ· ì°ê¸°
         yield return new WaitForEndOfFrame();
         Texture2D screenshot = ScreenCapture.CaptureScreenshotAsTexture();
 
@@ -385,7 +385,7 @@ public class PlayerController : MonoBehaviour
         float totalMultiplier = _specialDamageMultiplier * (1f + _specialDamageBonus);
         int damage = Mathf.RoundToInt(DamageReturn() * totalMultiplier);
 
-        // Àû µ¥¹ÌÁö
+        // ì  ë°ë¯¸ì§€
         var enemies = FindObjectsByType<EnemyBase>(FindObjectsSortMode.None);
         foreach (var enemy in enemies)
         {
@@ -394,7 +394,7 @@ public class PlayerController : MonoBehaviour
             DamageTextManager.Instance.ShowSpecial(damage, enemy.transform.position);
         }
 
-        // »óÀÚ µ¥¹ÌÁö (ChestObject´Â EnemyBase ¹Ì»ó¼Ó)
+        // ìƒì ë°ë¯¸ì§€ (ChestObjectëŠ” EnemyBase ë¯¸ìƒì†)
         var chests = FindObjectsByType<ChestObject>(FindObjectsSortMode.None);
         foreach (var chest in chests)
         {
@@ -403,17 +403,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ¦¡¦¡ Q ½ºÅ³ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ Q ìŠ¤í‚¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     IEnumerator SuperSkillRoutine()
     {
         _isAttack = true;
 
-        // 1ÃÊµ¿¾È Â÷Â¡
+        // 1ì´ˆë™ì•ˆ ì°¨ì§•
         Coroutine blinkRoutine = StartCoroutine(BlinkCharge(1f));
         yield return new WaitForSeconds(1f);
         StopCoroutine(blinkRoutine);
 
-        // ±ôºıÀÓ ³¡³ª¸é »ö»ó º¹±¸
+        // ê¹œë¹¡ì„ ëë‚˜ë©´ ìƒ‰ìƒ ë³µêµ¬
         _spriteRenderer.color = Color.white;
 
         _damageMultiplier = 8f;
@@ -430,11 +430,11 @@ public class PlayerController : MonoBehaviour
     IEnumerator BlinkCharge(float duration)
     {
         float elapsed = 0f;
-        float blinkInterval = 0.08f; // ±ôºıÀÓ °£°İ (ÀÛÀ»¼ö·Ï ºü¸§)
+        float blinkInterval = 0.08f; // ê¹œë¹¡ì„ ê°„ê²© (ì‘ì„ìˆ˜ë¡ ë¹ ë¦„)
         bool isWhite = false;
 
         Color normalColor = Color.white;
-        Color blinkColor = new Color(1f, 1f, 0.2f, 1f); // ³ë¶õºû Èò»öÀ¸·Î ±â ¸ğÀ¸´Â ´À³¦
+        Color blinkColor = new Color(1f, 1f, 0.2f, 1f); // ë…¸ë€ë¹› í°ìƒ‰ìœ¼ë¡œ ê¸° ëª¨ìœ¼ëŠ” ëŠë‚Œ
 
         while (elapsed < duration)
         {
@@ -446,7 +446,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ¦¡¦¡ µ¥¹ÌÁö °è»ê ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ë°ë¯¸ì§€ ê³„ì‚° â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public int DamageReturn()
     {
         return DamageReturn(out _);
@@ -485,7 +485,7 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(0.5f);
 
-        // Ä«¸Ş¶ó ÁÜÀÎ
+        // ì¹´ë©”ë¼ ì¤Œì¸
         var cam = Camera.main;
         if (cam != null)
         {
@@ -497,7 +497,7 @@ public class PlayerController : MonoBehaviour
 
             cam.transform.DOMove(targetPos, zoomDuration)
                          .SetEase(Ease.InOutQuad)
-                         .SetUpdate(true); // timeScale 0ÀÌ¾îµµ µ¿ÀÛ
+                         .SetUpdate(true); // timeScale 0ì´ì–´ë„ ë™ì‘
 
             cam.DOOrthoSize(cam.orthographicSize * 0.4f, zoomDuration)
                .SetEase(Ease.InOutQuad)
@@ -511,7 +511,7 @@ public class PlayerController : MonoBehaviour
         IngameManager.Instance.ShowGameover();
     }
 
-    // ¦¡¦¡ ÇÇ°İ ¹«Àû + ±ôºıÀÓ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ í”¼ê²© ë¬´ì  + ê¹œë¹¡ì„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     IEnumerator InvincibleRoutine()
     {
         _invincibleCount++;
@@ -533,7 +533,7 @@ public class PlayerController : MonoBehaviour
             _playerHitBox.enabled = true;
     }
 
-    // ¦¡¦¡ ´ë½¬ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ëŒ€ì‰¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     IEnumerator DashRoutine()
     {
         _isDashing = true;

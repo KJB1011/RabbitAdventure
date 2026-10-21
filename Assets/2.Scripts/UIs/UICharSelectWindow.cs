@@ -1,9 +1,9 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Ä³¸¯ÅÍ ¼±ÅÃÃ¢UI ½ºÅ©¸³Æ®
+/// ìºë¦­í„° ì„ íƒì°½UI ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UICharSelectWindow : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class UICharSelectWindow : MonoBehaviour
     [SerializeField] TMP_InputField _nickInputField;
     [SerializeField] TextMeshProUGUI _nickNoticeText;
 
-    [Header("´Ğ³×ÀÓ ¼³Á¤")]
+    [Header("ë‹‰ë„¤ì„ ì„¤ì •")]
     [SerializeField] int _maxLength = 10;
 
     void Start()
@@ -27,18 +27,18 @@ public class UICharSelectWindow : MonoBehaviour
     {
         bool isEmpty = string.IsNullOrWhiteSpace(value);
 
-        // ¹öÆ° È°¼ºÈ­
+        // ë²„íŠ¼ í™œì„±í™”
         _playButton.interactable = !isEmpty;
 
-        // ¾È³» ÅØ½ºÆ®
+        // ì•ˆë‚´ í…ìŠ¤íŠ¸
         if (isEmpty)
         {
-            _nickNoticeText.text = "´Ğ³×ÀÓÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.";
+            _nickNoticeText.text = "ë‹‰ë„¤ì„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.";
             _nickNoticeText.color = Color.red;
         }
         else if (value.Length >= _maxLength)
         {
-            _nickNoticeText.text = $"ÃÖ´ë {_maxLength}±ÛÀÚ±îÁö ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.";
+            _nickNoticeText.text = $"ìµœëŒ€ {_maxLength}ê¸€ìê¹Œì§€ ì…ë ¥ ê°€ëŠ¥í•©ë‹ˆë‹¤.";
             _nickNoticeText.color = Color.yellow;
         }
         else

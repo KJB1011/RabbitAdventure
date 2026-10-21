@@ -1,19 +1,19 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// EnemyÁß ChaserÀÇ Çàµ¿À» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
-/// ÇÃ·¹ÀÌ¾î¿¡°Ô ÀÌµ¿ -> Åº¸· Èğ»Ñ¸®±â -> ½ÊÀÚ¹üÀ§¿¡ ¿øÇü¹üÀ§°ø°İ
-/// ÇØ´ç Çàµ¿À» ¹İº¹ÇÑ´Ù.
+/// Enemyì¤‘ Chaserì˜ í–‰ë™ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
+/// í”Œë ˆì´ì–´ì—ê²Œ ì´ë™ -> íƒ„ë§‰ í©ë¿Œë¦¬ê¸° -> ì‹­ìë²”ìœ„ì— ì›í˜•ë²”ìœ„ê³µê²©
+/// í•´ë‹¹ í–‰ë™ì„ ë°˜ë³µí•œë‹¤.
 /// </summary>
 public class Enemy_Chaser : EnemyController
 {
-    [Header("ÆĞÅÏ ¼³Á¤")]
+    [Header("íŒ¨í„´ ì„¤ì •")]
     [SerializeField] private float _waitBeforeShot = 1f;
     [SerializeField] private float _waitAfterShot = 1.5f;
 
-    [Header("½ÊÀÚ ¹üÀ§ °ø°İ")]
-    [SerializeField] private float _crossOffset = 3f;   // ½ÊÀÚ °£°İ
+    [Header("ì‹­ì ë²”ìœ„ ê³µê²©")]
+    [SerializeField] private float _crossOffset = 3f;   // ì‹­ì ê°„ê²©
     [SerializeField] private Vector2 _crossAreaSize = new Vector2(2.5f, 2.5f);
 
     private int _patternCount = 0;
@@ -36,16 +36,16 @@ public class Enemy_Chaser : EnemyController
         while (true)
         {
             if (_patternCount % 2 == 0)
-                yield return StartCoroutine(PatternDash()); // µ¹Áø + Åº¸·
+                yield return StartCoroutine(PatternDash()); // ëŒì§„ + íƒ„ë§‰
             else
-                yield return StartCoroutine(PatternCrossArea()); // ½ÊÀÚ ¹üÀ§
+                yield return StartCoroutine(PatternCrossArea()); // ì‹­ì ë²”ìœ„
 
             _patternCount++;
             yield return new WaitForSeconds(0.5f);
         }
     }
 
-    // ¦¡¦¡ µ¹Áø + ¹æ»çÇü Åº¸· ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ëŒì§„ + ë°©ì‚¬í˜• íƒ„ë§‰ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternDash()
     {
@@ -62,11 +62,11 @@ public class Enemy_Chaser : EnemyController
         yield return new WaitForSeconds(_waitAfterShot);
     }
 
-    // ¦¡¦¡ ½ÊÀÚ ¹üÀ§ °ø°İ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì‹­ì ë²”ìœ„ ê³µê²© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternCrossArea()
     {
-        // ÀÚ±â À§Ä¡ ±âÁØ ½ÊÀÚ 4¹æÇâ ¹üÀ§ °ø°İ
+        // ìê¸° ìœ„ì¹˜ ê¸°ì¤€ ì‹­ì 4ë°©í–¥ ë²”ìœ„ ê³µê²©
         Vector3 origin = transform.position;
         Vector3[] positions = new Vector3[]
         {

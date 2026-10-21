@@ -1,20 +1,20 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// ¿ø¸ğ¾ç °ø°İ ÀüÁ¶ Ç¥½Ã ÄÄÆ÷³ÍÆ®
+/// ì›ëª¨ì–‘ ê³µê²© ì „ì¡° í‘œì‹œ ì»´í¬ë„ŒíŠ¸
 /// </summary>
 public class TelegraphIndicator : MonoBehaviour
 {
-    [Header("¸ğ¾ç ¼³Á¤")]
+    [Header("ëª¨ì–‘ ì„¤ì •")]
     [SerializeField] SpriteRenderer _spriteRenderer;
 
-    [Header("»ö»ó")]
-    [SerializeField] Color _startColor = new Color(1f, 0.3f, 0.3f, 0.3f); // ¹İÅõ¸í »¡°­
-    [SerializeField] Color _flashColor = new Color(1f, 0.3f, 0.3f, 0.8f); // Á¡Á¡ ÁøÇØÁü
+    [Header("ìƒ‰ìƒ")]
+    [SerializeField] Color _startColor = new Color(1f, 0.3f, 0.3f, 0.3f); // ë°˜íˆ¬ëª… ë¹¨ê°•
+    [SerializeField] Color _flashColor = new Color(1f, 0.3f, 0.3f, 0.8f); // ì ì  ì§„í•´ì§
 
-    [Header("¾Ö´Ï¸ŞÀÌ¼Ç")]
-    [SerializeField] float _pulseDuration = 0.3f; // ±ôºıÀÓ °£°İ
+    [Header("ì• ë‹ˆë©”ì´ì…˜")]
+    [SerializeField] float _pulseDuration = 0.3f; // ê¹œë¹¡ì„ ê°„ê²©
 
     Tween _pulseTween;
 
@@ -34,7 +34,7 @@ public class TelegraphIndicator : MonoBehaviour
         if (_spriteRenderer != null)
             _spriteRenderer.color = _startColor;
 
-        // Á¡Á¡ ¹à¾ÆÁö´Â ÆŞ½º È¿°ú
+        // ì ì  ë°ì•„ì§€ëŠ” í„ìŠ¤ íš¨ê³¼
         _pulseTween?.Kill();
         _pulseTween = _spriteRenderer
             .DOColor(_flashColor, _pulseDuration)

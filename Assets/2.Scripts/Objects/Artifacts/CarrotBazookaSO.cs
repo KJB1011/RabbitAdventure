@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 [CreateAssetMenu(menuName = "Artifact/Carrot Bazooka", fileName = "CarrotBazooka")]
 public class CarrotBazookaSO : ArtifactSO
@@ -9,7 +9,7 @@ public class CarrotBazookaSO : ArtifactSO
 }
 
 /// <summary>
-/// « ªÏ±‚ µ•πÃ¡ˆ ¡ı∞°
+/// ÌïÑÏÇ¥Í∏∞ Îç∞ÎØ∏ÏßÄ Ï¶ùÍ∞Ä
 /// </summary>
 public class Artifact_CarrotBazooka : ArtifactEffect
 {

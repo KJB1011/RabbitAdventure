@@ -1,15 +1,15 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Enemy - ¿øÇü¹üÀ§¿¡ µ¥¹ÌÁö¸¦ ³Ö´Â °ø°İ
+/// Enemy - ì›í˜•ë²”ìœ„ì— ë°ë¯¸ì§€ë¥¼ ë„£ëŠ” ê³µê²©
 /// </summary>
 public class AreaDamageZone : MonoBehaviour
 {
-    [Header("ÄÄÆ÷³ÍÆ® ÂüÁ¶")]
+    [Header("ì»´í¬ë„ŒíŠ¸ ì°¸ì¡°")]
     [SerializeField] TelegraphIndicator _telegraph;
 
-    [Header("¿¬Ãâ")]
+    [Header("ì—°ì¶œ")]
     [SerializeField] float _lingerDuration = 0.2f;
 
     System.Action _onComplete;
@@ -54,11 +54,11 @@ public class AreaDamageZone : MonoBehaviour
         }
     }
 
-    // ÁøÇà ÁßÀÎ °ø°İÀ» Áï½Ã Áß´Ü (½ÃÀüÀÚ°¡ »ç¸ÁÇßÀ» ¶§)
+    // ì§„í–‰ ì¤‘ì¸ ê³µê²©ì„ ì¦‰ì‹œ ì¤‘ë‹¨ (ì‹œì „ìê°€ ì‚¬ë§í–ˆì„ ë•Œ)
     public void Cancel()
     {
         StopAllCoroutines();
-        _telegraph.Hide(); // ¹«ÇÑ ·çÇÁ pulse tween Kill
+        _telegraph.Hide(); // ë¬´í•œ ë£¨í”„ pulse tween Kill
         _onComplete = null;
         gameObject.SetActive(false);
     }

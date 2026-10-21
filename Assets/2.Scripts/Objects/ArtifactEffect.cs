@@ -1,15 +1,15 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// ¸ğµç ¾ÆÆ¼ÆÑÆ® È¿°úÀÇ Ãß»ó ±â¹İ.
-/// PlayerController ÀÌº¥Æ®¸¦ ±¸µ¶ÇØ È¿°ú¸¦ Àû¿ëÇÏ°í,
-/// Deactivate ½Ã ±¸µ¶°ú È¿°ú¸¦ ÇØÁ¦ÇÕ´Ï´Ù.
+/// ëª¨ë“  ì•„í‹°íŒ©íŠ¸ íš¨ê³¼ì˜ ì¶”ìƒ ê¸°ë°˜.
+/// PlayerController ì´ë²¤íŠ¸ë¥¼ êµ¬ë…í•´ íš¨ê³¼ë¥¼ ì ìš©í•˜ê³ ,
+/// Deactivate ì‹œ êµ¬ë…ê³¼ íš¨ê³¼ë¥¼ í•´ì œí•©ë‹ˆë‹¤.
 /// </summary>
 public abstract class ArtifactEffect
 {
     protected PlayerController Player { get; private set; }
-    private MonoBehaviour _runner;   // ÄÚ·çÆ¾ ½ÇÇà ÁÖÃ¼ (ArtifactManager)
+    private MonoBehaviour _runner;   // ì½”ë£¨í‹´ ì‹¤í–‰ ì£¼ì²´ (ArtifactManager)
 
     public void Activate(PlayerController player, MonoBehaviour runner)
     {
@@ -24,7 +24,7 @@ public abstract class ArtifactEffect
         Player = null;
     }
 
-    // ³ëµå ÀÌµ¿ ½Ã Player.StopAllCoroutines()¿¡ ²÷±âÁö ¾Êµµ·Ï Manager¿¡¼­ ½ÇÇà
+    // ë…¸ë“œ ì´ë™ ì‹œ Player.StopAllCoroutines()ì— ëŠê¸°ì§€ ì•Šë„ë¡ Managerì—ì„œ ì‹¤í–‰
     protected Coroutine StartRoutine(IEnumerator routine) => _runner.StartCoroutine(routine);
 
     protected void StopRoutine(Coroutine routine)

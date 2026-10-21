@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using static Defines;
 
 [CreateAssetMenu(menuName = "Artifact/Acceleration Watch", fileName = "AccelerationWatch")]
@@ -11,7 +11,7 @@ public class AccelerationWatchSO : ArtifactSO
 }
 
 /// <summary>
-/// ±âº» °ø°İ ÀûÁß ½Ã Q ½ºÅ³ ÄğÅ¸ÀÓ °¨¼Ò
+/// ê¸°ë³¸ ê³µê²© ì ì¤‘ ì‹œ Q ìŠ¤í‚¬ ì¿¨íƒ€ì„ ê°ì†Œ
 /// </summary>
 public class Artifact_AccelerationWatch : ArtifactEffect
 {

@@ -1,10 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 
 /// <summary>
-/// Àâ´ÙÇÑ ÇïÆÛÇÔ¼öµéÀÌ ÀÖ´Â ½ºÅ©¸³Æ®
-/// ¸¶¿ì½º À§Ä¡Ã£±â, ¿ÀºêÁ§Æ® Èçµé±â ±â´ÉÀÌ ÀÖ½À´Ï´Ù.
+/// ì¡ë‹¤í•œ í—¬í¼í•¨ìˆ˜ë“¤ì´ ìˆëŠ” ìŠ¤í¬ë¦½íŠ¸
+/// ë§ˆìš°ìŠ¤ ìœ„ì¹˜ì°¾ê¸°, ì˜¤ë¸Œì íŠ¸ í”ë“¤ê¸° ê¸°ëŠ¥ì´ ìˆìŠµë‹ˆë‹¤.
 /// </summary>
 public class Utils : MonoBehaviour
 {

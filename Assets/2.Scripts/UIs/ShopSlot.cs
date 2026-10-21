@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,26 +7,26 @@ using DG.Tweening;
 using static Defines;
 
 /// <summary>
-/// »óÁ¡¿¡ ÀÖ´Â ¾ÆÀÌÅÛ ½½·Ô(¹öÆ°)À» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
+/// ìƒì ì— ìˆëŠ” ì•„ì´í…œ ìŠ¬ë¡¯(ë²„íŠ¼)ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class ShopSlot : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    [Header("UI ÂüÁ¶")]
+    [Header("UI ì°¸ì¡°")]
     [SerializeField] Image _itemImage;
     [SerializeField] TextMeshProUGUI _priceText;
     [SerializeField] RectTransform _imageRect;
     [SerializeField] GameObject _descPanel;
     [SerializeField] TextMeshProUGUI _descText;
 
-    [Header("½½·Ô ¼³Á¤")]
-    [SerializeField] bool _isFixedItem = false; // °íÁ¤ ¾ÆÀÌÅÛÀÌ¸é Ã¼Å©
+    [Header("ìŠ¬ë¡¯ ì„¤ì •")]
+    [SerializeField] bool _isFixedItem = false; // ê³ ì • ì•„ì´í…œì´ë©´ ì²´í¬
 
-    [Header("È£¹ö ¼³Á¤")]
+    [Header("í˜¸ë²„ ì„¤ì •")]
     [SerializeField] float _hoverScale = 1.15f;
     [SerializeField] float _hoverDuration = 0.15f;
 
-    [Header("±¸¸Å ¾Ë¸²")]
+    [Header("êµ¬ë§¤ ì•Œë¦¼")]
     [SerializeField] ShopNotification _notification;
 
     public enum SlotType { Artifact, FixedItem }
@@ -39,7 +39,7 @@ public class ShopSlot : MonoBehaviour,
     Vector3 _originalScale;
     Action _onPurchased;
 
-    // ¦¡¦¡ ½½·Ô ÃÊ±âÈ­ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ìŠ¬ë¡¯ ì´ˆê¸°í™” â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public void SetupArtifact(ArtifactSO data, Action onPurchased)
     {
@@ -84,7 +84,7 @@ public class ShopSlot : MonoBehaviour,
         if (_descPanel != null) _descPanel.SetActive(false);
     }
 
-    // ¦¡¦¡ È£¹ö ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ í˜¸ë²„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public void OnPointerEnter(PointerEventData _)
     {
@@ -92,7 +92,7 @@ public class ShopSlot : MonoBehaviour,
             _imageRect.DOScale(_originalScale * _hoverScale, _hoverDuration)
                       .SetEase(Ease.OutBack);
 
-        // °íÁ¤ ¾ÆÀÌÅÛÀº ¼³¸íÃ¢ ¾È ¿­¸²
+        // ê³ ì • ì•„ì´í…œì€ ì„¤ëª…ì°½ ì•ˆ ì—´ë¦¼
         if (!_isFixedItem && _descPanel != null)
             _descPanel.SetActive(true);
     }
@@ -107,7 +107,7 @@ public class ShopSlot : MonoBehaviour,
             _descPanel.SetActive(false);
     }
 
-    // ¦¡¦¡ Å¬¸¯ (±¸¸Å) ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ í´ë¦­ (êµ¬ë§¤) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public void OnPointerClick(PointerEventData _)
     {
@@ -115,7 +115,7 @@ public class ShopSlot : MonoBehaviour,
 
         if (IngameManager.Instance.Gold < _price)
         {
-            ShowFloatingText("ÀÚ±İ ºÎÁ·!", Color.red);
+            ShowFloatingText("ìê¸ˆ ë¶€ì¡±!", Color.red);
             return;
         }
 
@@ -127,7 +127,7 @@ public class ShopSlot : MonoBehaviour,
                 ArtifactManager.Instance.Acquire(_artifactData);
                 _sold = true;
                 _itemImage.color = new Color(1f, 1f, 1f, 0.3f);
-                _priceText.text = "±¸¸Å ¿Ï·á";
+                _priceText.text = "êµ¬ë§¤ ì™„ë£Œ";
                 break;
 
             case SlotType.FixedItem:
@@ -135,7 +135,7 @@ public class ShopSlot : MonoBehaviour,
                 break;
         }
 
-        ShowFloatingText("±¸¸Å¿Ï·á!", new Color(0.2f, 0.9f, 0.2f));
+        ShowFloatingText("êµ¬ë§¤ì™„ë£Œ!", new Color(0.2f, 0.9f, 0.2f));
         _onPurchased?.Invoke();
     }
 
@@ -152,13 +152,13 @@ public class ShopSlot : MonoBehaviour,
         }
     }
 
-    // ¦¡¦¡ ¾Ë¸² ÅØ½ºÆ® ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì•Œë¦¼ í…ìŠ¤íŠ¸ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void ShowFloatingText(string content, Color color)
     {
         if (_notification == null)
         {
-            Debug.LogWarning("[ShopSlot] _notificationÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogWarning("[ShopSlot] _notificationì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
         _notification.Show(content, color, transform.position);

@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using static Defines;
 
 /// <summary>
-/// Chest¸¸À» À§ÇÑ Hitbox
+/// Chestë§Œì„ ìœ„í•œ Hitbox
 /// </summary>
 public class ChestHitbox : MonoBehaviour
 {

@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î°¡ º¸À¯ÇÑ ¾ÆÆ¼ÆÑÆ®¸¦ °ü¸®ÇÕ´Ï´Ù.
-/// ¾ÆÆ¼ÆÑÆ® È¹µæ/Á¦°Å¿Í È¿°ú È°¼ºÈ­/ºñÈ°¼ºÈ­¸¦ ´ã´çÇÏ¸ç,
-/// È¿°úÀÇ ÄÚ·çÆ¾ ½ÇÇà ÁÖÃ¼ ¿ªÇÒµµ ÇÕ´Ï´Ù.
+/// í”Œë ˆì´ì–´ê°€ ë³´ìœ í•œ ì•„í‹°íŒ©íŠ¸ë¥¼ ê´€ë¦¬í•©ë‹ˆë‹¤.
+/// ì•„í‹°íŒ©íŠ¸ íšë“/ì œê±°ì™€ íš¨ê³¼ í™œì„±í™”/ë¹„í™œì„±í™”ë¥¼ ë‹´ë‹¹í•˜ë©°,
+/// íš¨ê³¼ì˜ ì½”ë£¨í‹´ ì‹¤í–‰ ì£¼ì²´ ì—­í• ë„ í•©ë‹ˆë‹¤.
 /// </summary>
 public class ArtifactManager : MonoBehaviour
 {
@@ -35,13 +35,13 @@ public class ArtifactManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¾ÆÆ¼ÆÑÆ®¸¦ È¹µæÇÕ´Ï´Ù. (»óÁ¡ ±¸¸Å)
+    /// ì•„í‹°íŒ©íŠ¸ë¥¼ íšë“í•©ë‹ˆë‹¤. (ìƒì  êµ¬ë§¤)
     /// </summary>
     public bool Acquire(ArtifactSO data)
     {
         if (data == null || _activeEffects.ContainsKey(data))
         {
-            Debug.Log($"[Artifact] È¹µæ ºÒ°¡ (¾øÀ½ ¶Ç´Â º¸À¯ Áß): {data?.artifactName}");
+            Debug.Log($"[Artifact] íšë“ ë¶ˆê°€ (ì—†ìŒ ë˜ëŠ” ë³´ìœ  ì¤‘): {data?.artifactName}");
             return false;
         }
 
@@ -49,12 +49,12 @@ public class ArtifactManager : MonoBehaviour
         effect.Activate(_player, this);
         _activeEffects[data] = effect;
 
-        Debug.Log($"[Artifact] È¹µæ: {data.artifactName}");
+        Debug.Log($"[Artifact] íšë“: {data.artifactName}");
         return true;
     }
 
     /// <summary>
-    /// ¾ÆÆ¼ÆÑÆ®¸¦ Á¦°ÅÇÕ´Ï´Ù.
+    /// ì•„í‹°íŒ©íŠ¸ë¥¼ ì œê±°í•©ë‹ˆë‹¤.
     /// </summary>
     public void Remove(ArtifactSO data)
     {
@@ -62,7 +62,7 @@ public class ArtifactManager : MonoBehaviour
 
         effect.Deactivate();
         _activeEffects.Remove(data);
-        Debug.Log($"[Artifact] Á¦°Å: {data.artifactName}");
+        Debug.Log($"[Artifact] ì œê±°: {data.artifactName}");
     }
 
     public bool HasArtifact(ArtifactSO data) => _activeEffects.ContainsKey(data);

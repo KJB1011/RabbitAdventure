@@ -1,23 +1,23 @@
-using System.Linq;
+ï»¿using System.Linq;
 using UnityEngine;
 using static Defines;
 
 /// <summary>
-/// »óÁ¡À» °ü¸®ÇÏ´Â UI ½ºÅ©¸³Æ®
-/// »óÁ¡ ÃÊ±âÈ­¿Í ±¸¸Å¸¦ ´ã´çÇÕ´Ï´Ù.
+/// ìƒì ì„ ê´€ë¦¬í•˜ëŠ” UI ìŠ¤í¬ë¦½íŠ¸
+/// ìƒì  ì´ˆê¸°í™”ì™€ êµ¬ë§¤ë¥¼ ë‹´ë‹¹í•©ë‹ˆë‹¤.
 /// </summary>
 public class UIShop : MonoBehaviour
 {
-    [Header("¾ÆÆ¼ÆÑÆ® ½½·Ô (À§ 3°³)")]
+    [Header("ì•„í‹°íŒ©íŠ¸ ìŠ¬ë¡¯ (ìœ„ 3ê°œ)")]
     [SerializeField] ShopSlot[] _artifactSlots;
 
-    [Header("°íÁ¤ ¾ÆÀÌÅÛ ½½·Ô (¾Æ·¡ 3°³)")]
+    [Header("ê³ ì • ì•„ì´í…œ ìŠ¬ë¡¯ (ì•„ë˜ 3ê°œ)")]
     [SerializeField] ShopSlot[] _fixedSlots;
 
-    [Header("¾ÆÆ¼ÆÑÆ® µ¥ÀÌÅÍ ¸ñ·Ï (¸ğµç ArtifactSO ¿¬°á)")]
+    [Header("ì•„í‹°íŒ©íŠ¸ ë°ì´í„° ëª©ë¡ (ëª¨ë“  ArtifactSO ì—°ê²°)")]
     [SerializeField] ArtifactSO[] _allArtifacts;
 
-    [Header("°íÁ¤ ¾ÆÀÌÅÛ ¼³Á¤")]
+    [Header("ê³ ì • ì•„ì´í…œ ì„¤ì •")]
     [SerializeField] Sprite _hpIcon;
     [SerializeField] Sprite _atkIcon;
     [SerializeField] Sprite _critIcon;
@@ -25,7 +25,7 @@ public class UIShop : MonoBehaviour
     [SerializeField] int _atkPrice = 5;
     [SerializeField] int _critPrice = 5;
 
-    // ±¸¸Å ÈÄ ½ºÅÈ ÆĞ³Î °»½Å¿ë
+    // êµ¬ë§¤ í›„ ìŠ¤íƒ¯ íŒ¨ë„ ê°±ì‹ ìš©
     private UIShopPlayerStats _statsUI;
 
     void Awake()
@@ -45,7 +45,7 @@ public class UIShop : MonoBehaviour
         _statsUI?.Refresh();
     }
 
-    // ¦¡¦¡ ¾ÆÆ¼ÆÑÆ® ½½·Ô ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì•„í‹°íŒ©íŠ¸ ìŠ¬ë¡¯ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void SetupArtifactSlots()
     {
         var available = _allArtifacts
@@ -63,32 +63,32 @@ public class UIShop : MonoBehaviour
         }
     }
 
-    // ¦¡¦¡ °íÁ¤ ¾ÆÀÌÅÛ ½½·Ô ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ê³ ì • ì•„ì´í…œ ìŠ¬ë¡¯ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void SetupFixedSlots()
     {
         if (_fixedSlots.Length < 3) return;
 
         _fixedSlots[0].SetupFixedItem(
             ITEM.HP, _hpIcon,
-            "HP¸¦ 1 È¸º¹ÇÕ´Ï´Ù.",
+            "HPë¥¼ 1 íšŒë³µí•©ë‹ˆë‹¤.",
             _hpPrice, OnPurchased);
 
         _fixedSlots[1].SetupFixedItem(
             ITEM.ATKUP, _atkIcon,
-            "°ø°İ·ÂÀ» 1 Áõ°¡½ÃÅµ´Ï´Ù.",
+            "ê³µê²©ë ¥ì„ 1 ì¦ê°€ì‹œí‚µë‹ˆë‹¤.",
             _atkPrice, OnPurchased);
 
         _fixedSlots[2].SetupFixedItem(
             ITEM.CRITRATEUP, _critIcon,
-            "Ä¡¸íÅ¸ È®·üÀ» 1% Áõ°¡½ÃÅµ´Ï´Ù.",
+            "ì¹˜ëª…íƒ€ í™•ë¥ ì„ 1% ì¦ê°€ì‹œí‚µë‹ˆë‹¤.",
             _critPrice, OnPurchased);
     }
 
-    // ¦¡¦¡ ±¸¸Å ¿Ï·á Äİ¹é ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ êµ¬ë§¤ ì™„ë£Œ ì½œë°± â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     private void OnPurchased()
     {
         SoundManager.Instance.PlaySFX("SFX/DropCoin");
-        // ±¸¸Å ÈÄ ½ºÅÈ ÆĞ³Î Áï½Ã °»½Å
+        // êµ¬ë§¤ í›„ ìŠ¤íƒ¯ íŒ¨ë„ ì¦‰ì‹œ ê°±ì‹ 
         _statsUI?.Refresh();
     }
 }

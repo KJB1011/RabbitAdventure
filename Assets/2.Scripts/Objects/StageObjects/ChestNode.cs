@@ -1,13 +1,13 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// »óÀÚ°¡ ³ª¿À´Â ³ëµå
+/// ìƒìê°€ ë‚˜ì˜¤ëŠ” ë…¸ë“œ
 /// </summary>
 public class ChestNode : NodeBase
 {
     [SerializeField] private ChestObject[] _chests;
-    [SerializeField] private float _delayBeforeComplete = 1.5f; // ¸ğµç »óÀÚ ÆÄ±« ÈÄ ´ë±â
+    [SerializeField] private float _delayBeforeComplete = 1.5f; // ëª¨ë“  ìƒì íŒŒê´´ í›„ ëŒ€ê¸°
 
     private int _remainingChests;
 

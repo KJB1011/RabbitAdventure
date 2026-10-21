@@ -1,10 +1,10 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// BGM / SFX Àç»ıÀ» ´ã´çÇÏ´Â ¸Å´ÏÀú
-/// Resources/Sounds/ Æú´õ¿¡¼­ AudioClipÀ» ·ÎµåÇÕ´Ï´Ù.
+/// BGM / SFX ì¬ìƒì„ ë‹´ë‹¹í•˜ëŠ” ë§¤ë‹ˆì €
+/// Resources/Sounds/ í´ë”ì—ì„œ AudioClipì„ ë¡œë“œí•©ë‹ˆë‹¤.
 /// </summary>
 public class SoundManager : MonoBehaviour
 {
@@ -17,13 +17,13 @@ public class SoundManager : MonoBehaviour
     [Header("SFX")]
     [SerializeField] private AudioSource _sfxSource;
     [SerializeField][Range(0f, 1f)] private float _sfxVolume = 1.0f;
-    [SerializeField] private int _sfxPoolSize = 5; // µ¿½Ã Àç»ı °¡´ÉÇÑ SFX ¼ö
+    [SerializeField] private int _sfxPoolSize = 5; // ë™ì‹œ ì¬ìƒ ê°€ëŠ¥í•œ SFX ìˆ˜
 
-    // SFX µ¿½Ã Àç»ıÀ» À§ÇÑ Ç®
+    // SFX ë™ì‹œ ì¬ìƒì„ ìœ„í•œ í’€
     private AudioSource[] _sfxPool;
     private int _sfxPoolIndex = 0;
 
-    // ·ÎµåÇÑ Å¬¸³ Ä³½Ì (°°Àº Å¬¸³À» ¸Å¹ø Resources.Load ÇÏÁö ¾Êµµ·Ï)
+    // ë¡œë“œí•œ í´ë¦½ ìºì‹± (ê°™ì€ í´ë¦½ì„ ë§¤ë²ˆ Resources.Load í•˜ì§€ ì•Šë„ë¡)
     private Dictionary<string, AudioClip> _clipCache = new();
     public float BGMVolume => _bgmVolume;
     public float SFXVolume => _sfxVolume;
@@ -40,7 +40,7 @@ public class SoundManager : MonoBehaviour
         InitSFXPool();
     }
 
-    // ¦¡¦¡ ÃÊ±âÈ­ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ì´ˆê¸°í™” â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void InitSFXPool()
     {
@@ -55,18 +55,18 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    // ¦¡¦¡ BGM ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ BGM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// <summary>
-    /// BGMÀ» Àç»ıÇÕ´Ï´Ù. °°Àº Å¬¸³ÀÌ¸é Àç½ÃÀÛÇÏÁö ¾Ê½À´Ï´Ù.
-    /// path ¿¹½Ã: "BGM/MainTheme" (Resources/Sounds/ ÀÌÈÄ °æ·Î)
+    /// BGMì„ ì¬ìƒí•©ë‹ˆë‹¤. ê°™ì€ í´ë¦½ì´ë©´ ì¬ì‹œì‘í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
+    /// path ì˜ˆì‹œ: "BGM/MainTheme" (Resources/Sounds/ ì´í›„ ê²½ë¡œ)
     /// </summary>
     public void PlayBGM(string path, bool loop = true)
     {
         var clip = LoadClip(path);
         if (clip == null) return;
 
-        // ÀÌ¹Ì °°Àº BGMÀÌ Àç»ı ÁßÀÌ¸é ¹«½Ã
+        // ì´ë¯¸ ê°™ì€ BGMì´ ì¬ìƒ ì¤‘ì´ë©´ ë¬´ì‹œ
         if (_bgmSource.clip == clip && _bgmSource.isPlaying) return;
 
         _bgmSource.clip = clip;
@@ -75,7 +75,7 @@ public class SoundManager : MonoBehaviour
         _bgmSource.Play();
     }
 
-    /// <summary>BGMÀ» ¼­¼­È÷ ÀüÈ¯ÇÕ´Ï´Ù.</summary>
+    /// <summary>BGMì„ ì„œì„œíˆ ì „í™˜í•©ë‹ˆë‹¤.</summary>
     public void CrossFadeBGM(string path, float fadeDuration = 1f, bool loop = true)
     {
         StartCoroutine(CrossFadeRoutine(path, fadeDuration, loop));
@@ -115,24 +115,24 @@ public class SoundManager : MonoBehaviour
 
         _bgmSource.volume = _bgmVolume;
     }
-    // ¦¡¦¡ SFX ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ SFX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// <summary>
-    /// SFX¸¦ Àç»ıÇÕ´Ï´Ù.
-    /// path ¿¹½Ã: "SFX/Attack" (Resources/Sounds/ ÀÌÈÄ °æ·Î)
+    /// SFXë¥¼ ì¬ìƒí•©ë‹ˆë‹¤.
+    /// path ì˜ˆì‹œ: "SFX/Attack" (Resources/Sounds/ ì´í›„ ê²½ë¡œ)
     /// </summary>
     public void PlaySFX(string path)
     {
         var clip = LoadClip(path);
         if (clip == null) return;
 
-        // Ç®¿¡¼­ ÇöÀç Àç»ı ÁßÀÌÁö ¾ÊÀº AudioSource Ã£±â
+        // í’€ì—ì„œ í˜„ì¬ ì¬ìƒ ì¤‘ì´ì§€ ì•Šì€ AudioSource ì°¾ê¸°
         AudioSource source = GetAvailableSFXSource();
         source.volume = _sfxVolume;
         source.PlayOneShot(clip);
     }
 
-    /// <summary>SFX¸¦ Æ¯Á¤ º¼·ıÀ¸·Î Àç»ıÇÕ´Ï´Ù.</summary>
+    /// <summary>SFXë¥¼ íŠ¹ì • ë³¼ë¥¨ìœ¼ë¡œ ì¬ìƒí•©ë‹ˆë‹¤.</summary>
     public void PlaySFX(string path, float volume)
     {
         var clip = LoadClip(path);
@@ -148,7 +148,7 @@ public class SoundManager : MonoBehaviour
         foreach (var src in _sfxPool)
             src.volume = _sfxVolume;
     }
-    /// <summary>SFX¸¦ ÁöÁ¤ÇÑ Áö¼Ó½Ã°£¸¸Å­¸¸ Àç»ı ÈÄ °­Á¦ Áß´ÜÇÕ´Ï´Ù.</summary>
+    /// <summary>SFXë¥¼ ì§€ì •í•œ ì§€ì†ì‹œê°„ë§Œí¼ë§Œ ì¬ìƒ í›„ ê°•ì œ ì¤‘ë‹¨í•©ë‹ˆë‹¤.</summary>
     public void PlaySFX(string path, float volume, float duration)
     {
         var clip = LoadClip(path);
@@ -157,7 +157,7 @@ public class SoundManager : MonoBehaviour
         AudioSource source = GetAvailableSFXSource();
         source.volume = _sfxVolume;
         source.clip = clip;
-        source.loop = true; // ·çÇÁ·Î ¼³Á¤ÇØ¼­ duration µ¿¾È ²÷±âÁö ¾Ê°Ô
+        source.loop = true; // ë£¨í”„ë¡œ ì„¤ì •í•´ì„œ duration ë™ì•ˆ ëŠê¸°ì§€ ì•Šê²Œ
         source.Play();
 
         StartCoroutine(StopSFXAfter(source, duration));
@@ -167,18 +167,18 @@ public class SoundManager : MonoBehaviour
     {
         yield return new WaitForSeconds(duration);
         source.Stop();
-        source.loop = false; // ·çÇÁ ÇØÁ¦
+        source.loop = false; // ë£¨í”„ í•´ì œ
         source.clip = null;
     }
-    // ¦¡¦¡ À¯Æ¿ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ìœ í‹¸ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private AudioSource GetAvailableSFXSource()
     {
-        // Àç»ı ÁßÀÌÁö ¾ÊÀº ¼Ò½º ¿ì¼± ¼±ÅÃ
+        // ì¬ìƒ ì¤‘ì´ì§€ ì•Šì€ ì†ŒìŠ¤ ìš°ì„  ì„ íƒ
         foreach (var src in _sfxPool)
             if (!src.isPlaying) return src;
 
-        // ÀüºÎ »ç¿ë ÁßÀÌ¸é ¶ó¿îµå ·Îºó
+        // ì „ë¶€ ì‚¬ìš© ì¤‘ì´ë©´ ë¼ìš´ë“œ ë¡œë¹ˆ
         var selected = _sfxPool[_sfxPoolIndex];
         _sfxPoolIndex = (_sfxPoolIndex + 1) % _sfxPoolSize;
         return selected;
@@ -192,7 +192,7 @@ public class SoundManager : MonoBehaviour
         var clip = Resources.Load<AudioClip>($"Sounds/{path}");
         if (clip == null)
         {
-            Debug.LogWarning($"[SoundManager] Å¬¸³À» Ã£À» ¼ö ¾ø½À´Ï´Ù: Resources/Sounds/{path}");
+            Debug.LogWarning($"[SoundManager] í´ë¦½ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: Resources/Sounds/{path}");
             return null;
         }
 
@@ -202,7 +202,7 @@ public class SoundManager : MonoBehaviour
 
     private IEnumerator CrossFadeRoutine(string path, float duration, bool loop)
     {
-        // ±âÁ¸ BGM ÆäÀÌµå ¾Æ¿ô
+        // ê¸°ì¡´ BGM í˜ì´ë“œ ì•„ì›ƒ
         float startVolume = _bgmSource.volume;
         float elapsed = 0f;
 
@@ -213,7 +213,7 @@ public class SoundManager : MonoBehaviour
             yield return null;
         }
 
-        // »õ BGMÀ¸·Î ±³Ã¼ ÈÄ ÆäÀÌµå ÀÎ
+        // ìƒˆ BGMìœ¼ë¡œ êµì²´ í›„ í˜ì´ë“œ ì¸
         var clip = LoadClip(path);
         if (clip != null)
         {

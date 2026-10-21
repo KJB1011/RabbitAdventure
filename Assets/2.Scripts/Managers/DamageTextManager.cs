@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// µ¥¹ÌÁö¸¦ ³ªÅ¸³»´Â HUD ÅØ½ºÆ®¸¦ °ü¸®ÇÕ´Ï´Ù.
+/// ë°ë¯¸ì§€ë¥¼ ë‚˜íƒ€ë‚´ëŠ” HUD í…ìŠ¤íŠ¸ë¥¼ ê´€ë¦¬í•©ë‹ˆë‹¤.
 /// </summary>
 public class DamageTextManager : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class DamageTextManager : MonoBehaviour
     [SerializeField] private GameObject _prefab;
     [SerializeField] private int _prewarmCount = 20;
 
-    [Header("Special ½ºÅ³")]
+    [Header("Special ìŠ¤í‚¬")]
     [SerializeField] private float _specialFontSize = 6f;
     [SerializeField] private Color _specialColor = new Color(1f, 0.4f, 0f);
 
@@ -24,12 +24,12 @@ public class DamageTextManager : MonoBehaviour
 
         if (_prefab == null)
         {
-            Debug.LogError("[DamageTextManager] _prefabÀÌ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            Debug.LogError("[DamageTextManager] _prefabì´ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
             return;
         }
         if (_prefab.GetComponent<DamageText>() == null)
         {
-            Debug.LogError($"[DamageTextManager] '{_prefab.name}'¿¡ DamageText ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogError($"[DamageTextManager] '{_prefab.name}'ì— DamageText ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -58,7 +58,7 @@ public class DamageTextManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀÏ¹İ / Ä¡¸íÅ¸ µ¥¹ÌÁö Ç¥½Ã
+    /// ì¼ë°˜ / ì¹˜ëª…íƒ€ ë°ë¯¸ì§€ í‘œì‹œ
     /// </summary>
     public void Show(int damage, bool isCrit, Vector3 worldPos)
     {
@@ -68,7 +68,7 @@ public class DamageTextManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Special ½ºÅ³ µ¥¹ÌÁö Ç¥½Ã
+    /// Special ìŠ¤í‚¬ ë°ë¯¸ì§€ í‘œì‹œ
     /// </summary>
     public void ShowSpecial(int damage, Vector3 worldPos)
     {

@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ÀûÀÇ HP¹Ù¸¦ ³ªÅ¸³»ÁÖ´Â UI ½ºÅ©¸³Æ®
+/// ì ì˜ HPë°”ë¥¼ ë‚˜íƒ€ë‚´ì£¼ëŠ” UI ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UIHPBar : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class UIHPBar : MonoBehaviour
         if (_contents != null) _contents.SetActive(true);
     }
 
-    // ÀûÀÌ µ¥¹ÌÁö¸¦ ¹ŞÀ» ¶§¸¶´Ù È£Ãâ
+    // ì ì´ ë°ë¯¸ì§€ë¥¼ ë°›ì„ ë•Œë§ˆë‹¤ í˜¸ì¶œ
     public void SetBarValue(float hpRate)
     {
         _hpSlider.value = hpRate;

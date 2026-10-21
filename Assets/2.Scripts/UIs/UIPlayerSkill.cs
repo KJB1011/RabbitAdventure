@@ -1,13 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using static Defines;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î¸¦ µû¶ó´Ù´Ï¸ç ½ºÅ³ÀÇ Äğ´Ù¿îÀ» ¾Ë·ÁÁÖ´Â ½ºÅ©¸³Æ®
+/// í”Œë ˆì´ì–´ë¥¼ ë”°ë¼ë‹¤ë‹ˆë©° ìŠ¤í‚¬ì˜ ì¿¨ë‹¤ìš´ì„ ì•Œë ¤ì£¼ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UIPlayerSkill : MonoBehaviour
 {
-    [SerializeField] PlayerController _targetPlayer; // ÄÚµå¿¡¼­ ÀÚµ¿À¸·Î ¹Ş¾Æ¿À°Ô ¼öÁ¤
+    [SerializeField] PlayerController _targetPlayer; // ì½”ë“œì—ì„œ ìë™ìœ¼ë¡œ ë°›ì•„ì˜¤ê²Œ ìˆ˜ì •
     [SerializeField] Transform _mainSkill;
     [SerializeField] Transform _subSkill;
     [SerializeField] Transform _superSkill;

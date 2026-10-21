@@ -1,27 +1,27 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// EnemyÁß SniperÀÇ Çàµ¿À» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
-/// Æ¯Á¤ À§Ä¡·Î ÀÌµ¿(°¢ ¸ð¼­¸®) -> ºü¸¥ Åº¸· ¹ß»ç -> Æ¯Á¤ À§Ä¡·Î ÀÌµ¿(°¢ ¸ð¼­¸®) -> ÇÃ·¹ÀÌ¾î À§Ä¡¿¡ ¹üÀ§°ø°Ý 3¹ø
-/// ÇØ´ç Çàµ¿À» ¹Ýº¹ÇÑ´Ù.
+/// Enemyì¤‘ Sniperì˜ í–‰ë™ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
+/// íŠ¹ì • ìœ„ì¹˜ë¡œ ì´ë™(ê° ëª¨ì„œë¦¬) -> ë¹ ë¥¸ íƒ„ë§‰ ë°œì‚¬ -> íŠ¹ì • ìœ„ì¹˜ë¡œ ì´ë™(ê° ëª¨ì„œë¦¬) -> í”Œë ˆì´ì–´ ìœ„ì¹˜ì— ë²”ìœ„ê³µê²© 3ë²ˆ
+/// í•´ë‹¹ í–‰ë™ì„ ë°˜ë³µí•œë‹¤.
 /// </summary>
 public class Enemy_Sniper : EnemyController
 {
-    [Header("ÄÚ³Ê À§Ä¡")]
+    [Header("ì½”ë„ˆ ìœ„ì¹˜")]
     [SerializeField] private Vector2 _bottomLeft = new Vector2(-6f, -3f);
     [SerializeField] private Vector2 _topLeft = new Vector2(-6f, 3f);
     [SerializeField] private Vector2 _topRight = new Vector2(6f, 3f);
     [SerializeField] private Vector2 _bottomRight = new Vector2(6f, -3f);
 
-    [Header("´Ü¹ß ÆÐÅÏ")]
+    [Header("ë‹¨ë°œ íŒ¨í„´")]
     [SerializeField] private float _waitAfterMove = 1f;
 
-    [Header("¹üÀ§ °ø°Ý ÆÐÅÏ")]
-    [SerializeField] private Vector2 _areaSize = new Vector2(3f, 3f); // ÃßÀû ¹üÀ§ Å©±â
-    [SerializeField] private float _areaDelay = 0.5f; // ¹üÀ§ °ø°Ý °£°Ý
+    [Header("ë²”ìœ„ ê³µê²© íŒ¨í„´")]
+    [SerializeField] private Vector2 _areaSize = new Vector2(3f, 3f); // ì¶”ì  ë²”ìœ„ í¬ê¸°
+    [SerializeField] private float _areaDelay = 0.5f; // ë²”ìœ„ ê³µê²© ê°„ê²©
 
-    [Header("ÀüÁ¶ Ç¥½Ã")]
+    [Header("ì „ì¡° í‘œì‹œ")]
     [SerializeField] private SpriteRenderer _bodySprite;
     private Color _normalColor;
     private readonly Color _telegraphColor = new Color(1f, 0.2f, 0.2f);
@@ -54,7 +54,7 @@ public class Enemy_Sniper : EnemyController
             yield return StartCoroutine(MoveToPosition(waypoints[index]));
             yield return new WaitForSeconds(_waitAfterMove);
 
-            // Â¦¼ö ÄÚ³Ê: ´Ü¹ß ¹ß»ç / È¦¼ö ÄÚ³Ê: ÇÃ·¹ÀÌ¾î ÃßÀû ¹üÀ§ °ø°Ý
+            // ì§ìˆ˜ ì½”ë„ˆ: ë‹¨ë°œ ë°œì‚¬ / í™€ìˆ˜ ì½”ë„ˆ: í”Œë ˆì´ì–´ ì¶”ì  ë²”ìœ„ ê³µê²©
             if (index % 2 == 0)
                 yield return StartCoroutine(PatternSingleShot());
             else
@@ -64,7 +64,7 @@ public class Enemy_Sniper : EnemyController
         }
     }
 
-    // ¦¡¦¡ ´Ü¹ß ¹ß»ç ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ë‹¨ë°œ ë°œì‚¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternSingleShot()
     {
@@ -75,7 +75,7 @@ public class Enemy_Sniper : EnemyController
         yield return new WaitUntil(() => done);
     }
 
-    // ¦¡¦¡ ÇÃ·¹ÀÌ¾î ÃßÀû ¹üÀ§ °ø°Ý ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ í”Œë ˆì´ì–´ ì¶”ì  ë²”ìœ„ ê³µê²© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     IEnumerator PatternAreaChase()
     {

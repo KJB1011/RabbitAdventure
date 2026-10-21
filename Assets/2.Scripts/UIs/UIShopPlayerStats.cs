@@ -1,14 +1,14 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// »óÁ¡ UI ¾È¿¡ ¹èÄ¡µÇ¾î ÀÖ´Â ÇÃ·¹ÀÌ¾î ½ºÅÈ Ç¥½Ã ÆĞ³ÎÀ» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
+/// ìƒì  UI ì•ˆì— ë°°ì¹˜ë˜ì–´ ìˆëŠ” í”Œë ˆì´ì–´ ìŠ¤íƒ¯ í‘œì‹œ íŒ¨ë„ì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class UIShopPlayerStats : MonoBehaviour
 {
     [SerializeField] PlayerController _player;
 
-    [Header("½ºÅÈ TMP ¿¬°á")]
+    [Header("ìŠ¤íƒ¯ TMP ì—°ê²°")]
     [SerializeField] TextMeshProUGUI _hpText;
     [SerializeField] TextMeshProUGUI _atkText;
     [SerializeField] TextMeshProUGUI _critRateText;

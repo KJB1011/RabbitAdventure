@@ -1,15 +1,15 @@
-public class Defines
+ï»¿public class Defines
 {
     public enum SKILL
     {
         MAIN = 0, SUB, SUPER, SPECIAL
     }
 
-    // ÇÃ·¹ÀÌ¾î °ø°İ Á¾·ù (¾ÆÆ¼ÆÑÆ® ¹ßµ¿ Á¶°Ç ±¸ºĞ¿ë)
+    // í”Œë ˆì´ì–´ ê³µê²© ì¢…ë¥˜ (ì•„í‹°íŒ©íŠ¸ ë°œë™ ì¡°ê±´ êµ¬ë¶„ìš©)
     public enum AttackType
     {
-        Basic,   // ÁÂÅ¬¸¯ ±âº» °ø°İ
-        Super,   // Q ½ºÅ³
+        Basic,   // ì¢Œí´ë¦­ ê¸°ë³¸ ê³µê²©
+        Super,   // Q ìŠ¤í‚¬
     }
 
     public enum ITEM

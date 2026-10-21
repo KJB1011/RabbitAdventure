@@ -1,7 +1,7 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// Ä¿¼­¸¦ µû¶ó´Ù´Ï´Â ½ºÇÁ¶óÀÌÆ®¸¦ Á¶Á¤ÇØÁÖ´Â ½ºÅ©¸³Æ®
+/// ì»¤ì„œë¥¼ ë”°ë¼ë‹¤ë‹ˆëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì¡°ì •í•´ì£¼ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class CustomCursor : MonoBehaviour
 {

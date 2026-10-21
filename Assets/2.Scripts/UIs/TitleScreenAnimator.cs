@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using DG.Tweening;
 
 /// <summary>
-/// ·ÎºñÈ­¸é Å¸ÀÌÆ² ¿¬Ãâ ´ã´ç
+/// ë¡œë¹„í™”ë©´ íƒ€ì´í‹€ ì—°ì¶œ ë‹´ë‹¹
 /// </summary>
 public class TitleScreenAnimator : MonoBehaviour
 {
@@ -16,20 +16,20 @@ public class TitleScreenAnimator : MonoBehaviour
 
         Sequence seq = DOTween.Sequence();
 
-        // ·Î°í°¡ ¾Æ·¡·Î ³»·Á¿È
+        // ë¡œê³ ê°€ ì•„ë˜ë¡œ ë‚´ë ¤ì˜´
         seq.Append(titleLogo.DOAnchorPos(new Vector2(400, 0), 1.0f).SetEase(Ease.OutBounce));
 
-        // ¹öÆ° ÆäÀÌµåÀÎ
+        // ë²„íŠ¼ í˜ì´ë“œì¸
         seq.Join(menuButtonsGroup.DOFade(1, 1.5f).SetDelay(0.5f));
 
-        // À§¾Æ·¡ ¿òÁ÷ÀÓ
+        // ìœ„ì•„ë˜ ì›€ì§ì„
         seq.OnComplete(() =>
         {
             titleLogo.DOLocalMoveY(10, 2.0f)
                      .SetRelative()
                      .SetLoops(-1, LoopType.Yoyo)
                      .SetEase(Ease.InOutSine)
-                     .SetLink(titleLogo.gameObject); // ¡ç Ãß°¡
+                     .SetLink(titleLogo.gameObject); // â† ì¶”ê°€
         });
     }
 }

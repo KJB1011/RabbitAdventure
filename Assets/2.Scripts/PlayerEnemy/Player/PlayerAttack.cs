@@ -1,10 +1,10 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using System;
 using static Defines;
 
 /// <summary>
-/// PlayerÀÇ ±âº»°ø°İ, Q½ºÅ³ÀÇ ¹üÀ§ ¹× ¿¬ÃâÀ» ´ã´çÇÏ´Â ½ºÅ©¸³Æ®
+/// Playerì˜ ê¸°ë³¸ê³µê²©, QìŠ¤í‚¬ì˜ ë²”ìœ„ ë° ì—°ì¶œì„ ë‹´ë‹¹í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸
 /// </summary>
 public class PlayerAttack : MonoBehaviour
 {
@@ -13,12 +13,12 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] float _baseAttackDistance = 1.2f;
     [SerializeField] float _baseSuperDistance = 2.5f;
 
-    [Header("±âº» °ø°İ")]
+    [Header("ê¸°ë³¸ ê³µê²©")]
     [SerializeField] BoxCollider2D _attackArea;
     [SerializeField] Transform _attackAreaPos;
     [SerializeField] float _basicActiveTime = 0.1f;
 
-    [Header("Q ½´ÆÛ½ºÅ³")]
+    [Header("Q ìŠˆí¼ìŠ¤í‚¬")]
     [SerializeField] BoxCollider2D _attackArea2;
     [SerializeField] Transform _attackAreaPos2;
     [SerializeField] float _superRangeMultiplier = 4f;
@@ -27,7 +27,7 @@ public class PlayerAttack : MonoBehaviour
     Vector2 _defaultColSize;
     Vector2 _defaultColSize2;
 
-    // ÀûÁßÇÑ Äİ¶óÀÌ´õ°¡ ¾î¶² °ø°İÀÎÁö ¹İÈ¯ (¾ÆÆ¼ÆÑÆ® ¹ßµ¿ Á¶°Ç ±¸ºĞ¿ë)
+    // ì ì¤‘í•œ ì½œë¼ì´ë”ê°€ ì–´ë–¤ ê³µê²©ì¸ì§€ ë°˜í™˜ (ì•„í‹°íŒ©íŠ¸ ë°œë™ ì¡°ê±´ êµ¬ë¶„ìš©)
     public AttackType GetAttackType(Collider2D col)
     => col == _attackArea2 ? AttackType.Super : AttackType.Basic;
 
@@ -42,7 +42,7 @@ public class PlayerAttack : MonoBehaviour
 
 
     /// <summary>
-    /// ³ëµå ÀüÈ¯ ½Ã ÁøÇà ÁßÀÎ °ø°İÀ» Áï½Ã Áß´ÜÇÕ´Ï´Ù.
+    /// ë…¸ë“œ ì „í™˜ ì‹œ ì§„í–‰ ì¤‘ì¸ ê³µê²©ì„ ì¦‰ì‹œ ì¤‘ë‹¨í•©ë‹ˆë‹¤.
     /// </summary>
     public void ForceStop()
     {
@@ -50,7 +50,7 @@ public class PlayerAttack : MonoBehaviour
         _attackArea.enabled = false;
         _attackArea2.enabled = false;
     }
-    // ¦¡¦¡ ±âº» °ø°İ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ ê¸°ë³¸ ê³µê²© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void AttackStart(Action onComplete)
     {
         StartCoroutine(CoBasicAttack(onComplete));
@@ -71,7 +71,7 @@ public class PlayerAttack : MonoBehaviour
         _attackArea.enabled = false;
         onComplete?.Invoke();
     }
-    // ¦¡¦¡ Q ½ºÅ³ ¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡¦¡
+    // â”€â”€ Q ìŠ¤í‚¬ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     public void SuperAttackStart(Action onComplete)
     {
         StartCoroutine(CoSuperAttack(onComplete));

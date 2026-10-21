@@ -1,9 +1,9 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// »óÁ¡À» ÀÌ¿ëÇÒ ¼ö ÀÖ´Â ³ëµå
-/// »óÁ¡ Á¶ÀÛ½Ã¿¡´Â ÇÃ·¹ÀÌ¾îÀÇ ¿òÁ÷ÀÓÀº Àá±â°Ô µÈ´Ù.
+/// ìƒì ì„ ì´ìš©í•  ìˆ˜ ìˆëŠ” ë…¸ë“œ
+/// ìƒì  ì¡°ì‘ì‹œì—ëŠ” í”Œë ˆì´ì–´ì˜ ì›€ì§ì„ì€ ì ê¸°ê²Œ ëœë‹¤.
 /// </summary>
 public class ShopNode : NodeBase
 {
@@ -16,7 +16,7 @@ public class ShopNode : NodeBase
     {
         _player = FindFirstObjectByType<PlayerController>();
 
-        // »óÁ¡ ÁøÀÔ ½Ã ÇÃ·¹ÀÌ¾î Á¶ÀÛ Àá±İ
+        // ìƒì  ì§„ì… ì‹œ í”Œë ˆì´ì–´ ì¡°ì‘ ì ê¸ˆ
         _player?.SetControllable(false);
 
         if (_slidePanel != null)
@@ -29,7 +29,7 @@ public class ShopNode : NodeBase
     {
         _leaveButton.onClick.RemoveListener(OnLeaveClicked);
 
-        // Á¶ÀÛ ÇØÁ¦
+        // ì¡°ì‘ í•´ì œ
         _player?.SetControllable(true);
 
         if (_slidePanel != null)
@@ -42,7 +42,7 @@ public class ShopNode : NodeBase
     {
         _leaveButton.onClick.RemoveListener(OnLeaveClicked);
 
-        // È¤½Ã ºñÁ¤»ó Á¾·á ½Ã¿¡µµ Á¶ÀÛ Àá±İ ÇØÁ¦
+        // í˜¹ì‹œ ë¹„ì •ìƒ ì¢…ë£Œ ì‹œì—ë„ ì¡°ì‘ ì ê¸ˆ í•´ì œ
         _player?.SetControllable(true);
     }
 }
