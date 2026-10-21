@@ -1,0 +1,14 @@
+using UnityEngine;
+
+/// <summary>
+/// Åº¸· ÀÚµ¿¼Ò¸ê ½ºÅ©¸³Æ®
+/// </summary>
+public class BulletObj : MonoBehaviour
+{
+    [SerializeField] float _duration = 5f;
+    void Start()
+    {
+        Destroy(gameObject, _duration);
+    }
+
+}

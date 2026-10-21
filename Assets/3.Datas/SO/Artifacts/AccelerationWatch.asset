@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6161c95dcdca974d9b1090691a9cd90, type: 3}
+  m_Name: AccelerationWatch
+  m_EditorClassIdentifier: Assembly-CSharp::ArtifactSO
+  artifactName: "\uAC00\uC18D\uC758 \uD68C\uC911\uC2DC\uACC4"
+  description: "\uAE30\uBCF8 \uACF5\uACA9 \uC801\uC911\uC2DC, Q\uC2A4\uD0AC\uC758
+    \uCFE8\uD0C0\uC784 0.2\uCD08 \uAC10\uC18C"
+  icon: {fileID: 21300000, guid: bdfa373529f69a943917285f9b6132b6, type: 3}
+  price: 25
+  _cooldownReduce: 0.2
