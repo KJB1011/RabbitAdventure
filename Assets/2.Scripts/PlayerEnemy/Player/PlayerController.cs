@@ -48,6 +48,11 @@ public class PlayerController : MonoBehaviour
 
     TrailRenderer _trailRenderer;
     SpriteRenderer _spriteRenderer;
+    Animator _animController;
+
+    // 흰색 플래시 (PlayerShaderGraph의 _FlashAmount 제어)
+    static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
+    MaterialPropertyBlock _flashBlock;
 
     Vector2 _dir;
     bool _isDashing = false;
@@ -126,6 +131,8 @@ public class PlayerController : MonoBehaviour
         _spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         _trailRenderer.enabled = false;
         _spriteRenderer.flipX = true;
+        _animController = transform.GetChild(0).GetComponent<Animator>();
+        _flashBlock = new MaterialPropertyBlock();
 
         _playerAttack.SetAttackRange(_rangeMultiplier);
     }
@@ -174,12 +181,12 @@ public class PlayerController : MonoBehaviour
         if (mousePos.x < transform.position.x)
         {
             _uiPlayerSkill.transform.position = transform.position + (Vector3.right / 10 * 7f);
-            _spriteRenderer.flipX = false;
+            _spriteRenderer.flipX = true;
         }
         else
         {
             _uiPlayerSkill.transform.position = transform.position - (Vector3.right / 10 * 7f);
-            _spriteRenderer.flipX = true;
+            _spriteRenderer.flipX = false;
         }
     }
 
@@ -407,14 +414,15 @@ public class PlayerController : MonoBehaviour
     IEnumerator SuperSkillRoutine()
     {
         _isAttack = true;
+        _animController.SetTrigger("isAttack");
 
-        // 1초동안 차징
-        Coroutine blinkRoutine = StartCoroutine(BlinkCharge(1f));
+        // 0.8초동안 차징
+        Coroutine blinkRoutine = StartCoroutine(BlinkCharge(0.8f));
         yield return new WaitForSeconds(1f);
         StopCoroutine(blinkRoutine);
 
-        // 깜빡임 끝나면 색상 복구
-        _spriteRenderer.color = Color.white;
+        // 깜빡임 끝나면 원래 색으로 복구 (흰색 상태에서 멈췄을 수도 있으므로)
+        SetFlash(0f);
 
         _damageMultiplier = 8f;
         bool attackDone = false;
@@ -433,17 +441,24 @@ public class PlayerController : MonoBehaviour
         float blinkInterval = 0.08f; // 깜빡임 간격 (작을수록 빠름)
         bool isWhite = false;
 
-        Color normalColor = Color.white;
-        Color blinkColor = new Color(1f, 1f, 0.2f, 1f); // 노란빛 흰색으로 기 모으는 느낌
-
         while (elapsed < duration)
         {
             isWhite = !isWhite;
-            _spriteRenderer.color = isWhite ? blinkColor : normalColor;
+            SetFlash(isWhite ? 1f : 0f); // 1 = 완전 흰색, 0 = 원래 그림
 
             yield return new WaitForSeconds(blinkInterval);
             elapsed += blinkInterval;
         }
+
+        SetFlash(0f);
+    }
+
+    // 머티리얼 에셋은 그대로 두고, 이 SpriteRenderer에만 _FlashAmount 값을 적용
+    void SetFlash(float amount)
+    {
+        _spriteRenderer.GetPropertyBlock(_flashBlock); // 스프라이트 텍스처 등 기존 값 유지
+        _flashBlock.SetFloat(FlashAmountId, amount);
+        _spriteRenderer.SetPropertyBlock(_flashBlock);
     }
 
     // ── 데미지 계산 ──────────────────────────────────────────
