@@ -362,6 +362,7 @@ public class PlayerController : MonoBehaviour
         _invincibleCount++;
         _playerHitBox.enabled = false;
 
+        _animController.SetTrigger("isSpecial");
         SoundManager.Instance.PlaySFX("SFX/SpecialCharge");
         VFXManager.Instance.PlayAttached("SpecialCharge", transform);
         yield return new WaitForSecondsRealtime(_specialInvincibleDelay);
@@ -414,7 +415,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator SuperSkillRoutine()
     {
         _isAttack = true;
-        _animController.SetTrigger("isAttack");
+        _animController.SetTrigger("isSuper");
 
         // 0.8초동안 차징
         Coroutine blinkRoutine = StartCoroutine(BlinkCharge(0.8f));
@@ -565,6 +566,7 @@ public class PlayerController : MonoBehaviour
         float finalDashDistance = Mathf.Min(_dashDistance, dirToMouse.magnitude);
         Vector2 targetPos = startPos + dashDirection * finalDashDistance;
 
+        _animController.SetTrigger("isDash");
         SoundManager.Instance.PlaySFX("SFX/Dash");
         float elapsed = 0f;
         while (elapsed < _dashDuration)
