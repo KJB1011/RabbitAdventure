@@ -53,6 +53,8 @@ public class IngameManager : MonoBehaviour
     Vector3 _initCamPos;
     float _initOrthoSize;
 
+    static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
+    MaterialPropertyBlock _flashBlock;
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -73,6 +75,8 @@ public class IngameManager : MonoBehaviour
 
     void Start()
     {
+        _flashBlock = new MaterialPropertyBlock();
+
         var cam = Camera.main;
         if (cam != null)
         {
@@ -304,6 +308,26 @@ public class IngameManager : MonoBehaviour
         _totalDamage += damage;
         if (_maxDamageInNode < damage)
             _maxDamageInNode = damage;
+    }
+
+    // ── 적 타격 효과 ─────────────────────────────────────────────
+    public void SetFlash(SpriteRenderer sr, float duration)
+    {
+        StartCoroutine(CoSetFlash(sr, duration));
+    }
+    IEnumerator CoSetFlash(SpriteRenderer sr, float duration)
+    {
+        sr.GetPropertyBlock(_flashBlock);
+        _flashBlock.SetFloat(FlashAmountId, 1f);
+        sr.SetPropertyBlock(_flashBlock);
+
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1;
+
+        sr.GetPropertyBlock(_flashBlock);
+        _flashBlock.SetFloat(FlashAmountId, 0f);
+        sr.SetPropertyBlock(_flashBlock);
     }
 
     // ── 기타 ─────────────────────────────────────────────────

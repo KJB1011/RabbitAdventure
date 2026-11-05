@@ -58,7 +58,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 1d464f00fad7526488569795b06e1a64, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -169,10 +169,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 887c8b9072b6ae24baae0d5c2bc9cc0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttack
-  _radialBulletId: 1
-  bulletCount: 16
+  _defaultBulletCount: 16
   bulletSpeed: 4
-  _fastBulletId: 2
   fastBulletSpeed: 30
   _areaDamageZonePrefab: {fileID: 3984908655926695466, guid: 90437089111a9024b86950942480c3e8, type: 3}
   _areaTelegraphDuration: 0.8
@@ -348,3 +346,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
   owner: {fileID: 2092216890448948324}
   _spriteTF: {fileID: 5573547813789539186}
+  _spriteRenderer: {fileID: 2031058613633952918}

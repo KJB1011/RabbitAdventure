@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static Defines;
 
 /// <summary>
 /// Enemy의 히트박스
@@ -8,6 +9,7 @@ public class EnemyHitbox : MonoBehaviour
 {
     [SerializeField] private EnemyController owner;
     [SerializeField] private Transform _spriteTF;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -21,13 +23,19 @@ public class EnemyHitbox : MonoBehaviour
         owner.DamageTaken(damage);
 
         // 아티팩트 발동 알림 — 맞은 적과 공격 종류를 함께 전달
-        player.NotifyAttackHit(owner, player.GetAttackType(other));
+        AttackType atkType = player.GetAttackType(other);
+        player.NotifyAttackHit(owner, atkType);
 
         DamageTextManager.Instance.Show(damage, isCrit, owner.transform.position);
+        if(atkType == AttackType.Super) // SuperSkill일 경우 반짝 및 멈춤
+        {
+            IngameManager.Instance.SetFlash(_spriteRenderer, 0.1f);
+        }
         Utils.Shake(_spriteTF, this);
         VFXManager.Instance.Play("Hit", transform.position);
         PlayHitSpark(player.transform.position);
     }
+
 
     // 적의 중앙에서, 플레이어 반대쪽으로 흰색 스파크를 튀긴다
     void PlayHitSpark(Vector2 attackerPos)
@@ -43,4 +51,5 @@ public class EnemyHitbox : MonoBehaviour
         // 위치: 히트박스 중앙 (기존 Hit 이펙트와 같은 위치)
         VFXManager.Instance.Play("HitSpark", transform.position, rot);
     }
+
 }
