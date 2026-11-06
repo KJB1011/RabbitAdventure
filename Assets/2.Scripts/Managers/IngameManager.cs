@@ -321,13 +321,40 @@ public class IngameManager : MonoBehaviour
         _flashBlock.SetFloat(FlashAmountId, 1f);
         sr.SetPropertyBlock(_flashBlock);
 
-        Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = 1;
 
         sr.GetPropertyBlock(_flashBlock);
         _flashBlock.SetFloat(FlashAmountId, 0f);
         sr.SetPropertyBlock(_flashBlock);
+    }
+
+    public void SetStop(float duration)
+    {
+        StartCoroutine(CoSetStop(duration));
+    }
+    IEnumerator CoSetStop(float duration)
+    {
+        Time.timeScale = 0;
+        ShakeCamera();
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1;
+    }
+    // ── 화면 흔들림 ───────────────────────────────────────────
+    public const string CamShakeId = "CamShake"; // 흔들림 트윈만 골라서 찾고 정리하기 위한 이름표
+
+    /// <param name="duration">흔들리는 시간 (초)</param>
+    /// <param name="strength">흔들림 세기 (월드 단위 거리)</param>
+    public void ShakeCamera(float duration = 0.15f, float strength = 0.15f)
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+
+        // 여러 적이 동시에 맞아도 흔들림은 한 번만 (겹치면 너무 세지고 위치가 어긋남)
+        if (DOTween.IsTweening(CamShakeId)) return;
+
+        // 끝나면 원래 위치로 자동 복귀한다
+        cam.transform.DOShakePosition(duration, strength, vibrato: 25, randomness: 90f, snapping: false, fadeOut: true)
+                     .SetId(CamShakeId).SetUpdate(true);
     }
 
     // ── 기타 ─────────────────────────────────────────────────

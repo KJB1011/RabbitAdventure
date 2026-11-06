@@ -27,12 +27,14 @@ public class EnemyHitbox : MonoBehaviour
         player.NotifyAttackHit(owner, atkType);
 
         DamageTextManager.Instance.Show(damage, isCrit, owner.transform.position);
-        if(atkType == AttackType.Super) // SuperSkill일 경우 반짝 및 멈춤
+        if(atkType == AttackType.Super) // SuperSkill일 경우 사운드 재생
         {
-            IngameManager.Instance.SetFlash(_spriteRenderer, 0.1f);
+            SoundManager.Instance.PlaySFX("SFX/HeavyHit");
+            IngameManager.Instance.SetStop(0.1f);
         }
-        Utils.Shake(_spriteTF, this);
+        IngameManager.Instance.SetFlash(_spriteRenderer, 0.1f);
         VFXManager.Instance.Play("Hit", transform.position);
+        Utils.Shake(_spriteTF, this);
         PlayHitSpark(player.transform.position);
     }
 

@@ -392,6 +392,7 @@ public class PlayerController : MonoBehaviour
     {
         float totalMultiplier = _specialDamageMultiplier * (1f + _specialDamageBonus);
         int damage = Mathf.RoundToInt(DamageReturn() * totalMultiplier);
+        bool hitAny = false; // 하나라도 맞았는지 (적중 사운드용)
 
         // 적 데미지
         var enemies = FindObjectsByType<EnemyBase>(FindObjectsSortMode.None);
@@ -400,6 +401,7 @@ public class PlayerController : MonoBehaviour
             if (!enemy.gameObject.activeSelf || enemy.IsDead) continue;
             enemy.DamageTaken(damage);
             DamageTextManager.Instance.ShowSpecial(damage, enemy.transform.position);
+            hitAny = true;
         }
 
         // 상자 데미지 (ChestObject는 EnemyBase 미상속)
@@ -408,7 +410,12 @@ public class PlayerController : MonoBehaviour
         {
             if (!chest.gameObject.activeSelf) continue;
             chest.TakeDamage(damage);
+            hitAny = true;
         }
+
+        // 적중 사운드는 맞은 대상 수와 상관없이 한 번만 (여러 번 겹쳐 재생되면 소리가 뭉개짐)
+        if (hitAny)
+            SoundManager.Instance.PlaySFX("SFX/SwordHit");
     }
 
     // ── Q 스킬 ───────────────────────────────────────────────
@@ -505,6 +512,9 @@ public class PlayerController : MonoBehaviour
         var cam = Camera.main;
         if (cam != null)
         {
+            // 흔들리는 중이었다면 즉시 끝내서 원래 위치로 되돌린 뒤 줌인 (두 연출이 위치를 다투지 않게)
+            DOTween.Complete(IngameManager.CamShakeId);
+
             float zoomDuration = 1.5f;
             Vector3 targetPos = new Vector3(
                 transform.position.x,

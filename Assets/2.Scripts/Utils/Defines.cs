@@ -9,7 +9,9 @@
     public enum AttackType
     {
         Basic,   // 좌클릭 기본 공격
+        Dash,
         Super,   // Q 스킬
+        Special,
     }
 
     public enum ITEM
