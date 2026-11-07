@@ -311,11 +311,11 @@ public class IngameManager : MonoBehaviour
     }
 
     // ── 적 타격 효과 ─────────────────────────────────────────────
-    public void SetFlash(SpriteRenderer sr, float duration)
+    public void Flash(SpriteRenderer sr, float duration)
     {
-        StartCoroutine(CoSetFlash(sr, duration));
+        StartCoroutine(CoFlash(sr, duration));
     }
-    IEnumerator CoSetFlash(SpriteRenderer sr, float duration)
+    IEnumerator CoFlash(SpriteRenderer sr, float duration)
     {
         sr.GetPropertyBlock(_flashBlock);
         _flashBlock.SetFloat(FlashAmountId, 1f);
@@ -328,11 +328,11 @@ public class IngameManager : MonoBehaviour
         sr.SetPropertyBlock(_flashBlock);
     }
 
-    public void SetStop(float duration)
+    public void HitStop(float duration)
     {
-        StartCoroutine(CoSetStop(duration));
+        StartCoroutine(CoHitStop(duration));
     }
-    IEnumerator CoSetStop(float duration)
+    IEnumerator CoHitStop(float duration)
     {
         Time.timeScale = 0;
         ShakeCamera();

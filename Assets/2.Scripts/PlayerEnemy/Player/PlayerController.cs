@@ -400,7 +400,9 @@ public class PlayerController : MonoBehaviour
         {
             if (!enemy.gameObject.activeSelf || enemy.IsDead) continue;
             enemy.DamageTaken(damage);
+            IngameManager.Instance.Flash(enemy.CharSprite, 0.5f);
             DamageTextManager.Instance.ShowSpecial(damage, enemy.transform.position);
+            VFXManager.Instance.Play("SpecialHit", enemy.transform.position);
             hitAny = true;
         }
 
@@ -415,7 +417,10 @@ public class PlayerController : MonoBehaviour
 
         // 적중 사운드는 맞은 대상 수와 상관없이 한 번만 (여러 번 겹쳐 재생되면 소리가 뭉개짐)
         if (hitAny)
+        {
             SoundManager.Instance.PlaySFX("SFX/SwordHit");
+            IngameManager.Instance.ShakeCamera(0.5f, 0.35f);
+        }
     }
 
     // ── Q 스킬 ───────────────────────────────────────────────

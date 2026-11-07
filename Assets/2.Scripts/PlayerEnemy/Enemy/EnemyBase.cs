@@ -25,7 +25,11 @@ public abstract class EnemyBase : MonoBehaviour
     [SerializeField] float _fallDistance = 10f;
     [SerializeField] float _spinSpeed = 720f;
 
+    [Header("전투 연출")]
+    [SerializeField] SpriteRenderer _enemySprite;
+
     public bool IsDead { get; protected set; }
+    public SpriteRenderer CharSprite { get => _enemySprite; }
 
     public void DamageTaken(int damage) 
     {

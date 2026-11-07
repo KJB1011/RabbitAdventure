@@ -292,6 +292,7 @@ MonoBehaviour:
   _fallSpeed: 15
   _fallDistance: 10
   _spinSpeed: 720
+  _enemySprite: {fileID: 2854563446032553892}
   moveDuration: 1.5
   _waitBeforeShot: 1
   _waitAfterShot: 1.5

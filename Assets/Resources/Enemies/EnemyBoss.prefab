@@ -148,6 +148,7 @@ MonoBehaviour:
   _fallSpeed: 15
   _fallDistance: 10
   _spinSpeed: 720
+  _enemySprite: {fileID: 2372519349042348217}
   moveDuration: 1.5
   _phase1BulletCount: 12
   _phase2BulletCount: 24

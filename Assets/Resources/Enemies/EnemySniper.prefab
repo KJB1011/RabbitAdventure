@@ -148,6 +148,7 @@ MonoBehaviour:
   _fallSpeed: 15
   _fallDistance: 10
   _spinSpeed: 720
+  _enemySprite: {fileID: 2031058613633952918}
   moveDuration: 1.5
   _bottomLeft: {x: -6, y: -3}
   _topLeft: {x: -6, y: 3}

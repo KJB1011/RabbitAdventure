@@ -30,9 +30,13 @@ public class EnemyHitbox : MonoBehaviour
         if(atkType == AttackType.Super) // SuperSkill일 경우 사운드 재생
         {
             SoundManager.Instance.PlaySFX("SFX/HeavyHit");
-            IngameManager.Instance.SetStop(0.1f);
+            IngameManager.Instance.HitStop(0.1f);
+            IngameManager.Instance.Flash(_spriteRenderer, 0.1f);
         }
-        IngameManager.Instance.SetFlash(_spriteRenderer, 0.1f);
+        else
+        {
+            IngameManager.Instance.Flash(_spriteRenderer, 0.05f);
+        }
         VFXManager.Instance.Play("Hit", transform.position);
         Utils.Shake(_spriteTF, this);
         PlayHitSpark(player.transform.position);
