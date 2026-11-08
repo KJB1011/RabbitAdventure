@@ -416,11 +416,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // 적중 사운드는 맞은 대상 수와 상관없이 한 번만 (여러 번 겹쳐 재생되면 소리가 뭉개짐)
+        // (화면 흔들림은 화면이 드러나는 유리 깨짐 순간에 SpecialSkillEffect가 담당)
         if (hitAny)
-        {
             SoundManager.Instance.PlaySFX("SFX/SwordHit");
-            IngameManager.Instance.ShakeCamera(0.5f, 0.35f);
-        }
     }
 
     // ── Q 스킬 ───────────────────────────────────────────────
