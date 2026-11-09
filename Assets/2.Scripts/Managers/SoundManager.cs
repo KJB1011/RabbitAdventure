@@ -25,6 +25,17 @@ public class SoundManager : MonoBehaviour
 
     // 로드한 클립 캐싱 (같은 클립을 매번 Resources.Load 하지 않도록)
     private Dictionary<string, AudioClip> _clipCache = new();
+
+    [Header("미리 불러오기 (Preload)")]
+    [Tooltip("인게임 시작 시 미리 불러올 효과음 (Resources/Sounds/ 기준 경로). 처음 재생할 때의 렉을 없애기 위함.")]
+    [SerializeField] private string[] _preloadSfx =
+    {
+        "SFX/Sword", "SFX/SwordHit", "SFX/StrongSword", "SFX/HeavyHit",
+        "SFX/Hit", "SFX/Dash", "SFX/Slain", "SFX/BulletFire", "SFX/Telegraph",
+        "SFX/AreaDamage", "SFX/SpecialCharge", "SFX/GlassBreaking",
+        "SFX/DropCoin", "SFX/CoinDropping",
+    };
+
     public float BGMVolume => _bgmVolume;
     public float SFXVolume => _sfxVolume;
     void Awake()
@@ -38,6 +49,27 @@ public class SoundManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         InitSFXPool();
+    }
+
+    // ── 미리 불러오기 (Preload) ──────────────────────────────
+
+    /// <summary>
+    /// 목록의 효과음을 미리 캐시에 넣고, 소리 데이터(압축 해제)까지 준비해 둔다.
+    /// 한 프레임에 몰지 않도록 클립 하나마다 한 프레임씩 나눠서 진행한다.
+    /// </summary>
+    public IEnumerator PreloadRoutine()
+    {
+        foreach (var path in _preloadSfx)
+        {
+            var clip = LoadClip(path); // ① 파일 불러오기 + 캐시에 저장 (기존 PlaySFX와 같은 캐시)
+
+            // ② Preload Audio Data가 꺼진 클립은 Resources.Load만으로는 소리 데이터가 아직 없다.
+            //    여기서 미리 읽어 두면 처음 재생할 때 데이터를 읽느라 끊기지 않는다.
+            if (clip != null && clip.loadState == AudioDataLoadState.Unloaded)
+                clip.LoadAudioData();
+
+            yield return null;
+        }
     }
 
     // ── 초기화 ───────────────────────────────────────────────

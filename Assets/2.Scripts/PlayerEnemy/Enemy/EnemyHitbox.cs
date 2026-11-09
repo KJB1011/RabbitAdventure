@@ -11,6 +11,12 @@ public class EnemyHitbox : MonoBehaviour
     [SerializeField] private Transform _spriteTF;
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
+    // Q 스킬: 판정이 닿은 뒤 칼 이펙트가 적을 지나가는 순간까지 기다렸다가 멈춤·플래시·타격음
+    const float HeavyImpactDelay = 0.04f;
+
+    // 모든 적이 공유하는 값: 마지막으로 기본 공격 적중음을 낸 프레임 (중복 재생 방지)
+    static int _lastSwordHitFrame = -1;
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("PlayerAttack")) return;
@@ -27,15 +33,21 @@ public class EnemyHitbox : MonoBehaviour
         player.NotifyAttackHit(owner, atkType);
 
         DamageTextManager.Instance.Show(damage, isCrit, owner.transform.position);
-        if(atkType == AttackType.Super) // SuperSkill일 경우 사운드 재생
+        if(atkType == AttackType.Super) // SuperSkill: 휘두름 → 맞음 → 0.1초 뒤 플래시 + 멈춤 + 타격음
         {
-            SoundManager.Instance.PlaySFX("SFX/HeavyHit");
-            IngameManager.Instance.HitStop(0.1f);
-            IngameManager.Instance.Flash(_spriteRenderer, 0.1f);
+            IngameManager.Instance.HitStop(0.1f, HeavyImpactDelay, "SFX/HeavyHit");
+            IngameManager.Instance.Flash(_spriteRenderer, 0.1f, HeavyImpactDelay);
         }
         else
         {
             IngameManager.Instance.Flash(_spriteRenderer, 0.05f);
+
+            // 기본 공격 적중음 (한 번의 공격에 여러 적이 맞아도 같은 프레임에는 한 번만)
+            if (atkType == AttackType.Basic && _lastSwordHitFrame != Time.frameCount)
+            {
+                _lastSwordHitFrame = Time.frameCount;
+                SoundManager.Instance.PlaySFX("SFX/SwordHit");
+            }
         }
         VFXManager.Instance.Play("Hit", transform.position);
         Utils.Shake(_spriteTF, this);

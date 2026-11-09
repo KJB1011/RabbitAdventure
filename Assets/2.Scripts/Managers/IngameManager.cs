@@ -96,7 +96,21 @@ public class IngameManager : MonoBehaviour
         SpawnPlayer();
         AddGold(30);
 
+        // 인트로 연출(UI 페이드 + 플레이어 등장)과 "동시에" 이펙트·효과음을 미리 준비한다
+        StartCoroutine(PrewarmRoutine());
         StartCoroutine(IntroRoutine());
+    }
+
+    // ── 미리 준비 (Prewarm) ─────────────────────────────────
+    // 전투 중 처음 나오는 이펙트·효과음에서 렉이 걸리지 않도록,
+    // 플레이어가 아직 조작하지 않는 인트로 동안 미리 불러와 둔다.
+    private IEnumerator PrewarmRoutine()
+    {
+        if (VFXManager.Instance != null)
+            yield return VFXManager.Instance.PrewarmRoutine();
+
+        if (SoundManager.Instance != null)
+            yield return SoundManager.Instance.PreloadRoutine();
     }
     private void SpawnPlayer()
     {
@@ -311,33 +325,61 @@ public class IngameManager : MonoBehaviour
     }
 
     // ── 적 타격 효과 ─────────────────────────────────────────────
-    public void Flash(SpriteRenderer sr, float duration)
+    /// <param name="duration">빛나는 시간 (초)</param>
+    /// <param name="delay">빛나기 시작할 때까지 기다리는 시간 (초)</param>
+    public void Flash(SpriteRenderer sr, float duration, float delay = 0f)
     {
-        StartCoroutine(CoFlash(sr, duration));
+        StartCoroutine(CoFlash(sr, duration, delay));
     }
-    IEnumerator CoFlash(SpriteRenderer sr, float duration)
+    IEnumerator CoFlash(SpriteRenderer sr, float duration, float delay)
     {
+        if (delay > 0f)
+            yield return new WaitForSecondsRealtime(delay);
+        if (sr == null) yield break; // 기다리는 사이 적이 사라졌을 수 있다
+
         sr.GetPropertyBlock(_flashBlock);
         _flashBlock.SetFloat(FlashAmountId, 1f);
         sr.SetPropertyBlock(_flashBlock);
 
         yield return new WaitForSecondsRealtime(duration);
+        if (sr == null) yield break;
 
         sr.GetPropertyBlock(_flashBlock);
         _flashBlock.SetFloat(FlashAmountId, 0f);
         sr.SetPropertyBlock(_flashBlock);
     }
 
-    public void HitStop(float duration)
+    int _hitStopCount; // 지금 진행 중인 히트스톱 수 (여러 적이 조금씩 다른 순간에 맞아도 꼬이지 않게)
+
+    /// <param name="duration">멈추는 시간 (초)</param>
+    /// <param name="delay">멈추기 시작할 때까지 기다리는 시간 (초). 칼 이펙트가 적을 지나가는 순간에 맞추기 위함</param>
+    /// <param name="sfxPath">멈추는 순간 재생할 타격음 (없으면 null)</param>
+    public void HitStop(float duration, float delay = 0f, string sfxPath = null)
     {
-        StartCoroutine(CoHitStop(duration));
+        StartCoroutine(CoHitStop(duration, delay, sfxPath));
     }
-    IEnumerator CoHitStop(float duration)
+    IEnumerator CoHitStop(float duration, float delay, string sfxPath)
     {
+        // 실제 시간으로 기다린다 → 그 사이 다른 적의 히트스톱이 먼저 걸려도 예정대로 이어서 멈춘다
+        if (delay > 0f)
+            yield return new WaitForSecondsRealtime(delay);
+
+        _hitStopCount++;
+        if (_hitStopCount == 1)
+        {
+            // 소리와 화면 흔들림은 멈춤이 처음 시작될 때 한 번만 (여러 적이 맞아도 겹치지 않게)
+            if (!string.IsNullOrEmpty(sfxPath))
+                SoundManager.Instance.PlaySFX(sfxPath);
+            ShakeCamera();
+        }
+
         Time.timeScale = 0;
-        ShakeCamera();
         yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = 1;
+
+        // 다른 적의 히트스톱이 아직 진행 중이면 그쪽이 끝날 때 재개한다
+        _hitStopCount--;
+        if (_hitStopCount == 0)
+            Time.timeScale = 1;
     }
     // ── 화면 흔들림 ───────────────────────────────────────────
     public const string CamShakeId = "CamShake"; // 흔들림 트윈만 골라서 찾고 정리하기 위한 이름표

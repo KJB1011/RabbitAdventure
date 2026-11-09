@@ -9583,7 +9583,7 @@ GameObject:
   - component: {fileID: 4021103657954561941}
   - component: {fileID: 3681557055055860156}
   m_Layer: 0
-  m_Name: PlayerHIt
+  m_Name: PlayerHit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -22,6 +23,42 @@ public class VFXManager : MonoBehaviour
     [Tooltip("끄면 풀링 없이 매번 Instantiate/Destroy로 생성합니다. GC Alloc 비교 측정용.")]
     [SerializeField] private bool _usePooling = true;
 
+    // 미리 만들어 둘 이펙트와 개수 (처음 재생할 때의 렉을 없애기 위함)
+    [Serializable]
+    public class PrewarmEntry
+    {
+        public string id;      // Play()에 넘기는 이름과 같아야 한다
+        public int count = 1;  // 동시에 몇 개까지 쓰일지 (자주 겹치는 이펙트일수록 크게)
+
+        public PrewarmEntry() { } // Unity가 Inspector 값을 불러올 때 사용
+        public PrewarmEntry(string id, int count)
+        {
+            this.id = id;
+            this.count = count;
+        }
+    }
+
+    [Header("미리 생성 (Prewarm)")]
+    [Tooltip("인게임 시작 시 미리 만들어 둘 이펙트. 새 이펙트를 추가하면 여기에도 넣어주세요.")]
+    [SerializeField] private PrewarmEntry[] _prewarmVfx =
+    {
+        new PrewarmEntry("Hit", 5),
+        new PrewarmEntry("HitSpark", 5),
+        new PrewarmEntry("SwordVFX", 2),
+        new PrewarmEntry("SwordVFX2", 1),
+        new PrewarmEntry("SpecialHit", 3),
+        new PrewarmEntry("SpecialCharge", 1),
+        new PrewarmEntry("FinishHit", 2),
+        new PrewarmEntry("PlayerHit", 1),
+        new PrewarmEntry("AreaHit", 2),
+    };
+
+    [Tooltip("미리 만들어 둘 탄환. FireBullet()에 넘기는 이름과 같아야 한다.")]
+    [SerializeField] private PrewarmEntry[] _prewarmBullets =
+    {
+        new PrewarmEntry("VFX/TestBullet", 30),
+    };
+
     // 프리팹 캐싱 (SoundManager의 clipCache와 동일한 구조)
     private Dictionary<string, GameObject> _prefabCache = new();
 
@@ -36,6 +73,44 @@ public class VFXManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+    }
+
+    // ── 미리 생성 (Prewarm) ──────────────────────────────────
+
+    /// <summary>
+    /// 목록에 있는 이펙트·탄환을 미리 불러와 풀에 채워 둔다.
+    /// 한 프레임에 몰아서 하면 그 프레임이 끊기므로, 종류마다 한 프레임씩 나눠서 진행한다.
+    /// </summary>
+    public IEnumerator PrewarmRoutine()
+    {
+        if (!_usePooling) yield break; // 풀을 안 쓰면 채워 둘 곳이 없다
+
+        foreach (var entry in _prewarmVfx)
+        {
+            FillPool(GetOrCreateVFXPool(entry.id), entry.count);
+            yield return null; // 다음 프레임으로 넘겨서 부담을 나눈다
+        }
+
+        foreach (var entry in _prewarmBullets)
+        {
+            FillPool(GetOrCreateBulletPool(entry.id), entry.count);
+            yield return null;
+        }
+    }
+
+    // 풀에서 count개를 한꺼번에 꺼냈다가 다시 넣는다.
+    // 꺼낼 때 풀이 비어 있으면 새로 만들기 때문에, 이 과정이 끝나면 풀 안에 count개가 준비된다.
+    // (하나씩 꺼내고 바로 넣으면 같은 오브젝트만 재사용되어 1개만 생긴다)
+    static void FillPool<T>(ObjectPool<T> pool, int count) where T : class
+    {
+        if (pool == null) return;
+
+        var temp = ListPool<T>.Get(); // 임시 리스트도 풀에서 빌려 써서 메모리 할당을 줄인다
+        for (int i = 0; i < count; i++)
+            temp.Add(pool.Get());
+        foreach (var item in temp)
+            pool.Release(item);
+        ListPool<T>.Release(temp);
     }
 
     // ── VFX ──────────────────────────────────────────────────
