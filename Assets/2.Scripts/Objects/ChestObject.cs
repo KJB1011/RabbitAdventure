@@ -11,6 +11,9 @@ public class ChestObject : MonoBehaviour
     [SerializeField] GameObject _itemPrefab;
     [SerializeField] int _minDropCount = 3;
     [SerializeField] int _maxDropCount = 5;
+    [SerializeField] float _dropDistanceMin = 1.0f; // 상자에서 떨어지는 거리 (최소~최대 사이 랜덤)
+    [SerializeField] float _dropDistanceMax = 1.6f;
+    [SerializeField, Range(0f, 0.5f)] float _dropAngleJitter = 0.3f; // 각도 흔들림 (0 = 완전히 균등, 클수록 불규칙)
 
     [Header("파괴 연출")]
     [SerializeField] SpriteRenderer _spriteRenderer;
@@ -56,18 +59,34 @@ public class ChestObject : MonoBehaviour
 
         int count = Random.Range(_minDropCount, _maxDropCount + 1);
 
+        // 360°를 아이템 수만큼 똑같이 나눠서 각자 다른 방향으로 떨어뜨린다 → 서로 겹치지 않음
+        // (시작 각도를 랜덤으로 돌려서, 매번 같은 모양으로 떨어지지 않게)
+        float sliceAngle = 360f / count;
+        float startAngle = Random.Range(0f, 360f);
+        Vector2 center = transform.position;
+
         for (int i = 0; i < count; i++)
         {
             Defines.ITEM itemType = GetRandomItemType();
 
-            Vector2 offset = Random.insideUnitCircle * 0.8f;
-            GameObject go = Instantiate(_itemPrefab,
-                (Vector2)transform.position + offset, Quaternion.identity);
+            // i번째 방향 + 약간의 흔들림 (칸 크기의 ±jitter 비율만큼)
+            float jitter = Random.Range(-_dropAngleJitter, _dropAngleJitter) * sliceAngle;
+            float angle = (startAngle + sliceAngle * i + jitter) * Mathf.Deg2Rad;
+            Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+            float distance = Random.Range(_dropDistanceMin, _dropDistanceMax);
+            Vector2 landPos = center + dir * distance;
 
-            // 아이템 타입 세팅
+            // 상자 중심에서 생겨나서, 정해진 위치로 튀어나간다
+            GameObject go = Instantiate(_itemPrefab, center, Quaternion.identity);
+
+            // 아이템 타입 세팅 + 점프
+            // (점프 트윈은 아이템 쪽에서 돌아가므로, 바로 아래에서 상자가 꺼져도 끊기지 않는다)
             var pickup = go.GetComponent<ItemPickup>();
             if (pickup != null)
+            {
                 pickup.SetItemType(itemType);
+                pickup.JumpTo(landPos);
+            }
         }
     }
 

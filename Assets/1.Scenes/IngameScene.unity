@@ -15724,6 +15724,28 @@ MonoBehaviour:
   _bulletDefaultCapacity: 32
   _bulletMaxSize: 200
   _usePooling: 1
+  _prewarmVfx:
+  - id: Hit
+    count: 5
+  - id: HitSpark
+    count: 5
+  - id: SwordVFX
+    count: 2
+  - id: SwordVFX2
+    count: 1
+  - id: SpecialHit
+    count: 3
+  - id: SpecialCharge
+    count: 1
+  - id: FinishHit
+    count: 2
+  - id: PlayerHit
+    count: 1
+  - id: AreaHit
+    count: 2
+  _prewarmBullets:
+  - id: VFX/TestBullet
+    count: 30
 --- !u!4 &1317788118
 Transform:
   m_ObjectHideFlags: 0
@@ -16887,7 +16909,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 14}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -68, y: 221}
+  m_AnchoredPosition: {x: -67.99994, y: 221}
   m_SizeDelta: {x: 2600, y: 15}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1607166279
@@ -17590,7 +17612,7 @@ MonoBehaviour:
   _damageFontSize: 5
   _itemColor: {r: 0.4, g: 1, b: 0.4, a: 1}
   _itemFontSize: 2.5
-  _stackOffset: 0.5
+  _stackOffset: 0.3
 --- !u!1 &2046585686
 GameObject:
   m_ObjectHideFlags: 0

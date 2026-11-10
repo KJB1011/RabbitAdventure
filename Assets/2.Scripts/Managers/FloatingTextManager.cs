@@ -75,6 +75,10 @@ public class FloatingTextManager : MonoBehaviour
     public void ShowItemEffect(string content, Vector3 worldPos)
         => PlayText(content, _itemColor, _itemFontSize, worldPos);
 
+    // 아이템 종류마다 다른 색으로 표시할 때 (크기는 아이템 텍스트 기본값)
+    public void ShowItemEffect(string content, Color color, Vector3 worldPos)
+        => PlayText(content, color, _itemFontSize, worldPos);
+
     public void ShowCustom(string content, Color color, float fontSize, Vector3 worldPos)
         => PlayText(content, color, fontSize, worldPos);
 }

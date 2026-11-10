@@ -197,4 +197,5 @@ MonoBehaviour:
   _floatHeight: 1.2
   _floatDuration: 0.6
   _fadeDuration: 0.4
-  _fadeDelay: 0.3
+  _fadeDelay: 0.6
+  _pushDuration: 0.12
