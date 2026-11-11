@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 /// <summary>
 /// Enemy중 Boss의 행동을 담당하는 스크립트
@@ -18,6 +19,20 @@ public class Enemy_Boss : EnemyController
     [SerializeField] float _phase2ScaleMultiplier = 1.2f;
     [SerializeField] float _phase2FlashDuration = 0.15f;
     [SerializeField] int _phase2FlashCount = 5;
+
+    [Header("Phase 2 전환 - 부드럽게 커지기")]
+    [SerializeField] float _growSquash = 0.85f;                // 커지기 전 잠깐 움츠러드는 비율 (예비 동작)
+    [SerializeField] float _growSquashTime = 0.2f;
+    [SerializeField] float _growTime = 0.5f;                   // 목표 크기까지 커지는 시간
+    [SerializeField] float _growShakeDuration = 0.4f;
+    [SerializeField] float _growShakeStrength = 0.35f;
+    [SerializeField] string _growSfx = "SFX/PhaseChange";  // 깜빡임이 시작될 때 재생 (Resources/Sounds/ 기준 경로)
+
+    [Header("Phase 2 전환 - 충격파")]
+    [SerializeField] Sprite _shockwaveSprite;                  // 링 모양 이미지 (ShockwaveRing)
+    [SerializeField] float _shockwaveEndSize = 14f;            // 퍼져서 도달하는 지름 (월드 단위)
+    [SerializeField] float _shockwaveTime = 0.6f;
+    [SerializeField] Color _shockwaveColor = new Color(1f, 0.35f, 0.35f, 0.9f);
 
     [Header("웨이포인트")]
     [SerializeField]
@@ -300,24 +315,64 @@ public class Enemy_Boss : EnemyController
         yield return StartCoroutine(MoveToPosition(Vector2.zero));
         yield return new WaitForSeconds(0.2f);
 
-        Color originalColor = _bodySprite != null ? _bodySprite.color : Color.white;
+        if (!string.IsNullOrEmpty(_growSfx)) SoundManager.Instance.PlaySFX(_growSfx);
+
+        // 흰색으로 깜빡이며 힘을 모은다
         for (int i = 0; i < _phase2FlashCount; i++)
         {
-            if (_bodySprite != null) _bodySprite.color = Color.black;
-            yield return new WaitForSeconds(_phase2FlashDuration);
-            if (_bodySprite != null) _bodySprite.color = originalColor;
-            yield return new WaitForSeconds(_phase2FlashDuration);
+            if (_bodySprite != null)
+                IngameManager.Instance.Flash(_bodySprite, _phase2FlashDuration);
+            yield return new WaitForSeconds(_phase2FlashDuration * 2f);
         }
 
-        transform.localScale *= _phase2ScaleMultiplier;
+        // 부드럽게 커지기
+        Vector3 baseScale = transform.localScale;
+        Vector3 targetScale = baseScale * _phase2ScaleMultiplier;
 
-        yield return new WaitForSeconds(0.3f);
+        yield return transform.DOScale(baseScale * _growSquash, _growSquashTime)
+                              .SetEase(Ease.OutQuad)
+                              .WaitForCompletion();
+
+        transform.DOScale(targetScale, _growTime).SetEase(Ease.OutBack); // OutBack: 목표를 살짝 넘었다가 돌아옴 → "부풀어 오르는" 느낌
+        PlayShockwave();
+        DOTween.Complete(IngameManager.CamShakeId);
+        IngameManager.Instance.ShakeCamera(_growShakeDuration, _growShakeStrength);
+
+        yield return new WaitForSeconds(_growTime + 0.3f);
 
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = true;
 
         _isPhase2 = true;
-        Debug.Log("[Boss] Phase 2 시작!");
+    }
+
+    // 보스를 중심으로 링이 퍼져 나가며 사라지는 충격파
+    void PlayShockwave()
+    {
+        if (_shockwaveSprite == null) return;
+
+        var go = new GameObject("Phase2Shockwave");
+        go.transform.position = transform.position;
+
+        // 기본 스프라이트 머티리얼을 쓴다 (색·투명도로 사라지게 해야 하므로 플래시 셰이더 X)
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = _shockwaveSprite;
+        sr.color = _shockwaveColor;
+        if (_bodySprite != null)
+        {
+            sr.sortingLayerID = _bodySprite.sortingLayerID;
+            sr.sortingOrder = _bodySprite.sortingOrder + 5; // 보스보다 앞에
+        }
+
+        // 이미지 크기를 기준으로, 작게 시작해서 _shockwaveEndSize 지름까지 퍼지게 한다
+        float spriteSize = _shockwaveSprite.bounds.size.x;
+        float endScale = _shockwaveEndSize / spriteSize;
+        go.transform.localScale = Vector3.one * (endScale * 0.1f);
+
+        DOTween.Sequence()
+               .Join(go.transform.DOScale(endScale, _shockwaveTime).SetEase(Ease.OutCubic))
+               .Join(sr.DOFade(0f, _shockwaveTime).SetEase(Ease.InQuad))
+               .OnComplete(() => Destroy(go));
     }
     // Phase 2 진입 전에는 HP가 임계값(50%) 아래로 안 내려감
     protected override int ClampHp(int hp)

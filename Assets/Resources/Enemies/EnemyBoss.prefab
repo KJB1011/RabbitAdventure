@@ -154,9 +154,19 @@ MonoBehaviour:
   _phase2BulletCount: 24
   _phase2Threshold: 0.5
   _bodySprite: {fileID: 2372519349042348217}
-  _phase2ScaleMultiplier: 1.4
-  _phase2FlashDuration: 0.15
-  _phase2FlashCount: 5
+  _phase2ScaleMultiplier: 1.6
+  _phase2FlashDuration: 0.1
+  _phase2FlashCount: 3
+  _growSquash: 0.85
+  _growSquashTime: 0.2
+  _growTime: 0.5
+  _growShakeDuration: 0.4
+  _growShakeStrength: 0.35
+  _growSfx: SFX/PhaseChange
+  _shockwaveSprite: {fileID: -6752388399461814384, guid: f7f15ec3c552dcf40be9536b23ec346d, type: 3}
+  _shockwaveEndSize: 14
+  _shockwaveTime: 0.6
+  _shockwaveColor: {r: 1, g: 0.35, b: 0.35, a: 0.9}
   _waypoints:
   - {x: 0, y: 2}
   - {x: -5, y: 0}
