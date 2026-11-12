@@ -16,7 +16,8 @@ public class IngameManager : MonoBehaviour
     [SerializeField] NodeBase[] _nodes;
 
     [Header("노드 전환")]
-    [SerializeField] float _nodeTransitionDelay = 5f;
+    [SerializeField] ExitPortal _exitPortal;            // 클리어 후 오른쪽에 나타나는 출구 포털
+    [SerializeField] BackgroundScroller _bgScroller;    // 이동하는 동안 배경을 빠르게 흘려보냄
     [SerializeField] GameObject _resultUI;
     [SerializeField] GameObject _gameoverUI;
     [SerializeField] GameObject _countdownUI;
@@ -205,8 +206,6 @@ public class IngameManager : MonoBehaviour
         // 중간 결과창 표시
         _countdownPanel.Show();
 
-        float remaining = isBattle ? _nodeTransitionDelay : 3f;
-
         if (_maxDamageText != null && isBattle)
         {
             _maxDamageText.enabled = true;
@@ -218,21 +217,52 @@ public class IngameManager : MonoBehaviour
             _avgDPSText.text = $"평균 DPS : {(_totalDamage / _totalBattleTime):F1}";
         }
 
-        while (remaining > 0f)
+        // 카운트다운 대신 출구 포털을 열고, 플레이어가 포털을 다 채울 때까지 기다린다
+        // (안내 문구와 진행 게이지는 포털 위에 직접 표시된다 → 결과창 문구 자리는 비워 둔다)
+        if (_countdownText != null)
+            _countdownText.text = string.Empty;
+
+        if (_exitPortal != null && _player != null)
         {
-            if (_countdownText != null)
-                _countdownText.text = $"다음 구역까지 {Mathf.CeilToInt(remaining)}초";
-            remaining -= Time.deltaTime;
-            yield return null;
+            bool entered = false;
+            _exitPortal.Open(_player.transform, () => entered = true);
+            yield return new WaitUntil(() => entered);
+        }
+        else
+        {
+            // 포털이 연결되지 않았을 때를 대비한 기존 방식 (3초 후 자동 이동)
+            yield return new WaitForSeconds(3f);
         }
 
-        // 플레이어 강제로 왼쪽으로 이동
-        if (_player != null)
-            yield return StartCoroutine(_player.MoveToPositionRoutine(_playerStartPos));
-
-        // 중간 결과창 비활성화 및 초기화
+        // 중간 결과창은 플레이어가 이동하는 동안 함께 닫는다
         bool hideDone = false;
         _countdownPanel.Hide(() => hideDone = true);
+
+        // 플레이어: 오른쪽 화면 밖으로 퇴장 → 왼쪽 화면 밖에서 다음 구역으로 등장
+        if (_player != null)
+        {
+            _player.SetBoundary(false);   // 맵 경계 밖으로 나갈 수 있게
+            _player.LockFacing(faceRight: true); // 이동하는 동안은 마우스와 상관없이 오른쪽을 본다
+
+            // 배경이 빠르게 흘러가기 시작 → "앞으로 달려 나가는" 느낌
+            if (_bgScroller != null) _bgScroller.StartBoost();
+
+            // 퇴장 (진행 중인 스킬 정리·무적 초기화도 이 함수 안에서 처리됨)
+            Vector2 exitPos = new Vector2(-_playerOffscreen.x, _player.transform.position.y);
+            yield return StartCoroutine(_player.MoveToPositionRoutine(exitPos));
+
+            // 등장 (게임 시작 인트로와 같은 방식)
+            _player.SetControllable(false);
+
+            // 플레이어가 자리에 도착하는 시간에 맞춰 배경도 서서히 원래 속도로
+            if (_bgScroller != null) _bgScroller.StopBoost(_playerEnterTime);
+            yield return StartCoroutine(PlayerEnterFromLeft(_playerOffscreen, _playerStartPos, _playerEnterTime));
+
+            _player.SetBoundary(true);
+            _player.SetControllable(true);
+            _player.UnlockFacing();
+        }
+
         yield return new WaitUntil(() => hideDone);
 
         _nodes[_currentIndex].gameObject.SetActive(false);
@@ -298,6 +328,9 @@ public class IngameManager : MonoBehaviour
 
         GetHPBar()?.Hide();
         _countdownPanel?.Hide();
+        if (_exitPortal != null) _exitPortal.Close(immediate: true);
+        if (_bgScroller != null) _bgScroller.StopBoost(0f);
+        if (_player != null) _player.UnlockFacing();
 
         ActivateNode(_currentIndex);
     }

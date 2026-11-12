@@ -61,6 +61,10 @@ public class PlayerController : MonoBehaviour
     bool _isControllable = true;
     bool _boundaryEnabled = true;
 
+    // 바라보는 방향 고정 (노드 이동 연출 중에는 마우스와 상관없이 한 방향만 보게)
+    bool _isFacingLocked = false;
+    bool _lockedFaceLeft = false;
+
     int _invincibleCount = 0;
 
     float _damageMultiplier = 1f;
@@ -120,6 +124,17 @@ public class PlayerController : MonoBehaviour
     {
         _boundaryEnabled = enabled;
     }
+
+    // 바라보는 방향을 고정 / 해제 (해제하면 다시 마우스 방향을 따라간다)
+    public void LockFacing(bool faceRight)
+    {
+        _isFacingLocked = true;
+        _lockedFaceLeft = !faceRight;
+    }
+    public void UnlockFacing()
+    {
+        _isFacingLocked = false;
+    }
     public void GameOver()
     {
         _isGameOver = true;
@@ -178,7 +193,10 @@ public class PlayerController : MonoBehaviour
             );
         }
 
-        if (mousePos.x < transform.position.x)
+        // 바라보는 방향: 고정 중이면 고정된 방향, 아니면 마우스 방향
+        bool faceLeft = _isFacingLocked ? _lockedFaceLeft : mousePos.x < transform.position.x;
+
+        if (faceLeft)
         {
             _uiPlayerSkill.transform.position = transform.position + (Vector3.right / 10 * 7f);
             _spriteRenderer.flipX = true;
