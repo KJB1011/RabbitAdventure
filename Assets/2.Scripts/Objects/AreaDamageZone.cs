@@ -47,6 +47,10 @@ public class AreaDamageZone : MonoBehaviour
 
         foreach (var hit in hits)
         {
+            // 플레이어 몸(HitPoint)에 닿았을 때만 데미지
+            // (플레이어의 공격 범위 콜라이더도 Player의 자식이라, 이 확인이 없으면 공격 범위만 걸쳐도 맞는다)
+            if (!hit.CompareTag("PlayerHitbox")) continue;
+
             var player = hit.GetComponentInParent<PlayerController>();
             if (player == null) continue;
             player.DamageTaken();

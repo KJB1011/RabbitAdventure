@@ -14,6 +14,10 @@ public class ItemPickup : MonoBehaviour
     [SerializeField] float _maxSpeed = 20f;
     [SerializeField] float _pickupRadius = 0.4f;
 
+    [Header("골드 금액")]
+    [SerializeField] int _goldMin = 6;  // 골드 아이템 하나당 금액 (최소~최대, 최대값 포함)
+    [SerializeField] int _goldMax = 7;
+
     [Header("튀어나오기")]
     [SerializeField] float _jumpPowerMin = 0.6f;    // 점프 높이 (최소~최대 사이 랜덤)
     [SerializeField] float _jumpPowerMax = 1.0f;
@@ -199,7 +203,8 @@ public class ItemPickup : MonoBehaviour
         switch (_itemType)
         {
             case Defines.ITEM.GOLD:
-                int gold = Random.Range(5, 9);
+                // int용 Random.Range는 최대값을 포함하지 않으므로 +1 (6~7이면 Range(6, 8))
+                int gold = Random.Range(_goldMin, _goldMax + 1);
                 IngameManager.Instance.AddGold(gold);
                 effectText = $"Gold + {gold}";
                 break;

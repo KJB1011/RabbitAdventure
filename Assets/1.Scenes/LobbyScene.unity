@@ -7355,6 +7355,23 @@ MonoBehaviour:
   _sfxSource: {fileID: 1842192893}
   _sfxVolume: 0.5
   _sfxPoolSize: 5
+  _preloadSfx:
+  - SFX/Player_Sword
+  - SFX/Player_SwordHit
+  - SFX/Player_StrongSword
+  - SFX/HeavyHit
+  - SFX/Hit
+  - SFX/Player_Dash
+  - SFX/Slain
+  - SFX/BulletFire
+  - SFX/Telegraph
+  - SFX/AreaDamage
+  - SFX/Player_SpecialCharge
+  - SFX/GlassBreaking
+  - SFX/DropCoin
+  - SFX/CoinDropping
+  - SFX/PhaseChange
+  - SFX/Player_SwordOneSlash
 --- !u!4 &1842192896
 Transform:
   m_ObjectHideFlags: 0

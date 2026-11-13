@@ -63,7 +63,7 @@ public class PlayerAttack : MonoBehaviour
         _attackAreaPos.position = transform.position + transform.right * (_baseAttackDistance * multiplier);
         _attackArea.size = _defaultColSize * multiplier;
 
-        SoundManager.Instance.PlaySFX("SFX/Sword");
+        SoundManager.Instance.PlaySFX("SFX/Player_Sword");
         var vfx = VFXManager.Instance.Play("SwordVFX", (Vector2)_attackAreaPos.position, transform.rotation);
         if (vfx != null) vfx.transform.localScale = Vector3.one * multiplier;
 
@@ -85,7 +85,7 @@ public class PlayerAttack : MonoBehaviour
         _attackAreaPos2.position = transform.position + transform.right * (_baseSuperDistance * multiplier);
         _attackArea2.size = _defaultColSize2 * multiplier;
 
-        SoundManager.Instance.PlaySFX("SFX/StrongSword");
+        SoundManager.Instance.PlaySFX("SFX/Player_StrongSword");
         var vfx = VFXManager.Instance.Play("SwordVFX2", (Vector2)_attackAreaPos2.position, transform.rotation);
         if (vfx != null) vfx.transform.localScale = Vector3.one * _superRangeMultiplier;
 

@@ -11,7 +11,14 @@ public class ArtifactManager : MonoBehaviour
     public static ArtifactManager Instance { get; private set; }
 
     private readonly Dictionary<ArtifactSO, ArtifactEffect> _activeEffects = new();
+    private readonly List<ArtifactSO> _ownedOrder = new(); // 획득한 순서 (Dictionary는 순서를 보장하지 않으므로 따로 기록)
     private PlayerController _player;
+
+    /// <summary>보유 중인 아티팩트 (획득한 순서대로)</summary>
+    public IReadOnlyList<ArtifactSO> OwnedArtifacts => _ownedOrder;
+
+    /// <summary>아티팩트를 얻거나 잃었을 때 알림 (UI 갱신용)</summary>
+    public event System.Action OnArtifactsChanged;
 
     void Awake()
     {
@@ -48,8 +55,10 @@ public class ArtifactManager : MonoBehaviour
         var effect = data.CreateEffect();
         effect.Activate(_player, this);
         _activeEffects[data] = effect;
+        _ownedOrder.Add(data);
 
         Debug.Log($"[Artifact] 획득: {data.artifactName}");
+        OnArtifactsChanged?.Invoke();
         return true;
     }
 
@@ -62,7 +71,9 @@ public class ArtifactManager : MonoBehaviour
 
         effect.Deactivate();
         _activeEffects.Remove(data);
+        _ownedOrder.Remove(data);
         Debug.Log($"[Artifact] 제거: {data.artifactName}");
+        OnArtifactsChanged?.Invoke();
     }
 
     public bool HasArtifact(ArtifactSO data) => _activeEffects.ContainsKey(data);

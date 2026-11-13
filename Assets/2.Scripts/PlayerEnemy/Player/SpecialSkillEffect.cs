@@ -49,7 +49,9 @@ public class SpecialSkillEffect : MonoBehaviour
         ResetSlash();
         gameObject.SetActive(true); // 연출용 캔버스 소환
 
-        SoundManager.Instance.PlaySFX("SFX/StrongSword");
+        // 베는 순간: 묵직한 칼소리 + 날카로운 한 번 베기 소리를 겹쳐서 재생
+        SoundManager.Instance.PlaySFX("SFX/Player_StrongSword");
+        SoundManager.Instance.PlaySFX("SFX/Player_SwordOneSlash");
         Time.timeScale = 0f; // 연출동안 잠깐 게임 멈춰놓기
 
         // 칼로 베듯 선이 지나간 뒤

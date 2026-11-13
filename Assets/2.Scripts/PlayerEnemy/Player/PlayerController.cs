@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("캐릭터 능력치")]
     [SerializeField] float _speed = 1f;
+    [SerializeField, Range(0f, 1f)] float _superChargeSpeedRate = 0.5f; // Q 스킬 차징 중 이동속도 배율 (0.5 = 절반)
     [SerializeField] int _hp = 10;
     [SerializeField] int _maxHp = 10;
     [SerializeField] float _atk;
@@ -68,6 +69,7 @@ public class PlayerController : MonoBehaviour
     int _invincibleCount = 0;
 
     float _damageMultiplier = 1f;
+    float _moveSpeedRate = 1f; // 이동속도에 곱하는 배율 (1 = 평소, 스킬 사용 중 느려질 때 낮아짐)
 
     float _mainSkillCooldown;
     float _subSkillCooldown;
@@ -140,8 +142,24 @@ public class PlayerController : MonoBehaviour
         _isGameOver = true;
     }
 
+    // 꾹 누르고 있는지 확인하기 위한 입력 액션 (Awake에서 한 번만 찾아 둔다)
+    InputAction _attackAction;
+    InputAction _dashAction;
+    InputAction _superSkillAction;
+    InputAction _specialSkillAction;
+
     void Awake()
     {
+        var playerInput = GetComponent<PlayerInput>();
+        if (playerInput != null)
+        {
+            // FindAction: 이름으로 찾되, 없으면 오류 대신 null을 돌려준다
+            _attackAction = playerInput.actions.FindAction("Attack");
+            _dashAction = playerInput.actions.FindAction("Dash");
+            _superSkillAction = playerInput.actions.FindAction("SuperSkill");
+            _specialSkillAction = playerInput.actions.FindAction("SpecialSkill");
+        }
+
         _trailRenderer = GetComponent<TrailRenderer>();
         _spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         _trailRenderer.enabled = false;
@@ -175,6 +193,14 @@ public class PlayerController : MonoBehaviour
             _uiPlayerSkill.SetCoolDown(Defines.SKILL.SPECIAL, SpecialSkillCooldownRatio);
         }
 
+        // 꾹 누르고 있으면 쿨타임이 끝나는 즉시 다시 발동
+        // (각 함수 안에서 쿨타임·공격 중·대시 중 등을 검사하므로, 조건이 맞을 때만 실제로 나간다)
+        // 대시 → 필살기 → Q → 기본 공격 순서: 같이 누르고 있으면 회피가 가장 먼저, 그다음 큰 스킬이 먼저 나가도록
+        if (_dashAction != null && _dashAction.IsPressed()) OnDash();
+        if (_specialSkillAction != null && _specialSkillAction.IsPressed()) OnSpecialSkill();
+        if (_superSkillAction != null && _superSkillAction.IsPressed()) OnSuperSkill();
+        if (_attackAction != null && _attackAction.IsPressed()) OnAttack();
+
         Vector2 mousePos = Utils.GetMousePos();
         Vector2 dir = (mousePos - (Vector2)_playerAttack.transform.position).normalized;
 
@@ -182,7 +208,7 @@ public class PlayerController : MonoBehaviour
             _playerAttack.transform.right = dir;
 
         if (!_isDashing && _isControllable)
-            transform.Translate(_dir * _speed * Time.deltaTime);
+            transform.Translate(_dir * _speed * _moveSpeedRate * Time.deltaTime);
 
         if (_boundaryEnabled)
         {
@@ -276,6 +302,7 @@ public class PlayerController : MonoBehaviour
         _isAttack = false;
         _isDashing = false;
         _damageMultiplier = 1f;
+        _moveSpeedRate = 1f; // Q 차징 중에 끊겼을 수 있으므로 원래대로
 
         // Time.timeScale이 0일 경우 대비 복구
         if (Time.timeScale == 0f)
@@ -329,6 +356,7 @@ public class PlayerController : MonoBehaviour
         _isGameOver = false;
         _invincibleCount = 0;
         _damageMultiplier = 1f;
+        _moveSpeedRate = 1f;
 
         _playerHitBox.enabled = true;
         _spriteRenderer.enabled = true;
@@ -377,13 +405,22 @@ public class PlayerController : MonoBehaviour
     IEnumerator SpecialSkillRoutine()
     {
         _isAttack = true;
-        _invincibleCount++;
-        _playerHitBox.enabled = false;
 
         _animController.SetTrigger("isSpecial");
-        SoundManager.Instance.PlaySFX("SFX/SpecialCharge");
+        SoundManager.Instance.PlaySFX("SFX/Player_SpecialCharge");
         VFXManager.Instance.PlayAttached("SpecialCharge", transform);
         yield return new WaitForSecondsRealtime(_specialInvincibleDelay);
+
+        // 차징 중에 맞아서 죽었다면 연출을 발동하지 않음
+        if (_isGameOver)
+        {
+            _isAttack = false;
+            yield break;
+        }
+
+        // 차징이 끝나고 연출이 발동되는 순간부터 무적
+        _invincibleCount++;
+        _playerHitBox.enabled = false;
 
         // PlayerController(항상 활성)에서 스냅샷 찍기
         yield return new WaitForEndOfFrame();
@@ -436,7 +473,7 @@ public class PlayerController : MonoBehaviour
         // 적중 사운드는 맞은 대상 수와 상관없이 한 번만 (여러 번 겹쳐 재생되면 소리가 뭉개짐)
         // (화면 흔들림은 화면이 드러나는 유리 깨짐 순간에 SpecialSkillEffect가 담당)
         if (hitAny)
-            SoundManager.Instance.PlaySFX("SFX/SwordHit");
+            SoundManager.Instance.PlaySFX("SFX/Player_SwordHit");
     }
 
     // ── Q 스킬 ───────────────────────────────────────────────
@@ -445,13 +482,19 @@ public class PlayerController : MonoBehaviour
         _isAttack = true;
         _animController.SetTrigger("isSuper");
 
-        // 0.8초동안 차징
-        Coroutine blinkRoutine = StartCoroutine(BlinkCharge(0.8f));
-        yield return new WaitForSeconds(1f);
+        // 누른 순간부터 이펙트가 나가기 전까지 이동속도 감소
+        _moveSpeedRate = _superChargeSpeedRate;
+
+        // 차징
+        Coroutine blinkRoutine = StartCoroutine(BlinkCharge(0.4f));
+        yield return new WaitForSeconds(0.5f);
         StopCoroutine(blinkRoutine);
 
         // 깜빡임 끝나면 원래 색으로 복구 (흰색 상태에서 멈췄을 수도 있으므로)
         SetFlash(0f);
+
+        // 이펙트가 발동하는 순간 이동속도 원래대로
+        _moveSpeedRate = 1f;
 
         _damageMultiplier = 8f;
         bool attackDone = false;
@@ -598,7 +641,7 @@ public class PlayerController : MonoBehaviour
         Vector2 targetPos = startPos + dashDirection * finalDashDistance;
 
         _animController.SetTrigger("isDash");
-        SoundManager.Instance.PlaySFX("SFX/Dash");
+        SoundManager.Instance.PlaySFX("SFX/Player_Dash");
         float elapsed = 0f;
         while (elapsed < _dashDuration)
         {

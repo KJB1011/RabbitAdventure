@@ -30,9 +30,9 @@ public class SoundManager : MonoBehaviour
     [Tooltip("인게임 시작 시 미리 불러올 효과음 (Resources/Sounds/ 기준 경로). 처음 재생할 때의 렉을 없애기 위함.")]
     [SerializeField] private string[] _preloadSfx =
     {
-        "SFX/Sword", "SFX/SwordHit", "SFX/StrongSword", "SFX/HeavyHit",
-        "SFX/Hit", "SFX/Dash", "SFX/Slain", "SFX/BulletFire", "SFX/Telegraph",
-        "SFX/AreaDamage", "SFX/SpecialCharge", "SFX/GlassBreaking",
+        "SFX/Player_Sword", "SFX/Player_SwordHit", "SFX/Player_StrongSword", "SFX/HeavyHit",
+        "SFX/Hit", "SFX/Player_Dash", "SFX/Slain", "SFX/BulletFire", "SFX/Telegraph",
+        "SFX/AreaDamage", "SFX/Player_SpecialCharge", "SFX/Player_SwordOneSlash", "SFX/GlassBreaking",
         "SFX/DropCoin", "SFX/CoinDropping", "SFX/PhaseChange",
     };
 
