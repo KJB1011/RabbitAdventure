@@ -10,12 +10,20 @@ public class ArtifactManager : MonoBehaviour
 {
     public static ArtifactManager Instance { get; private set; }
 
+    [Tooltip("최대 보유 개수 (상태 패널의 아티팩트 칸 수)")]
+    [SerializeField] private int _maxArtifacts = 8;
+
     private readonly Dictionary<ArtifactSO, ArtifactEffect> _activeEffects = new();
     private readonly List<ArtifactSO> _ownedOrder = new(); // 획득한 순서 (Dictionary는 순서를 보장하지 않으므로 따로 기록)
     private PlayerController _player;
 
     /// <summary>보유 중인 아티팩트 (획득한 순서대로)</summary>
     public IReadOnlyList<ArtifactSO> OwnedArtifacts => _ownedOrder;
+
+    public int MaxArtifacts => _maxArtifacts;
+
+    /// <summary>칸이 가득 찼으면 더 얻을 수 없다</summary>
+    public bool IsFull => _ownedOrder.Count >= _maxArtifacts;
 
     /// <summary>아티팩트를 얻거나 잃었을 때 알림 (UI 갱신용)</summary>
     public event System.Action OnArtifactsChanged;
@@ -49,6 +57,11 @@ public class ArtifactManager : MonoBehaviour
         if (data == null || _activeEffects.ContainsKey(data))
         {
             Debug.Log($"[Artifact] 획득 불가 (없음 또는 보유 중): {data?.artifactName}");
+            return false;
+        }
+        if (IsFull)
+        {
+            Debug.Log($"[Artifact] 획득 불가 (최대 {_maxArtifacts}개): {data.artifactName}");
             return false;
         }
 

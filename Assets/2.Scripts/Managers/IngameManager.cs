@@ -349,6 +349,37 @@ public class IngameManager : MonoBehaviour
         return true;
     }
 
+    // ── 디버그 (Inspector 버튼에서 호출: Editor/IngameManagerEditor.cs) ──────
+#if UNITY_EDITOR
+    public void DebugDoubleAtk()
+    {
+        if (_player == null) { Debug.LogWarning("[Debug] 플레이어가 아직 없습니다"); return; }
+        _player.AddAtk(_player.Atk); // 지금 공격력만큼 더하기 = 2배
+        Debug.Log($"[Debug] 공격력 2배 → {_player.Atk}");
+    }
+
+    public void DebugAddGold(int amount)
+    {
+        AddGold(amount);
+        Debug.Log($"[Debug] 골드 +{amount} → {Gold}");
+    }
+
+    // 후보 중 아직 없는 아티팩트를 하나 골라 얻는다 (후보 목록은 에디터 스크립트가 프로젝트에서 찾아서 넘겨준다)
+    public void DebugGiveRandomArtifact(System.Collections.Generic.IList<ArtifactSO> pool)
+    {
+        var manager = ArtifactManager.Instance;
+        if (manager == null) { Debug.LogWarning("[Debug] ArtifactManager가 없습니다"); return; }
+        if (manager.IsFull) { Debug.LogWarning($"[Debug] 아티팩트가 가득 찼습니다 (최대 {manager.MaxArtifacts}개)"); return; }
+
+        var candidates = new System.Collections.Generic.List<ArtifactSO>();
+        foreach (var artifact in pool)
+            if (artifact != null && !manager.HasArtifact(artifact)) candidates.Add(artifact);
+
+        if (candidates.Count == 0) { Debug.LogWarning("[Debug] 얻을 수 있는 아티팩트가 없습니다 (전부 보유 중)"); return; }
+        manager.Acquire(candidates[Random.Range(0, candidates.Count)]);
+    }
+#endif
+
     // ── 전투 통계 ─────────────────────────────────────────────
     public void AddDamage(int damage)
     {

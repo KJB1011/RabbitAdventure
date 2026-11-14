@@ -95,6 +95,12 @@ public class PlayerController : MonoBehaviour
     public float SubSkillCooldownRatio => _subSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_subSkillCooldown / _subSkillCooldownDuration);
     public float SuperSkillCooldownRatio => _superSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_superSkillCooldown / _superSkillCooldownDuration);
     public float SpecialSkillCooldownRatio => _specialSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_specialSkillCooldown / _specialSkillCooldownDuration);
+
+    // 남은 쿨타임 (초, 0 이상)
+    public float MainSkillCooldownLeft => Mathf.Max(0f, _mainSkillCooldown);
+    public float SubSkillCooldownLeft => Mathf.Max(0f, _subSkillCooldown);
+    public float SuperSkillCooldownLeft => Mathf.Max(0f, _superSkillCooldown);
+    public float SpecialSkillCooldownLeft => Mathf.Max(0f, _specialSkillCooldown);
     
     // 외부 효과(아티팩트·버프)용 스탯 변경
     public void AddAtkMultiplier(float bonus) => _atkMultiplierBonus += bonus;

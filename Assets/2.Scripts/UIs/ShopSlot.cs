@@ -119,6 +119,13 @@ public class ShopSlot : MonoBehaviour,
             return;
         }
 
+        // 아티팩트 칸이 가득 찼으면 돈을 쓰기 전에 막는다
+        if (_slotType == SlotType.Artifact && ArtifactManager.Instance.IsFull)
+        {
+            ShowFloatingText("아티팩트 칸이 가득 찼어요!", Color.red);
+            return;
+        }
+
         IngameManager.Instance.SpendGold(_price);
 
         switch (_slotType)
