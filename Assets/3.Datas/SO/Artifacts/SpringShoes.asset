@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3d6a10d36dd33080534d6b7207a62b5, type: 3}
+  m_Name: SpringShoes
+  m_EditorClassIdentifier: Assembly-CSharp::SpringShoesSO
+  artifactName: "깡충 스프링 신발"
+  description: "대쉬가 끝난 자리에 충격파를 일으켜 주변 적에게 공격력 100%의 피해"
+  icon: {fileID: 3415432241423165068, guid: ad379762bff49484c9d572e520c0d1e3, type: 3}
+  price: 30
+  _radius: 1.5
+  _damageRate: 1
+  _vfxId: SpringShockwave
+  _sfxPath: SFX/AreaDamage

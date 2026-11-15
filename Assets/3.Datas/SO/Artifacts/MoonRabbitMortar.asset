@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c32ed04673c6deaf5f9312225054db95, type: 3}
+  m_Name: MoonRabbitMortar
+  m_EditorClassIdentifier: Assembly-CSharp::MoonRabbitMortarSO
+  artifactName: "달토끼의 절구"
+  description: "기본 공격을 10번 맞힐 때마다 필살기 쿨타임 1초 감소"
+  icon: {fileID: -2585007302770035746, guid: 8cbef1f44abae964bb3f2e6c119ea98e, type: 3}
+  price: 26
+  _hitsRequired: 10
+  _cooldownReduce: 1

@@ -1153,6 +1153,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dc2599a351c163b4ea5270b5d5599975, type: 2}
   - {fileID: 11400000, guid: 7f2a7e95384447347a1e54f56fee3316, type: 2}
   - {fileID: 11400000, guid: e1b724ccef8db4d45b634813e9d6d8ca, type: 2}
+  - {fileID: 11400000, guid: 1a5044b7adccf062eebde440fbdb2f85, type: 2}
+  - {fileID: 11400000, guid: 034f3e58a581c8885239a0c036346839, type: 2}
+  - {fileID: 11400000, guid: 9769feaea14aa64b32c6a6746eb30ae2, type: 2}
+  - {fileID: 11400000, guid: 8e829e74205ada97d4f37f06b425aac9, type: 2}
+  - {fileID: 11400000, guid: af068704d57c91675c2ad6c79e1e3c65, type: 2}
   _hpIcon: {fileID: 21300000, guid: db0ed6c2b641e6a4ba9048c11372dc6b, type: 3}
   _atkIcon: {fileID: 21300000, guid: ae48db2a4d1f56147a422d22981d7ea0, type: 3}
   _critIcon: {fileID: 21300000, guid: e8f7d1765fb9fa54eb0516d20e68c374, type: 3}

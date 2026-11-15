@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
     float _extraDashInvincibleTime = 0f;  // 외부 대쉬 추가 무적 시간
 
     public event System.Action OnDashStarted;
+    public event System.Action OnDashEnded;                          // 대쉬 이동이 끝난 순간 (도착 지점에서)
     public event System.Action<EnemyBase, AttackType> OnAttackHit;   // 맞은 적 + 공격 종류
 
     public bool IsInvincible => _invincibleCount > 0;
@@ -107,8 +108,16 @@ public class PlayerController : MonoBehaviour
     public void RemoveAtkMultiplier(float bonus) => _atkMultiplierBonus -= bonus;
     public void AddSpecialDamageBonus(float bonus) => _specialDamageBonus += bonus;
     public void AddDashInvincibleTime(float time) => _extraDashInvincibleTime += time;
+    public void AddCritDamageRate(float amount) => _critDamageRate += amount; // 치명타 배율 (1.5 → 2.0 등)
     public int GetBaseAtk() => (int)_atk;
 
+    // 최대 HP 변경. 줄어들면 현재 HP도 넘지 않게 맞추고, 늘어나면 늘어난 만큼 회복 (최소 1)
+    public void AddMaxHp(int amount)
+    {
+        _maxHp = Mathf.Max(1, _maxHp + amount);
+        _hp = Mathf.Clamp(_hp + Mathf.Max(0, amount), 1, _maxHp);
+        if (_hpTxt != null) _hpTxt.text = _hp.ToString(); // 플레이어가 파괴된 뒤 불려도 안전하게
+    }
 
     // EnemyHitbox 에서 플레이어 공격 적중 시 호출
     public void NotifyAttackHit(EnemyBase target, AttackType type) => OnAttackHit?.Invoke(target, type);
@@ -119,6 +128,13 @@ public class PlayerController : MonoBehaviour
     {
         _superSkillCooldown = Mathf.Max(0, _superSkillCooldown - amount);
         _uiPlayerSkill.SetCoolDown(SKILL.SUPER, SuperSkillCooldownRatio);   // 0이 되면 Update가 갱신하지 않으므로 직접 갱신
+    }
+
+    // 필살기(Special) 쿨타임 감소 (외부 효과용)
+    public void ReduceSpecialSkillCooldown(float amount)
+    {
+        _specialSkillCooldown = Mathf.Max(0, _specialSkillCooldown - amount);
+        _uiPlayerSkill.SetCoolDown(SKILL.SPECIAL, SpecialSkillCooldownRatio);
     }
 
     // 플레이어 움직임 제어 함수
@@ -672,6 +688,7 @@ public class PlayerController : MonoBehaviour
 
         _trailRenderer.enabled = false;
         _isDashing = false;
+        OnDashEnded?.Invoke();
 
         if (_extraDashInvincibleTime > 0)
             yield return new WaitForSeconds(_extraDashInvincibleTime);

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d99081106b75404290f1e63bd1dfa2a3, type: 3}
+  m_Name: RabbitFootCharm
+  m_EditorClassIdentifier: Assembly-CSharp::RabbitFootCharmSO
+  artifactName: "토끼 발 부적"
+  description: "치명타 확률 +15%, 치명타 피해 +50%"
+  icon: {fileID: 2529464226970997660, guid: 8364e39b8c9e2e246aef1482a5949511, type: 3}
+  price: 25
+  _critRate: 15
+  _critDamageRate: 0.5

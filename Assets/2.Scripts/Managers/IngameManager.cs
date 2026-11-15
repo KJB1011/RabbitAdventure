@@ -33,7 +33,10 @@ public class IngameManager : MonoBehaviour
 
     [Header("골드")]
     [SerializeField] TextMeshProUGUI _goldText;
-    public int Gold { get; set; } = 0;
+    public int Gold { get; private set; } = 0; // 바꿀 때는 AddGold / SpendGold만 사용 (알림이 빠지지 않게)
+
+    /// <summary>골드가 바뀔 때 알림 (바뀐 뒤의 골드). 아티팩트 등에서 사용</summary>
+    public event System.Action<int> OnGoldChanged;
 
     [Header("인트로 연출")]
     [SerializeField] CanvasGroup _gameUICanvas;    // 인게임 전체 UI의 CanvasGroup
@@ -339,6 +342,7 @@ public class IngameManager : MonoBehaviour
     {
         Gold += amount;
         if (_goldText != null) _goldText.text = Gold.ToString();
+        OnGoldChanged?.Invoke(Gold);
     }
 
     public bool SpendGold(int amount)
@@ -346,6 +350,7 @@ public class IngameManager : MonoBehaviour
         if (Gold < amount) return false;
         Gold -= amount;
         if (_goldText != null) _goldText.text = Gold.ToString();
+        OnGoldChanged?.Invoke(Gold);
         return true;
     }
 
