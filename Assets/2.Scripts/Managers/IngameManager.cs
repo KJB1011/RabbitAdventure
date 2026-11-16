@@ -30,6 +30,7 @@ public class IngameManager : MonoBehaviour
 
     [Header("HP Bar")]
     [SerializeField] UIHPBar _uiHpBar;
+    [SerializeField] UIHPBar _uiHpBar2; // 적이 두 마리 나올 때 두 번째 적용 (첫 번째 바 바로 아래)
 
     [Header("골드")]
     [SerializeField] TextMeshProUGUI _goldText;
@@ -76,6 +77,7 @@ public class IngameManager : MonoBehaviour
     }
 
     public UIHPBar GetHPBar() => _uiHpBar;
+    public UIHPBar GetHPBar2() => _uiHpBar2;
 
     void Start()
     {
@@ -330,6 +332,7 @@ public class IngameManager : MonoBehaviour
         _isBattle = false;
 
         GetHPBar()?.Hide();
+        GetHPBar2()?.Hide();
         _countdownPanel?.Hide();
         if (_exitPortal != null) _exitPortal.Close(immediate: true);
         if (_bgScroller != null) _bgScroller.StopBoost(0f);

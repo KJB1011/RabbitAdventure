@@ -37,6 +37,7 @@ public class BulletTelegraph : MonoBehaviour
         // 방향으로 회전
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        transform.localScale = new Vector3(_lineLength, _lineWidth, 1f); // 직사각형으로 쓰였다가 돌아온 경우 대비
 
         // 위치: 발사 위치에서 방향으로 반만큼 이동 (중심점 맞추기)
         transform.position = (Vector2)origin + direction.normalized * (_lineLength * 0.5f);
@@ -44,6 +45,19 @@ public class BulletTelegraph : MonoBehaviour
         gameObject.SetActive(true);
 
         // 페이드 인
+        _lineSprite?.DOColor(_visibleColor, _fadeInTime);
+    }
+
+    /// <summary>
+    /// 같은 경고 표시를 원하는 크기의 직사각형으로 보여줍니다. (예: 탄이 튀어나올 벽 쪽)
+    /// </summary>
+    public void ShowRect(Vector2 center, Vector2 size)
+    {
+        transform.rotation = Quaternion.identity;
+        transform.localScale = new Vector3(size.x, size.y, 1f);
+        transform.position = center;
+
+        gameObject.SetActive(true);
         _lineSprite?.DOColor(_visibleColor, _fadeInTime);
     }
 

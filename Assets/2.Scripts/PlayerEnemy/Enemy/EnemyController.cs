@@ -32,6 +32,15 @@ public class EnemyController : EnemyBase
         _attack = GetComponent<EnemyAttack>();
     }
 
+    /// <summary>플레이어를 바라본다 (공격을 시작할 때 호출)</summary>
+    public void FacePlayer()
+    {
+        if (PlayerTF != null) FaceTo(PlayerTF.position);
+    }
+
+    /// <summary>플레이어 위치 (없으면 null) — 외부(노드 등)에서 패턴을 조립할 때 사용</summary>
+    public Vector2? PlayerPos => PlayerTF != null ? (Vector2)PlayerTF.position : null;
+
     protected void InitEnemy(int hp)
     {
         _totalHp = hp;
@@ -44,6 +53,7 @@ public class EnemyController : EnemyBase
     {
         Vector2 startPosition = transform.position;
         float elapsed = 0f;
+        FaceTo(targetPosition); // 이동하는 쪽을 본다 (공격할 때는 다시 플레이어를 본다)
 
         while (elapsed < moveDuration)
         {

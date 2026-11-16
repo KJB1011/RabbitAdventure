@@ -93,6 +93,7 @@ public class Enemy_Boss : EnemyController
             int pattern = _patternIndex % patternCount;
             _patternIndex++;
 
+            FacePlayer(); // 패턴을 시작할 때 플레이어 쪽을 본다
             switch (pattern)
             {
                 case 0: yield return StartCoroutine(PatternRadial()); break;

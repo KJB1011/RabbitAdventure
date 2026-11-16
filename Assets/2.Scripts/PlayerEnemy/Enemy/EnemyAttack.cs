@@ -29,13 +29,111 @@ public class EnemyAttack : MonoBehaviour
 
     // 경고선·범위 공격 인스턴스 풀
     private readonly List<BulletTelegraph> _telegraphPool = new();
+    private readonly List<SectorTelegraph> _sectorPool = new();
     private readonly List<AreaDamageZone> _allZones = new();     // 생성된 전부 (ClearAll 용)
     private readonly Queue<AreaDamageZone> _idleZones = new();   // 대기 중 (재사용 용)
     private Transform _attackRoot;
+    private EnemyController _owner; // 공격할 때 플레이어 쪽을 바라보게 하려고
 
     void Awake()
     {
         _attackRoot = new GameObject($"{name}_Attacks").transform;
+        _owner = GetComponent<EnemyController>();
+    }
+
+    // 모든 공격의 시작에서 호출 → 패턴 스크립트마다 따로 넣지 않아도 공격할 때 플레이어를 본다
+    private void FacePlayer()
+    {
+        if (_owner != null) _owner.FacePlayer();
+    }
+
+    // ── 탄 한 발 (위치·속도 직접 지정) ──────────────────────────
+    public void FireBullet(Vector2 position, Vector2 velocity)
+    {
+        VFXManager.Instance.FireBullet("VFX/TestBullet", position, velocity);
+    }
+
+    // ── 부채꼴 탄막 (궤적 전조 있음) ───────────────────────────
+    /// <param name="spreadAngle">부채꼴 전체 각도 (도)</param>
+    public void FireFanWithTelegraph(Vector2 targetPosition, int count, float spreadAngle, float speed,
+                                     System.Action onComplete = null)
+    {
+        FacePlayer();
+        StartCoroutine(FanRoutine(targetPosition, count, spreadAngle, speed, onComplete));
+    }
+
+    private IEnumerator FanRoutine(Vector2 targetPosition, int count, float spreadAngle, float speed,
+                                   System.Action onComplete)
+    {
+        Vector2 origin = transform.position;
+        float baseAngle = Mathf.Atan2(targetPosition.y - origin.y, targetPosition.x - origin.x) * Mathf.Rad2Deg;
+        float step = count > 1 ? spreadAngle / (count - 1) : 0f;
+        float start = baseAngle - spreadAngle * 0.5f;
+
+        var dirs = new Vector2[count];
+        var telegraphs = new List<BulletTelegraph>();
+        for (int i = 0; i < count; i++)
+        {
+            float a = (count > 1 ? start + step * i : baseAngle) * Mathf.Deg2Rad;
+            dirs[i] = new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+            var t = ShowLine(origin, dirs[i]);
+            if (t != null) telegraphs.Add(t);
+        }
+
+        yield return new WaitForSeconds(_telegraphDuration);
+
+        foreach (var t in telegraphs) HideLine(t);
+        SoundManager.Instance.PlaySFX("SFX/BulletFire");
+        foreach (var dir in dirs) FireBullet(origin, dir * speed);
+
+        onComplete?.Invoke();
+    }
+
+    // ── 경고 표시만 따로 (탄이 아닌 공격이나 직접 조립하는 패턴의 예고용) ──
+    /// <summary>경고선 (돌진 경로 등)</summary>
+    public BulletTelegraph ShowLine(Vector2 origin, Vector2 direction)
+    {
+        var telegraph = GetTelegraph();
+        telegraph?.Show(origin, direction);
+        return telegraph;
+    }
+
+    /// <summary>직사각형 경고 (탄이 튀어나올 벽 쪽 등)</summary>
+    public BulletTelegraph ShowRect(Vector2 center, Vector2 size)
+    {
+        var telegraph = GetTelegraph();
+        telegraph?.ShowRect(center, size);
+        return telegraph;
+    }
+
+    /// <summary>경고선·직사각형 경고 숨기기</summary>
+    public void HideLine(BulletTelegraph telegraph)
+    {
+        if (telegraph != null) telegraph.Hide(() => ReturnTelegraph(telegraph));
+    }
+
+    /// <summary>부채꼴 경고 (할퀴기 등). apex = 꼭짓점, angle = 전체 각도(도)</summary>
+    public SectorTelegraph ShowSector(Vector2 apex, Vector2 direction, float radius, float angle)
+    {
+        SectorTelegraph sector = null;
+        foreach (var s in _sectorPool)
+            if (!s.gameObject.activeSelf) { sector = s; break; }
+
+        if (sector == null)
+        {
+            // 머티리얼·그리는 순서는 기존 경고선 프리팹과 같게 (같은 층에 같은 느낌으로 보이게)
+            var template = _bulletTelegraphPrefab != null ? _bulletTelegraphPrefab.GetComponentInChildren<SpriteRenderer>() : null;
+            sector = SectorTelegraph.Create(_attackRoot, template);
+            _sectorPool.Add(sector);
+        }
+
+        sector.Show(apex, direction, radius, angle);
+        return sector;
+    }
+
+    public void HideSector(SectorTelegraph sector)
+    {
+        if (sector != null) sector.Hide();
     }
 
     void OnDestroy()
@@ -67,6 +165,7 @@ public class EnemyAttack : MonoBehaviour
 
     public void FireRadialAttackWithTelegraph(int bulletCount, System.Action onComplete = null)
     {
+        FacePlayer();
         StartCoroutine(RadialTelegraphRoutine(bulletCount, onComplete));
     }
 
@@ -106,6 +205,7 @@ public class EnemyAttack : MonoBehaviour
 
     public void FireSingleShot(Vector2 targetPosition)
     {
+        FacePlayer();
         Vector2 dir = (targetPosition - (Vector2)transform.position).normalized;
         VFXManager.Instance.FireBullet("VFX/TestBullet", transform.position,
             dir * fastBulletSpeed);
@@ -116,6 +216,7 @@ public class EnemyAttack : MonoBehaviour
     public void FireSingleShotWithTelegraph(Vector2 targetPosition,
                                              System.Action onComplete = null)
     {
+        FacePlayer();
         StartCoroutine(SingleTelegraphRoutine(targetPosition, onComplete));
     }
 
@@ -140,6 +241,7 @@ public class EnemyAttack : MonoBehaviour
 
     public void FireAreaAttack(Vector3 pos, Vector2 size, float angle = 0f, System.Action onComplete = null)
     {
+        FacePlayer();
         var zone = GetAreaZone();
         if (zone == null)
         {
@@ -194,6 +296,10 @@ public class EnemyAttack : MonoBehaviour
         foreach (var t in _telegraphPool)
             if (t.gameObject.activeSelf)
                 t.Hide();
+
+        foreach (var s in _sectorPool)
+            if (s.gameObject.activeSelf)
+                s.Hide();
     }
     // ── BulletTelegraph 풀 ────────────────────────────────────
 

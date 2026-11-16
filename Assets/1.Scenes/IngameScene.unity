@@ -13235,6 +13235,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatNode
   _enemyPrefab: {fileID: 7302269988202185816, guid: 019885a4a40aa1b4098492cb4685abe9, type: 3}
   _spawnPoint: {fileID: 1568581760}
+  _randomEnemyPrefabs:
+  - {fileID: 7302269988202185816, guid: 019885a4a40aa1b4098492cb4685abe9, type: 3}
+  - {fileID: 7002381502864860115, guid: 3a1dad3c30ef9614b8f072f7befe21b6, type: 3}
+  - {fileID: 7302269988202185816, guid: 388c3c9f5fcd0e4332a51cf6f30753da, type: 3}
+  _avoidSameAs: {fileID: 0}
 --- !u!4 &557452286 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3046483565569023314, guid: 4745716f4e419354a9751a1ce7e941a0, type: 3}
@@ -14515,6 +14520,7 @@ MonoBehaviour:
   - {fileID: 224117151}
   - {fileID: 1117887998}
   - {fileID: 40569170}
+  - {fileID: 1900000003}
   - {fileID: 1914721883}
   - {fileID: 356209111}
   _exitPortal: {fileID: 478700707}
@@ -14529,6 +14535,7 @@ MonoBehaviour:
   _resultPanel: {fileID: 2064387272}
   _gameoverPanel: {fileID: 68211340}
   _uiHpBar: {fileID: 2046585689}
+  _uiHpBar2: {fileID: 1957785348}
   _goldText: {fileID: 1158091067}
   _gameUICanvas: {fileID: 422598787}
   _uiFadeDuration: 2
@@ -16642,6 +16649,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatNode
   _enemyPrefab: {fileID: 7002381502864860115, guid: 3a1dad3c30ef9614b8f072f7befe21b6, type: 3}
   _spawnPoint: {fileID: 888568292}
+  _randomEnemyPrefabs:
+  - {fileID: 7302269988202185816, guid: 019885a4a40aa1b4098492cb4685abe9, type: 3}
+  - {fileID: 7002381502864860115, guid: 3a1dad3c30ef9614b8f072f7befe21b6, type: 3}
+  - {fileID: 7302269988202185816, guid: 388c3c9f5fcd0e4332a51cf6f30753da, type: 3}
+  _avoidSameAs: {fileID: 551983243}
 --- !u!4 &1117887999
 Transform:
   m_ObjectHideFlags: 0
@@ -19815,6 +19827,7 @@ Transform:
   - {fileID: 224117152}
   - {fileID: 1117887999}
   - {fileID: 40569171}
+  - {fileID: 1900000002}
   - {fileID: 1914721882}
   - {fileID: 356209112}
   m_Father: {fileID: 0}
@@ -20241,7 +20254,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1957785347
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25952,6 +25965,55 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 75c972feb587a144fa4e62a9adae8c54, type: 3}
+--- !u!1 &1900000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1900000002}
+  - component: {fileID: 1900000003}
+  m_Layer: 0
+  m_Name: DuoCombatNode
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1900000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1847572465}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1900000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17463c5bc5958544fa850ab105f7ab78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DuoCombatNode
+  _vanguardPrefab: {fileID: 538329793064806379, guid: e72de8aec6ca1863bd0837ffe71f13a7, type: 3}
+  _artilleryPrefab: {fileID: 538329793064806379, guid: 4a154a3af691ab3bd3f60ccfd2591c1f, type: 3}
+  _vanguardPosition: {x: 3.5, y: -1.5}
+  _artilleryPosition: {x: 6.5, y: 3}
+  _patternInterval: 0.7
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -27,9 +27,26 @@ public abstract class EnemyBase : MonoBehaviour
 
     [Header("전투 연출")]
     [SerializeField] SpriteRenderer _enemySprite;
+    [Tooltip("스프라이트 원본이 오른쪽을 보고 있으면 체크 (플레이어 쪽으로 뒤집을 때 기준)")]
+    [SerializeField] bool _spriteFacesRight = true;
+
+    UIHPBar _hpBar; // 노드가 지정해 준 HP바 (없으면 기본 HP바 사용)
 
     public bool IsDead { get; protected set; }
     public SpriteRenderer CharSprite { get => _enemySprite; }
+
+    /// <summary>이 적 전용 HP바 지정 (적이 여러 마리 나올 때 각자 다른 바를 쓰게)</summary>
+    public void BindHPBar(UIHPBar bar) => _hpBar = bar;
+
+    /// <summary>지정한 위치를 바라보도록 스프라이트를 좌우로 뒤집는다</summary>
+    public void FaceTo(Vector2 targetPos)
+    {
+        if (_enemySprite == null) return;
+        float dx = targetPos.x - transform.position.x;
+        if (Mathf.Abs(dx) < 0.01f) return; // 바로 위·아래에 있으면 그대로
+        bool targetIsRight = dx > 0f;
+        _enemySprite.flipX = targetIsRight != _spriteFacesRight;
+    }
 
     public void DamageTaken(int damage) 
     {
@@ -42,7 +59,8 @@ public abstract class EnemyBase : MonoBehaviour
         if (IngameManager.Instance._isBattle)
             IngameManager.Instance.AddDamage(before - _nowHp);
 
-        IngameManager.Instance.SetHPBar(hpRate);
+        if (_hpBar != null) _hpBar.SetBarValue(hpRate);
+        else IngameManager.Instance.SetHPBar(hpRate);
 
         if (_nowHp <= 0)
             Die();
@@ -62,12 +80,16 @@ public abstract class EnemyBase : MonoBehaviour
         if (attack != null)
             attack.ClearAll();
 
-        // 탄환 전체 제거
-        VFXManager.Instance.ClearAllBullets();
+        // 마지막 적일 때만: 탄환 전체 제거 + 플레이어 무적
+        // (듀오처럼 동료가 남아 있으면 동료의 탄과 전투는 그대로 이어진다)
+        if (!AnyOtherEnemyAlive())
+        {
+            VFXManager.Instance.ClearAllBullets();
 
-        var player = FindFirstObjectByType<PlayerController>();
-        if (player != null)
-            player.StartInvincible(5f);
+            var player = FindFirstObjectByType<PlayerController>();
+            if (player != null)
+                player.StartInvincible(5f);
+        }
 
         int reward = UnityEngine.Random.Range(8, 11);
         IngameManager.Instance.AddGold(reward);
@@ -84,9 +106,19 @@ public abstract class EnemyBase : MonoBehaviour
         StartCoroutine(DeathRoutine());
     }
 
+    bool AnyOtherEnemyAlive()
+    {
+        foreach (var enemy in FindObjectsByType<EnemyBase>(FindObjectsSortMode.None))
+            if (enemy != this && !enemy.IsDead && enemy.gameObject.activeInHierarchy)
+                return true;
+        return false;
+    }
+
     protected IEnumerator EntranceFromRight(Vector2 targetPos)
     {
         Vector2 startPos = targetPos + Vector2.right * _entranceOffsetX;
+        transform.position = startPos;
+        FaceTo(targetPos); // 들어오는 방향(왼쪽)을 보면서 등장
         transform.position = startPos;
 
         float elapsed = 0f;

@@ -33,7 +33,7 @@ public class SoundManager : MonoBehaviour
         "SFX/Player_Sword", "SFX/Player_SwordHit", "SFX/Player_StrongSword", "SFX/HeavyHit",
         "SFX/Hit", "SFX/Player_Dash", "SFX/Slain", "SFX/BulletFire", "SFX/Telegraph",
         "SFX/AreaDamage", "SFX/Player_SpecialCharge", "SFX/Player_SwordOneSlash", "SFX/GlassBreaking",
-        "SFX/DropCoin", "SFX/CoinDropping", "SFX/PhaseChange",
+        "SFX/DropCoin", "SFX/CoinDropping", "SFX/PhaseChange", "SFX/Scratch",
     };
 
     public float BGMVolume => _bgmVolume;
