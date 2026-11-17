@@ -26,6 +26,7 @@ public class EnemyWeaver : EnemyController
     [Tooltip("탄을 채우는 범위 — 플레이어가 움직일 수 있는 범위(±9, ±5)보다 조금 넓게 해야 양 끝으로 피하지 못한다")]
     [SerializeField] Vector2 _wallCoverMin = new Vector2(-9.3f, -5.3f);
     [SerializeField] Vector2 _wallCoverMax = new Vector2(9.3f, 5.3f);
+    [SerializeField] float _offscreenMargin = 0.8f;   // 탄이 화면 밖 얼마나 먼 곳에서 출발할지
 
     [Header("바늘 기습")]
     [SerializeField] int _ambushCount = 2;
@@ -95,21 +96,24 @@ public class EnemyWeaver : EnemyController
             if (gapCandidates.Count > 0)
                 lanes.RemoveRange(gapCandidates[Random.Range(0, gapCandidates.Count)], _gapLanes);
 
-            // 예고: 탄이 튀어나올 벽 쪽에 길쭉한 직사각형 하나 (틈 위치는 알려주지 않는다)
-            var warn = ShowWallWarning(from, to, horizontalMove, fromMax);
+            GetScreenBounds(out Vector2 screenMin, out Vector2 screenMax);
+
+            // 예고: 탄이 튀어나올 화면 끝에 딱 붙은 길쭉한 직사각형 하나 (틈 위치는 알려주지 않는다)
+            var warn = ShowWallWarning(horizontalMove, fromMax, screenMin, screenMax);
             yield return new WaitForSeconds(_wallWarnTime);
             _attack.HideLine(warn);
 
-            // 발사
+            // 발사: 화면 밖에서 출발해 안으로 들어온다
             Vector2 dir = horizontalMove ? (fromMax ? Vector2.left : Vector2.right)
                                          : (fromMax ? Vector2.down : Vector2.up);
             SoundManager.Instance.PlaySFX("SFX/BulletFire");
             foreach (float p in lanes)
             {
-                // 출발점은 플레이어가 갈 수 있는 범위 밖 (가장자리에 붙어 있어도 탄 뒤로 숨지 못하게)
                 Vector2 origin = horizontalMove
-                    ? new Vector2(fromMax ? _wallCoverMax.x + 0.5f : _wallCoverMin.x - 0.5f, p)
-                    : new Vector2(p, fromMax ? _wallCoverMax.y + 0.5f : _wallCoverMin.y - 0.5f);
+                    ? new Vector2(fromMax ? Mathf.Max(screenMax.x, _wallCoverMax.x) + _offscreenMargin
+                                          : Mathf.Min(screenMin.x, _wallCoverMin.x) - _offscreenMargin, p)
+                    : new Vector2(p, fromMax ? Mathf.Max(screenMax.y, _wallCoverMax.y) + _offscreenMargin
+                                             : Mathf.Min(screenMin.y, _wallCoverMin.y) - _offscreenMargin);
                 _attack.FireBullet(origin, dir * _wallBulletSpeed);
             }
 
@@ -117,21 +121,35 @@ public class EnemyWeaver : EnemyController
         }
     }
 
-    // 벽 전체 길이만큼의 직사각형 (from~to: 벽을 따라 줄이 놓이는 범위)
-    BulletTelegraph ShowWallWarning(float from, float to, bool horizontalMove, bool fromMax)
+    // 화면 끝에 딱 붙은 직사각형 (벽 쪽 화면 가장자리 전체 길이)
+    BulletTelegraph ShowWallWarning(bool horizontalMove, bool fromMax, Vector2 screenMin, Vector2 screenMax)
     {
         float t = _wallWarnThickness;
-        // 벽 쪽 가장자리 (화면 안쪽으로 두께의 절반만큼 들어온 곳)
+        // 화면 가장자리에서 두께의 절반만큼 안쪽 = 직사각형의 바깥 변이 화면 끝과 딱 맞는다
         float edge = horizontalMove
-            ? (fromMax ? _arenaMax.x - t * 0.5f : _arenaMin.x + t * 0.5f)
-            : (fromMax ? _arenaMax.y - t * 0.5f : _arenaMin.y + t * 0.5f);
+            ? (fromMax ? screenMax.x - t * 0.5f : screenMin.x + t * 0.5f)
+            : (fromMax ? screenMax.y - t * 0.5f : screenMin.y + t * 0.5f);
 
-        float start = from - _laneSpacing * 0.5f, end = to + _laneSpacing * 0.5f;
-        float mid = (start + end) * 0.5f, length = end - start;
-
-        Vector2 center = horizontalMove ? new Vector2(edge, mid) : new Vector2(mid, edge);
-        Vector2 size = horizontalMove ? new Vector2(t, length) : new Vector2(length, t);
+        Vector2 center = horizontalMove ? new Vector2(edge, (screenMin.y + screenMax.y) * 0.5f)
+                                        : new Vector2((screenMin.x + screenMax.x) * 0.5f, edge);
+        Vector2 size = horizontalMove ? new Vector2(t, screenMax.y - screenMin.y)
+                                      : new Vector2(screenMax.x - screenMin.x, t);
         return _attack.ShowRect(center, size);
+    }
+
+    // 지금 카메라에 보이는 범위 (카메라가 없으면 탄 채우는 범위로 대신)
+    void GetScreenBounds(out Vector2 min, out Vector2 max)
+    {
+        var cam = Camera.main;
+        if (cam == null || !cam.orthographic)
+        {
+            min = _wallCoverMin; max = _wallCoverMax;
+            return;
+        }
+        float halfH = cam.orthographicSize, halfW = halfH * cam.aspect;
+        Vector2 c = cam.transform.position;
+        min = c - new Vector2(halfW, halfH);
+        max = c + new Vector2(halfW, halfH);
     }
 
     // ── 바늘 기습 ─────────────────────────────────────────────

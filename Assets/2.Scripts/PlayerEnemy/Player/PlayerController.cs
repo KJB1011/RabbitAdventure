@@ -229,7 +229,7 @@ public class PlayerController : MonoBehaviour
         if (!_isAttack)
             _playerAttack.transform.right = dir;
 
-        if (!_isDashing && _isControllable)
+        if (!_isDashing && _isControllable && !_isGameOver)
             transform.Translate(_dir * _speed * _moveSpeedRate * Time.deltaTime);
 
         if (_boundaryEnabled)
@@ -242,7 +242,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // 바라보는 방향: 고정 중이면 고정된 방향, 아니면 마우스 방향
-        bool faceLeft = _isFacingLocked ? _lockedFaceLeft : mousePos.x < transform.position.x;
+        bool faceLeft = (_isFacingLocked || _isGameOver) ? _lockedFaceLeft : mousePos.x < transform.position.x;
 
         if (faceLeft)
         {
@@ -383,6 +383,10 @@ public class PlayerController : MonoBehaviour
         _playerHitBox.enabled = true;
         _spriteRenderer.enabled = true;
         _trailRenderer.enabled = false;
+
+        // 쓰러진 모습에서 기본 자세로 되돌린다
+        _animController.ResetTrigger("isDead");
+        _animController.Play("Idle", 0, 0f);
 
         // 쿨다운 초기화
         _mainSkillCooldown = 0f;
@@ -582,6 +586,7 @@ public class PlayerController : MonoBehaviour
         if (_hp <= 0)
         {
             _isGameOver = true;
+            _animController.SetTrigger("isDead"); // 쓰러지는 애니메이션 (Any State에서 바로 전환)
             StartCoroutine(GameOverRoutine());
             return true;
         }
