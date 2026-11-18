@@ -13,6 +13,9 @@ public class ArtifactManager : MonoBehaviour
     [Tooltip("최대 보유 개수 (상태 패널의 아티팩트 칸 수)")]
     [SerializeField] private int _maxArtifacts = 8;
 
+    [Tooltip("게임에 등장하는 모든 아티팩트 (상자 보상에서 이 중 아직 없는 것을 뽑는다)")]
+    [SerializeField] private ArtifactSO[] _allArtifacts = new ArtifactSO[0];
+
     private readonly Dictionary<ArtifactSO, ArtifactEffect> _activeEffects = new();
     private readonly List<ArtifactSO> _ownedOrder = new(); // 획득한 순서 (Dictionary는 순서를 보장하지 않으므로 따로 기록)
     private PlayerController _player;
@@ -90,4 +93,25 @@ public class ArtifactManager : MonoBehaviour
     }
 
     public bool HasArtifact(ArtifactSO data) => _activeEffects.ContainsKey(data);
+
+    /// <summary>
+    /// 아직 갖고 있지 않은 아티팩트 중에서 최대 count개를 겹치지 않게 랜덤으로 뽑는다. (상자 보상 선택용)
+    /// </summary>
+    public List<ArtifactSO> GetRandomUnowned(int count)
+    {
+        var pool = new List<ArtifactSO>();
+        foreach (var a in _allArtifacts)
+            if (a != null && !HasArtifact(a) && !pool.Contains(a))
+                pool.Add(a);
+
+        // 앞에서부터 하나씩 남은 것 중 랜덤과 자리를 바꾼다 (피셔-예이츠 섞기) → 앞의 count개만 사용
+        int take = Mathf.Min(count, pool.Count);
+        for (int i = 0; i < take; i++)
+        {
+            int j = Random.Range(i, pool.Count);
+            (pool[i], pool[j]) = (pool[j], pool[i]);
+        }
+        pool.RemoveRange(take, pool.Count - take);
+        return pool;
+    }
 }

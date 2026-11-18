@@ -26,10 +26,22 @@ public class ChestObject : MonoBehaviour
     [Header("파괴 연출")]
     [SerializeField] SpriteRenderer _spriteRenderer;
 
+    [Header("아티팩트 선택")]
+    [Tooltip("부서질 때 아티팩트 3개 중 하나를 고르게 할지 (고르는 동안 떨어진 보상은 제자리에서 기다린다)")]
+    [SerializeField] bool _offerArtifact = true;
+
+    /// <summary>
+    /// 상자가 완전히 끝났을 때 (아티팩트 선택이 있으면 고른 뒤에) 호출
+    /// </summary>
     public event System.Action OnBroken;
+
+    bool _isBroken; // 같은 순간 여러 번 맞아도 한 번만 부서지게
+
+    void OnEnable() => _isBroken = false;
 
     public void TakeDamage(int damage)
     {
+        if (_isBroken) return;
         _hp -= damage;
 
         if (_spriteRenderer != null)
@@ -49,23 +61,50 @@ public class ChestObject : MonoBehaviour
 
     private void Break()
     {
-        DropItems();
-        OnBroken?.Invoke();
+        _isBroken = true;
+        List<ItemPickup> dropped = DropItems();
         gameObject.SetActive(false);
+
+        // 아티팩트 선택: 고르는 동안 보상은 기다리고, 고른 뒤에 플레이어에게 들어온다
+        // (상자는 이미 꺼졌으므로 코루틴 대신 창이 닫힐 때 불러주는 콜백으로 이어간다)
+        if (_offerArtifact && UIArtifactChoice.Instance != null)
+        {
+            foreach (var item in dropped) item.Hold();
+
+            bool opened = UIArtifactChoice.Instance.TryOpen(() =>
+            {
+                ReleaseAll(dropped);
+                OnBroken?.Invoke();
+            });
+            if (opened) return;
+
+            // 고를 아티팩트가 없으면(칸이 가득 참 등) 보상만 바로 준다
+            ReleaseAll(dropped);
+        }
+
+        OnBroken?.Invoke();
     }
 
-    private void DropItems()
+    private static void ReleaseAll(List<ItemPickup> items)
     {
+        foreach (var item in items)
+            if (item != null) item.Release();
+    }
+
+    // 떨어뜨린 아이템들을 돌려준다 (아티팩트 선택 동안 붙잡아 두기 위해)
+    private List<ItemPickup> DropItems()
+    {
+        var dropped = new List<ItemPickup>();
         if (_itemPrefab == null)
         {
             Debug.LogWarning("[ChestObject] _itemPrefab이 연결되지 않았습니다.");
-            return;
+            return dropped;
         }
 
         // 떨어뜨릴 아이템 목록을 먼저 만든다
         List<Defines.ITEM> drops = BuildDropList();
         int count = drops.Count;
-        if (count == 0) return;
+        if (count == 0) return dropped;
 
         // 360°를 아이템 수만큼 똑같이 나눠서 각자 다른 방향으로 떨어뜨린다 → 서로 겹치지 않음
         // (시작 각도를 랜덤으로 돌려서, 매번 같은 모양으로 떨어지지 않게)
@@ -94,8 +133,10 @@ public class ChestObject : MonoBehaviour
             {
                 pickup.SetItemType(itemType);
                 pickup.JumpTo(landPos);
+                dropped.Add(pickup);
             }
         }
+        return dropped;
     }
 
     // 이번 상자에서 떨어질 아이템 목록

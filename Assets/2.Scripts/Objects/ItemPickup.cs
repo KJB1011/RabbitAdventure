@@ -51,6 +51,13 @@ public class ItemPickup : MonoBehaviour
     PlayerController _player;
     float _currentSpeed;
     bool _isMoving = false; // true가 되면 플레이어에게 날아가고, 닿으면 먹어진다
+    bool _isHeld = false;   // true인 동안은 제자리에서 기다린다 (상자의 아티팩트 선택 중)
+
+    /// <summary>Release가 불릴 때까지 플레이어에게 날아가지 않고 기다린다</summary>
+    public void Hold() => _isHeld = true;
+
+    /// <summary>기다리기 해제 → (튀어나오는 시간이 지났다면) 바로 플레이어에게 날아간다</summary>
+    public void Release() => _isHeld = false;
 
     /// <summary>
     /// 현재 위치(상자 중심)에서 target으로 포물선을 그리며 튀어나온다.
@@ -140,6 +147,7 @@ public class ItemPickup : MonoBehaviour
     {
         _currentSpeed = _initialSpeed;
         _isMoving = false;
+        _isHeld = false;
 
         // FindWithTag로 플레이어 루트 오브젝트 찾기
         var playerObj = GameObject.FindWithTag("Player");
@@ -181,7 +189,7 @@ public class ItemPickup : MonoBehaviour
 
         // 상자에서 나온 뒤 _delay(1초)가 지나기 전까지는 움직이지도, 먹어지지도 않는다
         // (점프 중에 플레이어가 가까이 있어도 바로 먹어지지 않게)
-        if (!_isMoving) return;
+        if (!_isMoving || _isHeld) return;
 
         _currentSpeed = Mathf.Min(_currentSpeed + _acceleration * Time.deltaTime, _maxSpeed);
         Vector2 dir = (_playerTF.position - transform.position).normalized;
