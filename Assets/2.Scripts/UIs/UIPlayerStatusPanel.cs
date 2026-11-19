@@ -28,6 +28,8 @@ public class UIPlayerStatusPanel : MonoBehaviour
     [Tooltip("순서 동일. 스킬 아이콘 가운데의 남은 쿨타임 숫자 (Raycast Target 끄기).\n" +
              "컴포넌트 ⋮ 메뉴 → '쿨타임 숫자 자동 연결'로 한 번에 채울 수 있다")]
     [SerializeField] TextMeshProUGUI[] _skillCooldownTexts = new TextMeshProUGUI[4];
+    [Tooltip("순서 동일. 스킬 아이콘 아래의 숙련도 게이지 (Image Type: Filled, Horizontal). 없는 스킬은 비워 둔다")]
+    [SerializeField] Image[] _skillMasteryFills = new Image[4];
 
     [Header("펼쳐지는 부분 (스탯)")]
     [SerializeField] LayoutElement _statsWrapper;    // 높이를 0 ↔ 내용 높이로 바꿔서 펼치고 접는다 (Rect Mask 2D로 넘치는 부분을 가림)
@@ -40,6 +42,9 @@ public class UIPlayerStatusPanel : MonoBehaviour
     [Header("펼치기 설정")]
     [SerializeField] Key _toggleKey = Key.Tab;
     [SerializeField] float _toggleTime = 0.25f;
+
+    static readonly Color MasteryFillColor = new Color(0.55f, 0.85f, 1f);  // 숙련도 채우는 중 (하늘색)
+    static readonly Color MasteryDoneColor = new Color(1f, 0.82f, 0.3f);   // 강화 완료 (금색)
 
     bool _isExpanded;
     Tween _toggleTween;
@@ -89,6 +94,20 @@ public class UIPlayerStatusPanel : MonoBehaviour
         SetCooldown(1, _player.SubSkillCooldownRatio, _player.SubSkillCooldownLeft);
         SetCooldown(2, _player.SuperSkillCooldownRatio, _player.SuperSkillCooldownLeft);
         SetCooldown(3, _player.SpecialSkillCooldownRatio, _player.SpecialSkillCooldownLeft);
+
+        // 숙련도 게이지 (가득 차서 강화를 고르면 금색)
+        var mastery = SkillMasteryManager.Instance;
+        if (mastery != null)
+        {
+            for (int i = 0; i < _skillMasteryFills.Length; i++)
+            {
+                var fill = _skillMasteryFills[i];
+                if (fill == null) continue;
+                var skill = (Defines.SKILL)i;
+                fill.fillAmount = mastery.GetProgress(skill);
+                fill.color = mastery.GetChosen(skill) != null ? MasteryDoneColor : MasteryFillColor;
+            }
+        }
 
         if (_isExpanded)
             RefreshStats(force: false);

@@ -1,21 +1,19 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using static Defines;
 
 /// <summary>
 /// 상점을 관리하는 UI 스크립트
-/// 상점 초기화와 구매를 담당합니다.
+/// 위: 스킬 숙련도 4개 (스킬마다 한 번만 구매) / 아래: 고정 아이템 3개
 /// </summary>
 public class UIShop : MonoBehaviour
 {
-    [Header("아티팩트 슬롯 (위 3개)")]
-    [SerializeField] ShopSlot[] _artifactSlots;
+    [Header("스킬 숙련도 슬롯 (위 4개, 순서: 기본공격·대쉬·강타·필살기)")]
+    [SerializeField] ShopSlot[] _skillSlots = new ShopSlot[4];
+    [SerializeField] Sprite[] _skillIcons = new Sprite[4];
+    [SerializeField] int _masteryPrice = 20;
 
     [Header("고정 아이템 슬롯 (아래 3개)")]
     [SerializeField] ShopSlot[] _fixedSlots;
-
-    [Header("아티팩트 데이터 목록 (모든 ArtifactSO 연결)")]
-    [SerializeField] ArtifactSO[] _allArtifacts;
 
     [Header("고정 아이템 설정")]
     [SerializeField] Sprite _hpIcon;
@@ -40,26 +38,27 @@ public class UIShop : MonoBehaviour
 
     public void RefreshShop()
     {
-        SetupArtifactSlots();
+        SetupSkillSlots();
         SetupFixedSlots();
         _statsUI?.Refresh();
     }
 
-    // ── 아티팩트 슬롯 ─────────────────────────────────────────
-    private void SetupArtifactSlots()
+    // ── 스킬 숙련도 슬롯 ──────────────────────────────────────
+    private void SetupSkillSlots()
     {
-        var available = _allArtifacts
-            .Where(a => !ArtifactManager.Instance.HasArtifact(a))
-            .OrderBy(_ => Random.value)
-            .Take(_artifactSlots.Length)
-            .ToList();
-
-        for (int i = 0; i < _artifactSlots.Length; i++)
+        for (int i = 0; i < _skillSlots.Length; i++)
         {
-            if (i < available.Count)
-                _artifactSlots[i].SetupArtifact(available[i], OnPurchased);
-            else
-                _artifactSlots[i].gameObject.SetActive(false);
+            if (_skillSlots[i] == null) continue;
+
+            var skill = (SKILL)i;
+            string skillName = SkillMasteryManager.SkillName(skill);
+            Sprite icon = i < _skillIcons.Length ? _skillIcons[i] : null;
+
+            _skillSlots[i].SetupMastery(
+                skill, icon,
+                $"{skillName} 숙련",
+                $"{skillName} 숙련도를 가득 채웁니다.\n가득 차면 강화를 하나 고를 수 있습니다.\n(스킬마다 한 번만 구매 가능)",
+                _masteryPrice, OnPurchased);
         }
     }
 

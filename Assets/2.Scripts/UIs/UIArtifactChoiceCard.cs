@@ -28,8 +28,8 @@ public class UIArtifactChoiceCard : MonoBehaviour, IPointerEnterHandler, IPointe
     [SerializeField] float _hoverScale = 1.06f;           // 마우스를 올렸을 때
     [SerializeField] float _chosenScale = 1.15f;          // 골랐을 때
 
-    /// <summary>이 카드에 표시 중인 아티팩트</summary>
-    public ArtifactSO Data { get; private set; }
+    /// <summary>이 카드가 몇 번째 선택지인지 (0부터)</summary>
+    public int Index { get; private set; }
 
     Action<UIArtifactChoiceCard> _onClick;
     CanvasGroup _group;
@@ -41,18 +41,19 @@ public class UIArtifactChoiceCard : MonoBehaviour, IPointerEnterHandler, IPointe
         GetComponent<Button>().onClick.AddListener(() => _onClick?.Invoke(this));
     }
 
-    public void Setup(ArtifactSO data, Action<UIArtifactChoiceCard> onClick)
+    public void Setup(int index, UIArtifactChoice.Option option, Action<UIArtifactChoiceCard> onClick)
     {
-        Data = data;
+        Index = index;
         _onClick = onClick;
 
         if (_icon != null)
         {
-            _icon.sprite = data.icon;
+            _icon.sprite = option.Icon;
+            _icon.enabled = option.Icon != null; // 아이콘이 없으면 흰 네모 대신 숨김
             _icon.preserveAspect = true;
         }
-        if (_nameText != null) _nameText.text = data.artifactName;
-        if (_descText != null) _descText.text = data.description;
+        if (_nameText != null) _nameText.text = option.Name;
+        if (_descText != null) _descText.text = option.Description;
     }
 
     /// <summary>delay초 뒤에 작게 → 원래 크기로 튀어나온다</summary>

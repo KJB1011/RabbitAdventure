@@ -10,6 +10,7 @@ using UnityEngine;
 public class IngameManagerEditor : Editor
 {
     const int GoldAmount = 50;
+    const int MasteryAmount = 5;
 
     public override void OnInspectorGUI()
     {
@@ -34,6 +35,16 @@ public class IngameManagerEditor : Editor
 
         if (GUILayout.Button("무작위 아티팩트 얻기"))
             manager.DebugGiveRandomArtifact(FindAllArtifacts());
+
+        // 스킬 숙련도 (전투 중에 가득 차면 전투가 끝난 뒤 강화 선택 창이 열린다)
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("스킬 숙련도", EditorStyles.miniBoldLabel);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button($"대쉬 숙련도 +{MasteryAmount}"))
+            manager.DebugAddMastery(Defines.SKILL.SUB, MasteryAmount);
+        if (GUILayout.Button("대쉬 숙련도 가득"))
+            manager.DebugAddMastery(Defines.SKILL.SUB, 9999);
+        EditorGUILayout.EndHorizontal();
     }
 
     // 프로젝트 안의 모든 ArtifactSO 에셋을 찾는다 → 새 아티팩트를 만들어도 따로 등록할 필요 없음

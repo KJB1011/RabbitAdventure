@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf5f2c51ee724450a15eea93d0479099, type: 3}
+  m_Name: DashGale
+  m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeSO
+  skill: 1
+  type: 1
+  upgradeName: "질풍베기"
+  description: "대쉬가 훨씬 빨라지고 조금 더 멀리 나아가며, 지나간 길의 적에게 기본 공격의 100% 피해를 줍니다."
+  icon: {fileID: 21300000, guid: a1aca9e27dbb4f47bd8c022e73b59d4d, type: 3}

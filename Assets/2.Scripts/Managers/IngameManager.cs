@@ -51,6 +51,12 @@ public class IngameManager : MonoBehaviour
     bool _isTransitioning = false;
     float _totalBattleTime = 0f;
 
+    /// <summary>노드가 끝나고 다음 노드로 넘어가는 중인지 (결과창·이동 연출 중)</summary>
+    public bool IsTransitioning => _isTransitioning;
+
+    [Tooltip("전투가 끝난 뒤 스킬 강화 선택 창이 뜨기까지 기다리는 시간")]
+    [SerializeField] float _masteryChoiceDelay = 0.8f;
+
     public bool _isBattle = false;
     public int _maxDamageInNode = 0;
     public int _totalDamage = 0;
@@ -140,6 +146,10 @@ public class IngameManager : MonoBehaviour
         if (ArtifactManager.Instance != null)
             ArtifactManager.Instance.SetPlayer(_player);
 
+        // 스킬 숙련도도 플레이어의 스킬 사용을 지켜보도록 연결
+        if (SkillMasteryManager.Instance != null)
+            SkillMasteryManager.Instance.SetPlayer(_player);
+
         _player.SetInitChar(RememberManager.Instance._nickname);
     }
 
@@ -207,6 +217,14 @@ public class IngameManager : MonoBehaviour
     private IEnumerator TransitionRoutine(bool isBattle)
     {
         _isTransitioning = true;
+
+        // 전투 중에 스킬 숙련도가 가득 찼다면, 결과창보다 먼저 강화를 고르게 한다
+        var mastery = SkillMasteryManager.Instance;
+        if (isBattle && mastery != null && mastery.HasPendingChoice)
+        {
+            yield return new WaitForSeconds(_masteryChoiceDelay); // 마지막 적이 쓰러지는 모습을 잠깐 보여준다
+            yield return StartCoroutine(mastery.ResolvePendingChoices());
+        }
 
         // 중간 결과창 표시
         _countdownPanel.Show();
@@ -385,6 +403,18 @@ public class IngameManager : MonoBehaviour
 
         if (candidates.Count == 0) { Debug.LogWarning("[Debug] 얻을 수 있는 아티팩트가 없습니다 (전부 보유 중)"); return; }
         manager.Acquire(candidates[Random.Range(0, candidates.Count)]);
+    }
+
+    // 스킬 숙련도 올리기 (가득 차면 전투가 아닐 때 강화 선택 창이 열린다)
+    public void DebugAddMastery(Defines.SKILL skill, int amount)
+    {
+        var mastery = SkillMasteryManager.Instance;
+        if (mastery == null) { Debug.LogWarning("[Debug] SkillMasteryManager가 씬에 없습니다"); return; }
+        mastery.AddPoints(skill, amount, ignoreBattleCheck: true);
+        Debug.Log($"[Debug] {SkillMasteryManager.SkillName(skill)} 숙련도 +{amount} → {mastery.GetProgress(skill) * 100f:0}%");
+
+        // 전투 중이면 전투가 끝날 때, 아니면 바로 선택 창
+        if (!_isBattle && !_isTransitioning) mastery.TryResolveNow();
     }
 #endif
 
