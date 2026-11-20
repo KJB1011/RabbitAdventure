@@ -9,10 +9,15 @@ public enum SkillUpgradeType
 {
     None = 0,
 
-    // ── 대쉬 ──
+    // ── 회피기 (Dash) ──
     DashGale = 1,          // 질풍: 빠르게 돌진하며 지나간 자리의 적에게 피해
-    DashDoubleCharge = 2,  // 대쉬 2회 충전
-    DashEmpower = 3,       // 대쉬 후 다음 공격 강화
+    DashDoubleCharge = 2,  // 회피기 2회 충전
+    DashEmpower = 3,       // 회피기 후 다음 공격 강화
+
+    // ── 기본기 (BasicAttack) ──
+    MainThrust = 4,        // 찌르기: 좁고 긴 찌르기, 공격 속도 증가
+    MainTripleSlash = 5,   // 3연타: 스슥-삭!
+    MainCrescent = 6,      // 초승달 베기: 크게 한 번
 }
 
 /// <summary>

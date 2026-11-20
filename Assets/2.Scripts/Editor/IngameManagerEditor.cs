@@ -39,11 +39,19 @@ public class IngameManagerEditor : Editor
         // 스킬 숙련도 (전투 중에 가득 차면 전투가 끝난 뒤 강화 선택 창이 열린다)
         EditorGUILayout.Space(4);
         EditorGUILayout.LabelField("스킬 숙련도", EditorStyles.miniBoldLabel);
+        MasteryButtons(manager, Defines.SKILL.MAIN, 20);
+        MasteryButtons(manager, Defines.SKILL.SUB, MasteryAmount);
+    }
+
+    // 한 줄에 [○○ 숙련도 +n] [○○ 숙련도 가득]
+    static void MasteryButtons(IngameManager manager, Defines.SKILL skill, int amount)
+    {
+        string name = SkillMasteryManager.SkillName(skill);
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button($"대쉬 숙련도 +{MasteryAmount}"))
-            manager.DebugAddMastery(Defines.SKILL.SUB, MasteryAmount);
-        if (GUILayout.Button("대쉬 숙련도 가득"))
-            manager.DebugAddMastery(Defines.SKILL.SUB, 9999);
+        if (GUILayout.Button($"{name} 숙련도 +{amount}"))
+            manager.DebugAddMastery(skill, amount);
+        if (GUILayout.Button($"{name} 숙련도 가득"))
+            manager.DebugAddMastery(skill, 9999);
         EditorGUILayout.EndHorizontal();
     }
 

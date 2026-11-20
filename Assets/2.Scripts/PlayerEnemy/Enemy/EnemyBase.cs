@@ -14,6 +14,10 @@ public abstract class EnemyBase : MonoBehaviour
 
     public event Action OnDied;
 
+    [Header("처치 보상")]
+    [SerializeField] int _goldRewardMin = 5;   // 처치 시 골드 (최소~최대, 최대값 포함)
+    [SerializeField] int _goldRewardMax = 7;
+
     [Header("등장 연출")]
     [SerializeField] protected float _entranceDuration = 1.2f;
     [SerializeField] protected float _entranceOffsetX = 20f;
@@ -91,7 +95,7 @@ public abstract class EnemyBase : MonoBehaviour
                 player.StartInvincible(5f);
         }
 
-        int reward = UnityEngine.Random.Range(8, 11);
+        int reward = UnityEngine.Random.Range(_goldRewardMin, _goldRewardMax + 1);
         IngameManager.Instance.AddGold(reward);
 
         VFXManager.Instance.Play("FinishHit", transform.position);

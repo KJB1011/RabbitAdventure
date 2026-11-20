@@ -54,6 +54,11 @@ public class IngameManager : MonoBehaviour
     /// <summary>노드가 끝나고 다음 노드로 넘어가는 중인지 (결과창·이동 연출 중)</summary>
     public bool IsTransitioning => _isTransitioning;
 
+    [Tooltip("게임 시작 시 골드.\n상점 도착 시 목표 70~80 = 시작 30 + 처치 4마리×5~7 + 상자 2개×골드 3개×3~4")]
+    [SerializeField] int _startGold = 30;
+
+    int _goldAtNodeStart; // 지금 노드를 시작할 때의 골드
+
     [Tooltip("전투가 끝난 뒤 스킬 강화 선택 창이 뜨기까지 기다리는 시간")]
     [SerializeField] float _masteryChoiceDelay = 0.8f;
 
@@ -106,7 +111,7 @@ public class IngameManager : MonoBehaviour
         SoundManager.Instance?.CrossFadeBGM("BGM/BattleBGM", 1.5f);
 
         SpawnPlayer();
-        AddGold(30);
+        AddGold(_startGold);
 
         // 인트로 연출(UI 페이드 + 플레이어 등장)과 "동시에" 이펙트·효과음을 미리 준비한다
         StartCoroutine(PrewarmRoutine());
@@ -310,6 +315,7 @@ public class IngameManager : MonoBehaviour
     // 다른 노드(스테이지)로 전환
     private void ActivateNode(int index)
     {
+        _goldAtNodeStart = Gold; // 재시작하면 이 금액으로 되돌린다 (같은 적을 다시 잡아 골드를 버는 것 방지)
         _nodes[index].gameObject.SetActive(true);
         _nodes[index].StartNode(OnNodeComplete);
         Debug.Log($"[IngameManager] Node {index} 시작: {_nodes[index].GetType().Name}");
@@ -348,6 +354,11 @@ public class IngameManager : MonoBehaviour
         _totalDamage = 0;
         _totalBattleTime = 0f;
         _isBattle = false;
+
+        // 이번 노드에서 번 골드는 없던 일로 (노드를 시작할 때의 금액으로)
+        Gold = _goldAtNodeStart;
+        if (_goldText != null) _goldText.text = Gold.ToString();
+        OnGoldChanged?.Invoke(Gold);
 
         GetHPBar()?.Hide();
         GetHPBar2()?.Hide();

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeSO
   skill: 1
   type: 2
-  upgradeName: "연속 도약"
-  description: "대쉬를 2회까지 충전해서 연달아 사용할 수 있습니다."
+  upgradeName: "\uC5F0\uC18D \uB3C4\uC57D"
+  description: "\uD68C\uD53C\uAE30\uB97C 2\uD68C\uAE4C\uC9C0 \uCDA9\uC804\uD574\uC11C
+    \uC5F0\uB2EC\uC544 \uC0AC\uC6A9\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   icon: {fileID: 21300000, guid: 5cdbdc4d54154749a206a2fc11033952, type: 3}

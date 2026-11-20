@@ -213,9 +213,9 @@ public class SkillMasteryManager : MonoBehaviour
 
     public static string SkillName(SKILL skill) => skill switch
     {
-        SKILL.MAIN => "기본 공격",
-        SKILL.SUB => "대쉬",
-        SKILL.SUPER => "강타",
+        SKILL.MAIN => "기본기",
+        SKILL.SUB => "회피기",
+        SKILL.SUPER => "특수기",
         SKILL.SPECIAL => "필살기",
         _ => skill.ToString()
     };

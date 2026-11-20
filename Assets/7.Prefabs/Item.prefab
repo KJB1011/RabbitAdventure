@@ -110,6 +110,8 @@ MonoBehaviour:
   _acceleration: 8
   _maxSpeed: 20
   _pickupRadius: 0.4
+  _goldMin: 3
+  _goldMax: 4
   _jumpPowerMin: 0.6
   _jumpPowerMax: 1
   _jumpDurationMin: 0.35

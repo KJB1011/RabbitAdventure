@@ -695,6 +695,17 @@ MonoBehaviour:
   _attackAreaPos2: {fileID: 1938374786182106870}
   _superRangeMultiplier: 3
   _superActiveTime: 0.1
+  _thrustSize: {x: 2.8, y: 0.8}
+  _thrustDistance: 1.6
+  _thrustDamageRate: 0.8
+  _tripleDamageRate: 0.5
+  _tripleGap: 0.12
+  _tripleFinishDelay: 0.3
+  _tripleFinishScale: 1.6
+  _tripleFinishDamageRate: 1.3
+  _crescentSize: {x: 3.6, y: 4.4}
+  _crescentDistance: 2.1
+  _crescentDamageRate: 2.5
 --- !u!1 &2379439340605838137
 GameObject:
   m_ObjectHideFlags: 0
@@ -1218,6 +1229,7 @@ MonoBehaviour:
   _hpTxt: {fileID: 8621870036763573197}
   _nameTxt: {fileID: 6607154504020665897}
   _speed: 5
+  _superChargeSpeedRate: 0.5
   _hp: 5
   _maxHp: 5
   _atk: 10
@@ -1233,6 +1245,16 @@ MonoBehaviour:
   _specialDamageMultiplier: 30
   _specialInvincibleDelay: 1.5
   _specialSkillEffect: {fileID: 0}
+  _thrustAttackSpeedRate: 1.5
+  _tripleCooldownAdd: 0.5
+  _crescentCooldownAdd: 0.5
+  _galeDurationRate: 0.45
+  _galeDistanceRate: 1.3
+  _galeHitRadius: 0.8
+  _galeDamageRate: 1
+  _upgradedDashCharges: 2
+  _dashEmpowerBonus: 0.3
+  _dashEmpowerTint: {r: 1, g: 0.8, b: 0.55, a: 1}
   _nodeMoveDuration: 1
   _mapMin: {x: -9, y: -5}
   _mapMax: {x: 9, y: 5}

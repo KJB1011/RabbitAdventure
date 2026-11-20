@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeSO
   skill: 1
   type: 1
-  upgradeName: "질풍베기"
-  description: "대쉬가 훨씬 빨라지고 조금 더 멀리 나아가며, 지나간 길의 적에게 기본 공격의 100% 피해를 줍니다."
+  upgradeName: "\uC9C8\uD48D\uBCA0\uAE30"
+  description: "\uD68C\uD53C\uAE30\uAC00 \uD6E8\uC52C \uBE68\uB77C\uC9C0\uACE0 \uC870\uAE08
+    \uB354 \uBA40\uB9AC \uB098\uC544\uAC00\uBA70, \uC9C0\uB098\uAC04 \uAE38\uC758
+    \uC801\uC5D0\uAC8C \uAE30\uBCF8\uAE30\uC758 100% \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
   icon: {fileID: 21300000, guid: a1aca9e27dbb4f47bd8c022e73b59d4d, type: 3}

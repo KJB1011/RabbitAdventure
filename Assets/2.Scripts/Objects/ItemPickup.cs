@@ -15,8 +15,8 @@ public class ItemPickup : MonoBehaviour
     [SerializeField] float _pickupRadius = 0.4f;
 
     [Header("골드 금액")]
-    [SerializeField] int _goldMin = 6;  // 골드 아이템 하나당 금액 (최소~최대, 최대값 포함)
-    [SerializeField] int _goldMax = 7;
+    [SerializeField] int _goldMin = 3;  // 골드 아이템 하나당 금액 (최소~최대, 최대값 포함)
+    [SerializeField] int _goldMax = 4;
 
     [Header("튀어나오기")]
     [SerializeField] float _jumpPowerMin = 0.6f;    // 점프 높이 (최소~최대 사이 랜덤)

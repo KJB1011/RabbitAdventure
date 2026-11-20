@@ -40,6 +40,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _specialInvincibleDelay = 1.0f;
     [SerializeField] SpecialSkillEffect _specialSkillEffect;
 
+    [Header("기본기 강화 (데미지·범위는 PlayerAttack에서)")]
+    [SerializeField] float _thrustAttackSpeedRate = 1.5f;   // 찌르기: 공격 속도 배율 (쿨타임 ÷ 1.5)
+    [SerializeField] float _tripleCooldownAdd = 0.5f;       // 3연타: 쿨타임 증가 (초)
+    [SerializeField] float _crescentCooldownAdd = 0.5f;     // 초승달 베기: 쿨타임 증가 (초)
+
     [Header("대쉬 강화: 질풍")]
     [SerializeField] float _galeDurationRate = 0.45f;   // 대쉬 시간 배율 (작을수록 빠름)
     [SerializeField] float _galeDistanceRate = 1.3f;    // 대쉬 거리 배율
@@ -100,6 +105,7 @@ public class PlayerController : MonoBehaviour
     int _dashCharges = 1;
     bool _isDashEmpowerReady;             // 대쉬 후 아직 공격하지 않았다
     float _attackEmpowerRate = 1f;        // 지금 하는 공격에 곱하는 배율 (강화된 공격 중이면 1.3)
+    float _basicHitRate = 1f;             // 기본기 한 타의 데미지 배율 (PlayerAttack이 타마다 바꾼다. 3연타 1·2타 = 0.5 등)
     readonly System.Collections.Generic.HashSet<EnemyBase> _galeHitEnemies = new();
     readonly System.Collections.Generic.HashSet<ChestObject> _galeHitChests = new();
 
@@ -627,8 +633,11 @@ public class PlayerController : MonoBehaviour
         isCrit = Random.Range(0, 100f) < _critRate;
         float damage = isCrit ? base_ * _critDamageRate : base_;
         damage *= (1f + _atkMultiplierBonus);
-        return (int)(damage * _damageMultiplier * _attackEmpowerRate);
+        return (int)(damage * _damageMultiplier * _attackEmpowerRate * _basicHitRate);
     }
+
+    /// <summary>PlayerAttack이 기본기 판정을 켜고 끌 때 그 타의 데미지 배율을 알려준다</summary>
+    public void SetBasicHitRate(float rate) => _basicHitRate = rate;
 
     public bool DamageTaken()
     {
@@ -728,6 +737,22 @@ public class PlayerController : MonoBehaviour
 
             case SkillUpgradeType.DashEmpower:
                 _hasDashEmpower = true;
+                break;
+
+            // 기본기: 모양은 PlayerAttack이, 쿨타임은 여기서 바꾼다
+            case SkillUpgradeType.MainThrust:
+                _playerAttack.SetBasicStyle(PlayerAttack.BasicStyle.Thrust);
+                _mainSkillCooldownDuration /= _thrustAttackSpeedRate;
+                break;
+
+            case SkillUpgradeType.MainTripleSlash:
+                _playerAttack.SetBasicStyle(PlayerAttack.BasicStyle.TripleSlash);
+                _mainSkillCooldownDuration += _tripleCooldownAdd;
+                break;
+
+            case SkillUpgradeType.MainCrescent:
+                _playerAttack.SetBasicStyle(PlayerAttack.BasicStyle.Crescent);
+                _mainSkillCooldownDuration += _crescentCooldownAdd;
                 break;
         }
     }
