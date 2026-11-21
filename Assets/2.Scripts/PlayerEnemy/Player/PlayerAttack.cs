@@ -10,7 +10,7 @@ using static Defines;
 public class PlayerAttack : MonoBehaviour
 {
     /// <summary>기본기 모양 (숙련도 강화로 바뀜)</summary>
-    public enum BasicStyle { Normal, Thrust, TripleSlash, Crescent }
+    public enum BasicStyle { Normal, Thrust, TripleSlash, Crescent, SwordWave }
 
     float _rangeMultiplier = 1.0f;
 
@@ -44,6 +44,12 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] Vector2 _crescentSize = new Vector2(3.6f, 4.4f); // x = 정면 깊이, y = 좌우 폭
     [SerializeField] float _crescentDistance = 2.1f;                  // 판정 중심 (0.3 ~ 3.9 거리를 벤다 = 이펙트가 밀고 나간 끝까지)
     [SerializeField] float _crescentDamageRate = 2.5f;
+
+    [Header("기본기 강화: 검기 베기")]
+    [SerializeField] float _waveRange = 4f;          // 날아가는 거리
+    [SerializeField] float _waveSpeed = 16f;
+    [SerializeField] float _waveRadius = 0.6f;       // 검기 판정 반경
+    [SerializeField] float _waveDamageRate = 0.7f;   // 70% (관통)
 
     Vector2 _defaultColSize;
     Vector2 _defaultColSize2;
@@ -111,6 +117,18 @@ public class PlayerAttack : MonoBehaviour
                                    "CrescentVFX", m, "SFX/Player_StrongSword");
                 break;
 
+            case BasicStyle.SwordWave:
+                // 근접 판정 없이 검기만 날린다 (판정은 PlayerProjectile이 직접)
+                SoundManager.Instance.PlaySFX("SFX/Player_Sword");
+                var wave = VFXManager.Instance.Play("SwordWaveVFX", transform.position + transform.right * (0.6f * m), transform.rotation);
+                if (wave != null && wave.TryGetComponent(out PlayerProjectile proj))
+                {
+                    wave.transform.localScale = Vector3.one * m;
+                    proj.Launch(_owner, transform.right, _waveSpeed, _waveRange * m, _waveRadius * m, _waveDamageRate);
+                }
+                yield return new WaitForSeconds(_basicActiveTime);
+                break;
+
             default:
                 yield return Swing(_baseAttackDistance * m, _defaultColSize * m, 1f,
                                    "SwordVFX", m, "SFX/Player_Sword");
@@ -142,23 +160,24 @@ public class PlayerAttack : MonoBehaviour
     }
 
     // ── 특수기 ─────────────────────────────────────────────
-    public void SuperAttackStart(Action onComplete)
+    /// <param name="scale">범위 배율 (특수기 강화: 모아베기 단계, 받아치기 반격)</param>
+    public void SuperAttackStart(Action onComplete, float scale = 1f)
     {
-        StartCoroutine(CoSuperAttack(onComplete));
+        StartCoroutine(CoSuperAttack(onComplete, scale));
     }
 
-    IEnumerator CoSuperAttack(Action onComplete)
+    IEnumerator CoSuperAttack(Action onComplete, float scale)
     {
         _attackArea2.enabled = true;
 
-        float multiplier = _rangeMultiplier;
+        float multiplier = _rangeMultiplier * scale;
         _attackAreaPos2.position = transform.position + transform.right * (_baseSuperDistance * multiplier);
         _attackArea2.offset = new Vector2(_baseSuperDistance * multiplier, 0f); // 범위가 커지면 판정도 앞으로
         _attackArea2.size = _defaultColSize2 * multiplier;
 
         SoundManager.Instance.PlaySFX("SFX/Player_StrongSword");
         var vfx = VFXManager.Instance.Play("SwordVFX2", (Vector2)_attackAreaPos2.position, transform.rotation);
-        if (vfx != null) vfx.transform.localScale = Vector3.one * _superRangeMultiplier;
+        if (vfx != null) vfx.transform.localScale = Vector3.one * _superRangeMultiplier * scale;
 
         yield return new WaitForSeconds(_superActiveTime);
         _attackArea2.enabled = false;

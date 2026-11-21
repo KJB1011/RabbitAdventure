@@ -43,7 +43,8 @@ public class SpriteSlashVFX : MonoBehaviour
         _sprite.color = _color;
 
         t.DOScale(_toScale, _scaleTime).SetEase(Ease.OutCubic);
-        t.DOLocalRotate(new Vector3(0f, 0f, _toAngle), _scaleTime + _fadeDelay).SetEase(Ease.OutCubic);
+        // FastBeyond360: 0 → -330처럼 크게 돌 때도 짧은 쪽으로 돌지 않고 적은 각도만큼 그대로 돈다 (회전베기)
+        t.DOLocalRotate(new Vector3(0f, 0f, _toAngle), _scaleTime + _fadeDelay, RotateMode.FastBeyond360).SetEase(Ease.OutCubic);
         t.DOLocalMove(_toOffset, _scaleTime + _fadeDelay + _fadeTime * 0.5f).SetEase(Ease.OutCubic); // 사라지면서도 조금 더 나아간다
         _sprite.DOFade(0f, _fadeTime).SetDelay(_fadeDelay).SetEase(Ease.InQuad);
     }

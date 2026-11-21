@@ -41,6 +41,8 @@ public class IngameManagerEditor : Editor
         EditorGUILayout.LabelField("스킬 숙련도", EditorStyles.miniBoldLabel);
         MasteryButtons(manager, Defines.SKILL.MAIN, 20);
         MasteryButtons(manager, Defines.SKILL.SUB, MasteryAmount);
+        MasteryButtons(manager, Defines.SKILL.SUPER, 2);
+        MasteryButtons(manager, Defines.SKILL.SPECIAL, 1);
     }
 
     // 한 줄에 [○○ 숙련도 +n] [○○ 숙련도 가득]

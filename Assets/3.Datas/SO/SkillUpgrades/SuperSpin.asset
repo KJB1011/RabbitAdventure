@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf5f2c51ee724450a15eea93d0479099, type: 3}
+  m_Name: SuperSpin
+  m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeSO
+  skill: 2
+  type: 10
+  upgradeName: "\uD68C\uC804\uBCA0\uAE30"
+  description: "\uC8FC\uBCC0\uC744 3\uBC88 \uD68C\uC804\uD558\uBA70 \uBCB1\uB2C8\uB2E4.
+    (\uAC01 250%)\n\uAC00\uAE4C\uC6B4 \uC801 \uD0C4\uD658\uC744 \uC9C0\uC6B0\uACE0,
+    \uB3C4\uB294 \uB3D9\uC548\uC5D0\uB3C4 \uC6C0\uC9C1\uC77C \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  icon: {fileID: 21300000, guid: 33d493e13d2b47f47ad35dc13e050a46, type: 3}

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf5f2c51ee724450a15eea93d0479099, type: 3}
+  m_Name: SpecialSpirit
+  m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeSO
+  skill: 3
+  type: 16
+  upgradeName: "\uD22C\uC9C0 \uCDA9\uC804"
+  description: "\uD544\uC0B4\uAE30\uC5D0 \uCFE8\uD0C0\uC784\uC774 \uC5C6\uC5B4\uC9C0\uACE0,\n\uC801\uC744
+    40\uBC88 \uB9DE\uD788\uBA74 \uC0AC\uC6A9\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.\n\uD53C\uD574
+    2500%"
+  icon: {fileID: 21300000, guid: 65907579cc2e26e47af8fc2e119582c1, type: 3}

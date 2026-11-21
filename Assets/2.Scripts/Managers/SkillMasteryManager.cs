@@ -41,6 +41,8 @@ public class SkillMasteryManager : MonoBehaviour
 
     [Header("선택 창")]
     [SerializeField] string _choiceTitleFormat = "{0} 강화를 하나 선택하세요";
+    [Tooltip("강화 후보 중 몇 개를 보여줄지. 후보가 더 많으면 그중에서 무작위로 고른다")]
+    [SerializeField] int _choiceCount = 3;
 
     /// <summary>숙련도가 바뀌거나 강화를 골랐을 때 (UI 갱신용)</summary>
     public event Action OnMasteryChanged;
@@ -174,17 +176,23 @@ public class SkillMasteryManager : MonoBehaviour
 
     bool OpenChoice(Track track, Action onClosed)
     {
-        var options = new List<UIArtifactChoice.Option>();
+        // 후보를 섞어서 앞에서부터 _choiceCount개만 보여준다 (4개 중 3개 → 판마다 선택지가 달라진다)
         var upgrades = new List<SkillUpgradeSO>();
         if (track.upgrades != null)
-        {
             foreach (var up in track.upgrades)
-            {
-                if (up == null) continue;
-                upgrades.Add(up);
-                options.Add(new UIArtifactChoice.Option(up.icon, up.upgradeName, up.description));
-            }
+                if (up != null) upgrades.Add(up);
+
+        for (int i = upgrades.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            (upgrades[i], upgrades[j]) = (upgrades[j], upgrades[i]);
         }
+        if (upgrades.Count > _choiceCount)
+            upgrades.RemoveRange(_choiceCount, upgrades.Count - _choiceCount);
+
+        var options = new List<UIArtifactChoice.Option>();
+        foreach (var up in upgrades)
+            options.Add(new UIArtifactChoice.Option(up.icon, up.upgradeName, up.description));
 
         if (options.Count == 0 || UIArtifactChoice.Instance == null)
         {
@@ -219,4 +227,5 @@ public class SkillMasteryManager : MonoBehaviour
         SKILL.SPECIAL => "필살기",
         _ => skill.ToString()
     };
+
 }

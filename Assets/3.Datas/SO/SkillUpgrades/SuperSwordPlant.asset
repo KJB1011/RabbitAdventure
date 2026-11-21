@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf5f2c51ee724450a15eea93d0479099, type: 3}
+  m_Name: SuperSwordPlant
+  m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeSO
+  skill: 2
+  type: 12
+  upgradeName: "\uAC80 \uAF42\uAE30"
+  description: "\uBC1C\uBC11\uC5D0 \uAC80\uC744 \uAF42\uC544 4\uCD08 \uB3D9\uC548
+    \uC8FC\uBCC0 \uC801\uC5D0\uAC8C\n0.5\uCD08\uB9C8\uB2E4 120% \uD53C\uD574\uB97C
+    \uC90D\uB2C8\uB2E4."
+  icon: {fileID: 21300000, guid: 137c711ce20f9924bb1bc414b6f4156a, type: 3}

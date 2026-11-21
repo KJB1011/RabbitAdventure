@@ -15906,14 +15906,31 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 3079f6dd05a173e44a32eea52479bcbb, type: 2}
     - {fileID: 11400000, guid: ada3bde1dc8ce6f46a4a1f2016cab8d9, type: 2}
     - {fileID: 11400000, guid: 60e52fd739b3ce04dad58b7ccce40230, type: 2}
+    - {fileID: 11400000, guid: 122c19d4b1de53545a7db3a448c6edcd, type: 2}
   - skill: 1
     required: 20
     upgrades:
     - {fileID: 11400000, guid: 8499689be7f64207974e2c614f19e687, type: 2}
     - {fileID: 11400000, guid: b7f528ea95384a639b81f1d0216a87d0, type: 2}
     - {fileID: 11400000, guid: f93d540733854a0c8f8743ab5cb0e019, type: 2}
+    - {fileID: 11400000, guid: f5bf1f621c1e5214a84d9caf372b5074, type: 2}
+  - skill: 2
+    required: 10
+    upgrades:
+    - {fileID: 11400000, guid: 4b843cc1831df10449c4891a1825dff2, type: 2}
+    - {fileID: 11400000, guid: 56d77f6698b080f47bd360146153c687, type: 2}
+    - {fileID: 11400000, guid: 5bf449281f6d2e94db2bf669798e9f31, type: 2}
+    - {fileID: 11400000, guid: 7e4100c6c39360342a46a24cb5ced75f, type: 2}
+  - skill: 3
+    required: 5
+    upgrades:
+    - {fileID: 11400000, guid: fd04b12599540db43ad3099d78a7c647, type: 2}
+    - {fileID: 11400000, guid: f4a216055424bd242a7ae79fe2dc8873, type: 2}
+    - {fileID: 11400000, guid: 8d2b1bc1e9b0aa947a467f200b570240, type: 2}
+    - {fileID: 11400000, guid: e7c0ace5276232c41b4c4a82327cf313, type: 2}
   _purchaseFillRatio: 1
   _choiceTitleFormat: "{0} \uAC15\uD654\uB97C \uD558\uB098 \uC120\uD0DD\uD558\uC138\uC694"
+  _choiceCount: 3
 --- !u!4 &853379099
 Transform:
   m_ObjectHideFlags: 0
@@ -19694,6 +19711,10 @@ MonoBehaviour:
     count: 2
   - id: CrescentVFX
     count: 1
+  - id: SwordWaveVFX
+    count: 6
+  - id: SpinVFX
+    count: 3
   _prewarmBullets:
   - id: VFX/TestBullet
     count: 30

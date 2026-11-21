@@ -4,6 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static Defines;
+
+/// <summary>
+/// 플레이어의 이동, 4가지 스킬(기본기·회피기·특수기·필살기), 체력, 쿨타임을 담당한다.
+/// 스킬 강화(숙련도)는 PlayerSkillUpgrades 컴포넌트가 담당하고,
+/// 여기서는 스킬을 쓸 때 "강화가 있으면 이렇게 해줘"하고 그 컴포넌트에 물어본다. (_upgrades)
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] float _dashDistance = 4f;
@@ -17,7 +23,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("캐릭터 능력치")]
     [SerializeField] float _speed = 1f;
-    [SerializeField, Range(0f, 1f)] float _superChargeSpeedRate = 0.5f; // Q 스킬 차징 중 이동속도 배율 (0.5 = 절반)
+    [SerializeField, Range(0f, 1f)] float _superChargeSpeedRate = 0.5f; // 특수기 차징 중 이동속도 배율 (0.5 = 절반)
     [SerializeField] int _hp = 10;
     [SerializeField] int _maxHp = 10;
     [SerializeField] float _atk;
@@ -40,24 +46,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _specialInvincibleDelay = 1.0f;
     [SerializeField] SpecialSkillEffect _specialSkillEffect;
 
-    [Header("기본기 강화 (데미지·범위는 PlayerAttack에서)")]
-    [SerializeField] float _thrustAttackSpeedRate = 1.5f;   // 찌르기: 공격 속도 배율 (쿨타임 ÷ 1.5)
-    [SerializeField] float _tripleCooldownAdd = 0.5f;       // 3연타: 쿨타임 증가 (초)
-    [SerializeField] float _crescentCooldownAdd = 0.5f;     // 초승달 베기: 쿨타임 증가 (초)
-
-    [Header("대쉬 강화: 질풍")]
-    [SerializeField] float _galeDurationRate = 0.45f;   // 대쉬 시간 배율 (작을수록 빠름)
-    [SerializeField] float _galeDistanceRate = 1.3f;    // 대쉬 거리 배율
-    [SerializeField] float _galeHitRadius = 0.8f;       // 지나가며 베는 판정 반경
-    [SerializeField] float _galeDamageRate = 1f;        // 기본 공격 데미지의 몇 배 (1 = 100%)
-
-    [Header("대쉬 강화: 2회 충전")]
-    [SerializeField] int _upgradedDashCharges = 2;
-
-    [Header("대쉬 강화: 다음 공격 강화")]
-    [SerializeField] float _dashEmpowerBonus = 0.3f;    // 다음 공격 데미지 +30%
-    [SerializeField] Color _dashEmpowerTint = new Color(1f, 0.8f, 0.55f); // 강화가 준비된 동안 캐릭터 색
-
     [Header("노드 이동")]
     [SerializeField] float _nodeMoveDuration = 1f; // 이동 시간
 
@@ -68,6 +56,7 @@ public class PlayerController : MonoBehaviour
     TrailRenderer _trailRenderer;
     SpriteRenderer _spriteRenderer;
     Animator _animController;
+    PlayerSkillUpgrades _upgrades;
 
     // 흰색 플래시 (PlayerShaderGraph의 _FlashAmount 제어)
     static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
@@ -98,16 +87,10 @@ public class PlayerController : MonoBehaviour
     float _specialDamageBonus = 0f;       // 외부 필살기 데미지 보너스
     float _extraDashInvincibleTime = 0f;  // 외부 대쉬 추가 무적 시간
 
-    // 대쉬 강화 (숙련도로 하나를 고른다)
-    bool _hasGaleDash;                    // 질풍
-    bool _hasDashEmpower;                 // 다음 공격 강화
-    int _maxDashCharges = 1;              // 대쉬 충전 수 (강화하면 2)
+    int _maxDashCharges = 1;              // 회피기 충전 수 (강화하면 2)
     int _dashCharges = 1;
-    bool _isDashEmpowerReady;             // 대쉬 후 아직 공격하지 않았다
-    float _attackEmpowerRate = 1f;        // 지금 하는 공격에 곱하는 배율 (강화된 공격 중이면 1.3)
+    float _attackEmpowerRate = 1f;        // 지금 하는 공격에 곱하는 배율 (도약의 일격으로 강화된 공격이면 1.3)
     float _basicHitRate = 1f;             // 기본기 한 타의 데미지 배율 (PlayerAttack이 타마다 바꾼다. 3연타 1·2타 = 0.5 등)
-    readonly System.Collections.Generic.HashSet<EnemyBase> _galeHitEnemies = new();
-    readonly System.Collections.Generic.HashSet<ChestObject> _galeHitChests = new();
 
     public event System.Action<SKILL> OnSkillUsed;                    // 스킬을 사용한 순간 (숙련도용)
     public event System.Action OnDashStarted;
@@ -123,20 +106,24 @@ public class PlayerController : MonoBehaviour
 
     public float RangeMul => _rangeMultiplier;
     public float MainSkillCooldownRatio => _mainSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_mainSkillCooldown / _mainSkillCooldownDuration);
-    // 대쉬는 충전이 하나라도 남아 있으면 "사용 가능"으로 보여준다
+    // 회피기는 충전이 하나라도 남아 있으면 "사용 가능"으로 보여준다
     public float SubSkillCooldownRatio => _dashCharges > 0 || _subSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_subSkillCooldown / _subSkillCooldownDuration);
     public float SuperSkillCooldownRatio => _superSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_superSkillCooldown / _superSkillCooldownDuration);
-    public float SpecialSkillCooldownRatio => _specialSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_specialSkillCooldown / _specialSkillCooldownDuration);
+    // 필살기 강화(투지 충전)면 쿨타임 대신 게이지가 덜 찬 만큼 가린다
+    public float SpecialSkillCooldownRatio => _upgrades != null && _upgrades.UsesSpiritGauge ? _upgrades.SpiritShadow
+        : _specialSkillCooldownDuration <= 0 ? 0 : Mathf.Clamp01(_specialSkillCooldown / _specialSkillCooldownDuration);
 
     // 남은 쿨타임 (초, 0 이상)
     public float MainSkillCooldownLeft => Mathf.Max(0f, _mainSkillCooldown);
     public float SubSkillCooldownLeft => _dashCharges > 0 ? 0f : Mathf.Max(0f, _subSkillCooldown);
+    public float SuperSkillCooldownLeft => Mathf.Max(0f, _superSkillCooldown);
+    public float SpecialSkillCooldownLeft => _upgrades != null && _upgrades.UsesSpiritGauge ? _upgrades.SpiritHitsLeft // 투지 충전: 남은 타수
+        : Mathf.Max(0f, _specialSkillCooldown);
     public int DashCharges => _dashCharges;
     public int MaxDashCharges => _maxDashCharges;
     public bool IsControllable => _isControllable;
-    public float SuperSkillCooldownLeft => Mathf.Max(0f, _superSkillCooldown);
-    public float SpecialSkillCooldownLeft => Mathf.Max(0f, _specialSkillCooldown);
-    
+    public float AttackEmpowerRate => _attackEmpowerRate;
+
     // 외부 효과(아티팩트·버프)용 스탯 변경
     public void AddAtkMultiplier(float bonus) => _atkMultiplierBonus += bonus;
     public void RemoveAtkMultiplier(float bonus) => _atkMultiplierBonus -= bonus;
@@ -153,11 +140,15 @@ public class PlayerController : MonoBehaviour
         if (_hpTxt != null) _hpTxt.text = _hp.ToString(); // 플레이어가 파괴된 뒤 불려도 안전하게
     }
 
-    // EnemyHitbox 에서 플레이어 공격 적중 시 호출
-    public void NotifyAttackHit(EnemyBase target, AttackType type) => OnAttackHit?.Invoke(target, type);
+    // EnemyHitbox 등에서 플레이어 공격 적중 시 호출
+    public void NotifyAttackHit(EnemyBase target, AttackType type)
+    {
+        _upgrades.OnEnemyHit(); // 필살기 강화(투지 충전): 적을 맞힐 때마다 게이지
+        OnAttackHit?.Invoke(target, type);
+    }
     public AttackType GetAttackType(Collider2D attackCollider) => _playerAttack.GetAttackType(attackCollider);
 
-    // Q 스킬 쿨타임 감소 (외부 효과용)
+    // 특수기 쿨타임 감소 (외부 효과용)
     public void ReduceSuperSkillCooldown(float amount)
     {
         _superSkillCooldown = Mathf.Max(0, _superSkillCooldown - amount);
@@ -222,6 +213,8 @@ public class PlayerController : MonoBehaviour
         _spriteRenderer.flipX = true;
         _animController = transform.GetChild(0).GetComponent<Animator>();
         _flashBlock = new MaterialPropertyBlock();
+        _upgrades = GetComponent<PlayerSkillUpgrades>();
+        if (_upgrades == null) _upgrades = gameObject.AddComponent<PlayerSkillUpgrades>(); // 프리팹에 없으면 기본값으로 추가
 
         _playerAttack.SetAttackRange(_rangeMultiplier);
     }
@@ -235,7 +228,7 @@ public class PlayerController : MonoBehaviour
         }
         if (_subSkillCooldown > 0)
         {
-            // 대쉬는 충전식: 쿨타임이 끝날 때마다 하나씩 차고, 덜 찼으면 바로 다음 충전을 시작
+            // 회피기는 충전식: 쿨타임이 끝날 때마다 하나씩 차고, 덜 찼으면 바로 다음 충전을 시작
             _subSkillCooldown -= Time.deltaTime;
             if (_subSkillCooldown <= 0)
             {
@@ -257,7 +250,7 @@ public class PlayerController : MonoBehaviour
 
         // 꾹 누르고 있으면 쿨타임이 끝나는 즉시 다시 발동
         // (각 함수 안에서 쿨타임·공격 중·대시 중 등을 검사하므로, 조건이 맞을 때만 실제로 나간다)
-        // 대시 → 필살기 → Q → 기본 공격 순서: 같이 누르고 있으면 회피가 가장 먼저, 그다음 큰 스킬이 먼저 나가도록
+        // 회피기 → 필살기 → 특수기 → 기본기 순서: 같이 누르고 있으면 회피가 가장 먼저, 그다음 큰 스킬이 먼저 나가도록
         if (_dashAction != null && _dashAction.IsPressed()) OnDash();
         if (_specialSkillAction != null && _specialSkillAction.IsPressed()) OnSpecialSkill();
         if (_superSkillAction != null && _superSkillAction.IsPressed()) OnSuperSkill();
@@ -310,11 +303,7 @@ public class PlayerController : MonoBehaviour
         _mainSkillCooldown = _mainSkillCooldownDuration;
         _isAttack = true;
         BeginEmpoweredAttack();
-        _playerAttack.AttackStart(() =>
-        {
-            _isAttack = false;
-            _attackEmpowerRate = 1f;
-        });
+        _playerAttack.AttackStart(EndAttack);
         OnSkillUsed?.Invoke(SKILL.MAIN);
     }
 
@@ -343,7 +332,8 @@ public class PlayerController : MonoBehaviour
         if (_isAttack) return;
 
         _superSkillCooldown = _superSkillCooldownDuration;
-        StartCoroutine(SuperSkillRoutine());
+        // 특수기 강화가 있으면 강화된 동작, 없으면 기본 동작
+        StartCoroutine(_upgrades.HasSuperUpgrade ? _upgrades.SuperRoutine() : SuperSkillRoutine());
         OnSkillUsed?.Invoke(SKILL.SUPER);
     }
 
@@ -354,7 +344,16 @@ public class PlayerController : MonoBehaviour
         if (_specialSkillCooldown > 0) return;
         if (_isAttack) return;
 
-        _specialSkillCooldown = _specialSkillCooldownDuration;
+        // 투지 충전: 쿨타임 대신 게이지가 가득일 때만 쓸 수 있다
+        if (_upgrades.UsesSpiritGauge)
+        {
+            if (!_upgrades.TryUseSpiritGauge()) return;
+        }
+        else
+        {
+            _specialSkillCooldown = _specialSkillCooldownDuration;
+        }
+
         StartCoroutine(SpecialSkillRoutine());
         OnSkillUsed?.Invoke(SKILL.SPECIAL);
     }
@@ -371,15 +370,17 @@ public class PlayerController : MonoBehaviour
     public IEnumerator MoveToPositionRoutine(Vector2 target)
     {
         // 진행 중인 스킬 강제 중단 + 상태 초기화
-        StopAllCoroutines(); // 슈퍼스킬, 대쉬 등 모든 코루틴 중단
+        StopAllCoroutines(); // 특수기, 대쉬 등 모든 코루틴 중단
         _playerAttack.ForceStop();
+        _upgrades.OnNodeMove(); // 강화 쪽 코루틴·버프도 정리
 
         _isAttack = false;
         _isDashing = false;
         _damageMultiplier = 1f;
         _attackEmpowerRate = 1f;
         _trailRenderer.enabled = false;
-        _moveSpeedRate = 1f; // Q 차징 중에 끊겼을 수 있으므로 원래대로
+        SetFlash(0f);
+        _moveSpeedRate = 1f; // 특수기 차징 중에 끊겼을 수 있으므로 원래대로
 
         // Time.timeScale이 0일 경우 대비 복구
         if (Time.timeScale == 0f)
@@ -436,7 +437,6 @@ public class PlayerController : MonoBehaviour
         _attackEmpowerRate = 1f;
         _moveSpeedRate = 1f;
         _dashCharges = _maxDashCharges;
-        SetDashEmpowerReady(false);
 
         _playerHitBox.enabled = true;
         _spriteRenderer.enabled = true;
@@ -455,6 +455,7 @@ public class PlayerController : MonoBehaviour
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SUB, 0f);
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SUPER, 0f);
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SPECIAL, 0f);
+        _upgrades.ResetStates(); // 받아치기 자세, 투지 게이지, 다음 공격 강화 등
 
         // HP 텍스트 갱신
         if (_hpTxt != null)
@@ -499,8 +500,7 @@ public class PlayerController : MonoBehaviour
         // 차징 중에 맞아서 죽었다면 연출을 발동하지 않음
         if (_isGameOver)
         {
-            _isAttack = false;
-            _attackEmpowerRate = 1f;
+            EndAttack();
             yield break;
         }
 
@@ -526,13 +526,19 @@ public class PlayerController : MonoBehaviour
         if (_invincibleCount <= 0)
             _playerHitBox.enabled = true;
 
-        _isAttack = false;
-        _attackEmpowerRate = 1f;
+        EndAttack();
     }
 
     private void DealSpecialDamage()
     {
-        float totalMultiplier = _specialDamageMultiplier * (1f + _specialDamageBonus);
+        DealSpecialHit(_upgrades.SpecialDamageRate(_specialDamageMultiplier)); // 강화가 있으면 강화된 배율
+        _upgrades.OnSpecialDamageDealt(); // 필살기 강화별 추가 효과 (연속 일섬, 달의 가호, 탄막 반사)
+    }
+
+    /// <summary>화면의 모든 적·상자에 한 번 피해 (필살기 강화 "연속 일섬"이 여러 번 부른다)</summary>
+    public void DealSpecialHit(float rate)
+    {
+        float totalMultiplier = rate * (1f + _specialDamageBonus);
         int damage = Mathf.RoundToInt(DamageReturn() * totalMultiplier);
         bool hitAny = false; // 하나라도 맞았는지 (적중 사운드용)
 
@@ -563,7 +569,7 @@ public class PlayerController : MonoBehaviour
             SoundManager.Instance.PlaySFX("SFX/Player_SwordHit");
     }
 
-    // ── Q 스킬 ───────────────────────────────────────────────
+    // ── 특수기 (기본 동작) ───────────────────────────────────
     IEnumerator SuperSkillRoutine()
     {
         _isAttack = true;
@@ -614,8 +620,8 @@ public class PlayerController : MonoBehaviour
         SetFlash(0f);
     }
 
-    // 머티리얼 에셋은 그대로 두고, 이 SpriteRenderer에만 _FlashAmount 값을 적용
-    void SetFlash(float amount)
+    // 머티리얼 에셋은 그대로 두고, 이 SpriteRenderer에만 _FlashAmount 값을 적용 (1 = 완전 흰색, 0 = 원래 그림)
+    public void SetFlash(float amount)
     {
         _spriteRenderer.GetPropertyBlock(_flashBlock); // 스프라이트 텍스처 등 기존 값 유지
         _flashBlock.SetFloat(FlashAmountId, amount);
@@ -642,6 +648,7 @@ public class PlayerController : MonoBehaviour
     public bool DamageTaken()
     {
         if (IsInvincible || _isGameOver) return false;
+        if (_upgrades.TryParry()) return true; // 특수기 강화(받아치기): 자세 중이면 피해 대신 반격 (탄환은 사라진다)
 
         _hp--;
         _hpTxt.text = _hp.ToString();
@@ -717,113 +724,116 @@ public class PlayerController : MonoBehaviour
     }
 
     // ── 스킬 강화 (숙련도) ──────────────────────────────────
-    /// <summary>SkillMasteryManager에서 고른 강화를 켠다</summary>
-    public void ApplySkillUpgrade(SkillUpgradeType type)
+    /// <summary>SkillMasteryManager에서 고른 강화를 켠다 (실제 처리는 PlayerSkillUpgrades)</summary>
+    public void ApplySkillUpgrade(SkillUpgradeType type) => _upgrades.Apply(type);
+
+    // ── PlayerSkillUpgrades가 쓰는 함수들 ────────────────────
+    // (강화 컴포넌트가 플레이어 상태를 바꿀 때는 private 변수를 직접 건드리지 않고 이 함수들을 거친다)
+
+    public PlayerAttack Attack => _playerAttack;
+    public SpriteRenderer CharSprite => _spriteRenderer;
+    public bool IsGameOver => _isGameOver;
+    public bool IsAttacking { get => _isAttack; set => _isAttack = value; }
+    public bool IsSuperKeyHeld => _superSkillAction != null && _superSkillAction.IsPressed();
+    public float SuperChargeSpeedRate => _superChargeSpeedRate;
+    public float DashDistance => _dashDistance;
+    public float ExtraDashInvincibleTime => _extraDashInvincibleTime;
+
+    public void SetMoveSpeedRate(float rate) => _moveSpeedRate = rate;
+    public void SetDamageMultiplier(float multiplier) => _damageMultiplier = multiplier;
+    public void PlayAnim(string trigger) => _animController.SetTrigger(trigger);
+
+    /// <summary>공격을 시작할 때: "다음 공격 강화"가 준비돼 있으면 이번 공격에 적용</summary>
+    public void BeginEmpoweredAttack() => _attackEmpowerRate = _upgrades.ConsumeAttackEmpower();
+
+    /// <summary>공격이 끝났을 때: 공격 중 상태와 강화 배율을 원래대로</summary>
+    public void EndAttack()
     {
-        switch (type)
+        _isAttack = false;
+        _attackEmpowerRate = 1f;
+    }
+
+    /// <summary>기본기 쿨타임 변경 (쿨타임 × multiply + add)</summary>
+    public void ModifyMainCooldown(float multiply, float add)
+        => _mainSkillCooldownDuration = _mainSkillCooldownDuration * multiply + add;
+
+    /// <summary>회피기 최대 충전 수 변경. 고르자마자 하나 더 쓸 수 있게 충전도 하나 채운다</summary>
+    public void SetMaxDashCharges(int max)
+    {
+        _maxDashCharges = Mathf.Max(_maxDashCharges, max);
+        _dashCharges = Mathf.Min(_dashCharges + 1, _maxDashCharges);
+        // 이미 가득 찼는데 쿨타임이 돌고 있었다면 멈추고, 덜 찼는데 멈춰 있었다면 충전 시작
+        if (_dashCharges >= _maxDashCharges) _subSkillCooldown = 0f;
+        else if (_subSkillCooldown <= 0f) _subSkillCooldown = _subSkillCooldownDuration;
+        RefreshSkillUI(SKILL.SUB);
+    }
+
+    /// <summary>필살기 쿨타임 길이 변경 (달의 가호 9초, 투지 충전 0초)</summary>
+    public void SetSpecialCooldownDuration(float duration)
+    {
+        _specialSkillCooldownDuration = duration;
+        _specialSkillCooldown = Mathf.Min(_specialSkillCooldown, duration);
+        RefreshSkillUI(SKILL.SPECIAL);
+    }
+
+    /// <summary>특수기 쿨타임을 전체 길이의 ratio만큼 돌려받는다 (받아치기 실패)</summary>
+    public void RefundSuperCooldown(float ratio)
+    {
+        _superSkillCooldown = Mathf.Max(0f, _superSkillCooldown - _superSkillCooldownDuration * ratio);
+        RefreshSkillUI(SKILL.SUPER);
+    }
+
+    /// <summary>플레이어 옆 스킬 UI의 쿨타임 표시를 지금 값으로 다시 그린다</summary>
+    public void RefreshSkillUI(SKILL skill)
+    {
+        if (_uiPlayerSkill == null) return;
+        float ratio = skill switch
         {
-            case SkillUpgradeType.DashGale:
-                _hasGaleDash = true;
-                break;
-
-            case SkillUpgradeType.DashDoubleCharge:
-                _maxDashCharges = Mathf.Max(_maxDashCharges, _upgradedDashCharges);
-                _dashCharges = Mathf.Min(_dashCharges + 1, _maxDashCharges); // 고르자마자 하나 더 쓸 수 있게
-                // 이미 가득 찼는데 쿨타임이 돌고 있었다면 멈추고, 덜 찼는데 멈춰 있었다면 충전 시작
-                if (_dashCharges >= _maxDashCharges) _subSkillCooldown = 0f;
-                else if (_subSkillCooldown <= 0f) _subSkillCooldown = _subSkillCooldownDuration;
-                _uiPlayerSkill.SetCoolDown(SKILL.SUB, SubSkillCooldownRatio);
-                break;
-
-            case SkillUpgradeType.DashEmpower:
-                _hasDashEmpower = true;
-                break;
-
-            // 기본기: 모양은 PlayerAttack이, 쿨타임은 여기서 바꾼다
-            case SkillUpgradeType.MainThrust:
-                _playerAttack.SetBasicStyle(PlayerAttack.BasicStyle.Thrust);
-                _mainSkillCooldownDuration /= _thrustAttackSpeedRate;
-                break;
-
-            case SkillUpgradeType.MainTripleSlash:
-                _playerAttack.SetBasicStyle(PlayerAttack.BasicStyle.TripleSlash);
-                _mainSkillCooldownDuration += _tripleCooldownAdd;
-                break;
-
-            case SkillUpgradeType.MainCrescent:
-                _playerAttack.SetBasicStyle(PlayerAttack.BasicStyle.Crescent);
-                _mainSkillCooldownDuration += _crescentCooldownAdd;
-                break;
-        }
+            SKILL.MAIN => MainSkillCooldownRatio,
+            SKILL.SUB => SubSkillCooldownRatio,
+            SKILL.SUPER => SuperSkillCooldownRatio,
+            _ => SpecialSkillCooldownRatio,
+        };
+        _uiPlayerSkill.SetCoolDown(skill, ratio);
     }
 
-    // 질풍: 지금 위치 주변의 적을 한 번씩만 벤다 (대쉬마다 맞은 목록을 비운다)
-    void GaleSlash()
+    /// <summary>맵 경계 안으로 좌표를 맞춘다 (경계가 꺼져 있으면 그대로)</summary>
+    public Vector2 ClampToMap(Vector2 p) => _boundaryEnabled
+        ? new Vector2(Mathf.Clamp(p.x, _mapMin.x, _mapMax.x), Mathf.Clamp(p.y, _mapMin.y, _mapMax.y))
+        : p;
+
+    /// <summary>순간이동 (꼬리가 이동 경로를 따라 길게 그려지지 않게 지운다)</summary>
+    public void TeleportTo(Vector2 target)
     {
-        bool hitAny = false;
-        foreach (var hit in Physics2D.OverlapCircleAll(transform.position, _galeHitRadius))
-        {
-            // 적의 몸(EnemyHitbox)에 닿았을 때만 — 적의 공격 콜라이더나 총알은 무시
-            if (hit.TryGetComponent(out EnemyHitbox _))
-            {
-                var enemy = hit.GetComponentInParent<EnemyBase>();
-                if (enemy == null || enemy.IsDead || !_galeHitEnemies.Add(enemy)) continue;
-
-                int damage = Mathf.Max(1, Mathf.RoundToInt(DamageReturn(out bool isCrit) * _galeDamageRate));
-                enemy.DamageTaken(damage);
-                IngameManager.Instance.Flash(enemy.CharSprite, 0.05f);
-                DamageTextManager.Instance.Show(damage, isCrit, enemy.transform.position);
-
-                Vector2 dir = (Vector2)enemy.transform.position - (Vector2)transform.position;
-                if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
-                VFXManager.Instance.Play("HitSpark", enemy.transform.position, Quaternion.LookRotation(dir, Vector3.back));
-                hitAny = true;
-                continue;
-            }
-
-            var chest = hit.GetComponentInParent<ChestObject>();
-            if (chest != null && chest.gameObject.activeSelf && _galeHitChests.Add(chest))
-            {
-                chest.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(DamageReturn() * _galeDamageRate)));
-                hitAny = true;
-            }
-        }
-
-        if (hitAny)
-            SoundManager.Instance.PlaySFX("SFX/Player_SwordHit");
+        _trailRenderer.Clear();
+        transform.position = new Vector3(target.x, target.y, transform.position.z);
+        _trailRenderer.Clear();
     }
 
-    // 다음 공격 강화가 준비됐으면 이번 공격에 적용하고 소모한다
-    void BeginEmpoweredAttack()
-    {
-        if (!_isDashEmpowerReady) return;
-        _attackEmpowerRate = 1f + _dashEmpowerBonus;
-        SetDashEmpowerReady(false);
-    }
+    public void RaiseDashStarted() => OnDashStarted?.Invoke();
+    public void RaiseDashEnded() => OnDashEnded?.Invoke();
 
-    // 준비된 동안은 캐릭터 색을 살짝 바꿔서 알려준다
-    void SetDashEmpowerReady(bool ready)
-    {
-        _isDashEmpowerReady = ready;
-        if (_spriteRenderer != null)
-            _spriteRenderer.color = ready ? _dashEmpowerTint : Color.white;
-    }
-
-    // ── 대쉬 ────────────────────────────────────────────────
+    // ── 회피기 ──────────────────────────────────────────────
     IEnumerator DashRoutine()
     {
+        // 회피기 강화(순간이동): 미끄러지지 않고 바로 이동한다
+        if (_upgrades.HasBlink)
+        {
+            yield return StartCoroutine(_upgrades.BlinkRoutine());
+            yield break;
+        }
+
         _isDashing = true;
         _invincibleCount++;
         _playerHitBox.enabled = false;
         _trailRenderer.enabled = true;
 
         OnDashStarted?.Invoke();
+        _upgrades.OnDashBegin();
 
-        // 질풍 강화: 더 빠르고 조금 더 멀리
-        float maxDistance = _hasGaleDash ? _dashDistance * _galeDistanceRate : _dashDistance;
-        float duration = _hasGaleDash ? _dashDuration * _galeDurationRate : _dashDuration;
-        _galeHitEnemies.Clear();
-        _galeHitChests.Clear();
+        // 질풍베기 강화면 더 빠르고 조금 더 멀리
+        float maxDistance = _dashDistance * _upgrades.DashDistanceRate;
+        float duration = _dashDuration * _upgrades.DashDurationRate;
 
         Vector2 startPos = transform.position;
         Vector2 mouseWorldPos = Utils.GetMousePos();
@@ -850,8 +860,7 @@ public class PlayerController : MonoBehaviour
                 );
             }
 
-            if (_hasGaleDash)
-                GaleSlash();
+            _upgrades.OnDashMoving(); // 질풍베기: 지나가는 자리의 적을 벤다
 
             if (Vector2.Distance(startPos, transform.position) >= finalDashDistance * 0.95f)
                 break;
@@ -861,7 +870,7 @@ public class PlayerController : MonoBehaviour
 
         _trailRenderer.enabled = false;
         _isDashing = false;
-        if (_hasDashEmpower) SetDashEmpowerReady(true);
+        _upgrades.OnDashFinished(); // 도약의 일격: 다음 공격 강화 준비
         OnDashEnded?.Invoke();
 
         if (_extraDashInvincibleTime > 0)

@@ -289,6 +289,29 @@ public class VFXManager : MonoBehaviour
                 b.ReleaseSelf();
     }
 
+    /// <summary>center 반경 안의 탄환만 지운다 (순간이동·회전베기 등). 지운 개수를 돌려준다</summary>
+    public int ClearBulletsInRadius(Vector2 center, float radius)
+    {
+        int count = 0;
+        float r2 = radius * radius;
+        foreach (var b in GetComponentsInChildren<PooledBullet>())
+        {
+            if (!b.gameObject.activeSelf) continue;
+            if (((Vector2)b.transform.position - center).sqrMagnitude > r2) continue;
+            b.ReleaseSelf();
+            count++;
+        }
+        return count;
+    }
+
+    /// <summary>지금 날아가는 중인 탄환을 result에 담는다 (탄막 반사)</summary>
+    public void GetActiveBullets(List<PooledBullet> result)
+    {
+        result.Clear();
+        foreach (var b in GetComponentsInChildren<PooledBullet>())
+            if (b.gameObject.activeSelf) result.Add(b);
+    }
+
     // ── 유틸 ─────────────────────────────────────────────────
 
     private GameObject LoadPrefab(string path)

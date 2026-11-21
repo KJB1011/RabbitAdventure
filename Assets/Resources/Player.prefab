@@ -706,6 +706,10 @@ MonoBehaviour:
   _crescentSize: {x: 3.6, y: 4.4}
   _crescentDistance: 2.1
   _crescentDamageRate: 2.5
+  _waveRange: 4
+  _waveSpeed: 16
+  _waveRadius: 0.6
+  _waveDamageRate: 0.7
 --- !u!1 &2379439340605838137
 GameObject:
   m_ObjectHideFlags: 0
@@ -1150,6 +1154,7 @@ GameObject:
   - component: {fileID: 2435898202355396684}
   - component: {fileID: 719717138890193289}
   - component: {fileID: 7367704878811313906}
+  - component: {fileID: 8979028212160673700}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1245,16 +1250,6 @@ MonoBehaviour:
   _specialDamageMultiplier: 30
   _specialInvincibleDelay: 1.5
   _specialSkillEffect: {fileID: 0}
-  _thrustAttackSpeedRate: 1.5
-  _tripleCooldownAdd: 0.5
-  _crescentCooldownAdd: 0.5
-  _galeDurationRate: 0.45
-  _galeDistanceRate: 1.3
-  _galeHitRadius: 0.8
-  _galeDamageRate: 1
-  _upgradedDashCharges: 2
-  _dashEmpowerBonus: 0.3
-  _dashEmpowerTint: {r: 1, g: 0.8, b: 0.55, a: 1}
   _nodeMoveDuration: 1
   _mapMin: {x: -9, y: -5}
   _mapMax: {x: 9, y: 5}
@@ -1434,6 +1429,65 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &8979028212160673700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3795670308001565551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e356ea5a3ec06a48bc1397a66cabee8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillUpgrades
+  _thrustAttackSpeedRate: 1.5
+  _tripleCooldownAdd: 0.5
+  _crescentCooldownAdd: 0.5
+  _galeDurationRate: 0.45
+  _galeDistanceRate: 1.3
+  _galeHitRadius: 0.8
+  _galeDamageRate: 1
+  _upgradedDashCharges: 2
+  _dashEmpowerBonus: 0.3
+  _dashEmpowerTint: {r: 1, g: 0.8, b: 0.55, a: 1}
+  _blinkClearRadius: 1.3
+  _chargeStageTime: 0.5
+  _chargeMaxHold: 1.6
+  _chargeDamage:
+  - 5
+  - 9
+  - 15
+  _chargeRange:
+  - 1
+  - 1.3
+  - 1.6
+  _spinCount: 3
+  _spinInterval: 0.13
+  _spinRadius: 2.5
+  _spinDamageRate: 2.5
+  _spinBulletClearRadius: 1.6
+  _parryWindow: 0.4
+  _parryMoveRate: 0.3
+  _parryCounterRate: 15
+  _parryInvincibleTime: 0.6
+  _parryFailRefund: 0.5
+  _plantRadius: 2
+  _plantDuration: 4
+  _plantTickInterval: 0.5
+  _plantDamageRate: 1.2
+  _multiSlashRate: 7
+  _multiSlashCount: 5
+  _multiSlashInterval: 0.12
+  _moonRate: 18
+  _moonCooldown: 9
+  _moonAtkBonus: 0.3
+  _moonBuffTime: 6
+  _reflectRate: 20
+  _reflectWaveRate: 0.6
+  _reflectMax: 20
+  _spiritRate: 25
+  _spiritRequiredHits: 40
 --- !u!1 &4119697982759677859
 GameObject:
   m_ObjectHideFlags: 0
