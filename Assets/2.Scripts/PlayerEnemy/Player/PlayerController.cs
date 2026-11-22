@@ -96,6 +96,12 @@ public class PlayerController : MonoBehaviour
     public event System.Action OnDashStarted;
     public event System.Action OnDashEnded;                          // 대쉬 이동이 끝난 순간 (도착 지점에서)
     public event System.Action<EnemyBase, AttackType> OnAttackHit;   // 맞은 적 + 공격 종류
+    public event System.Action OnRangeChanged;                       // 공격범위가 바뀐 순간
+
+    // "이 위치에 맞으면 확정 치명타" 조건들 (아티팩트: 칼끝 일격). 하나라도 true면 치명타
+    readonly System.Collections.Generic.List<System.Func<Vector2, bool>> _critRules = new();
+    public void AddCritRule(System.Func<Vector2, bool> rule) => _critRules.Add(rule);
+    public void RemoveCritRule(System.Func<Vector2, bool> rule) => _critRules.Remove(rule);
 
     public bool IsInvincible => _invincibleCount > 0;
     public int CurrentHp => _hp;
@@ -479,6 +485,7 @@ public class PlayerController : MonoBehaviour
     {
         _rangeMultiplier += amount;
         _playerAttack.SetAttackRange(_rangeMultiplier);
+        OnRangeChanged?.Invoke(); // 공격범위에 따라 효과가 바뀌는 아티팩트(돋보기 안경)용
     }
 
     public void AddCritRate(float amount)
@@ -633,10 +640,23 @@ public class PlayerController : MonoBehaviour
     {
         return DamageReturn(out _);
     }
-    public int DamageReturn(out bool isCrit)
+    public int DamageReturn(out bool isCrit) => CalcDamage(false, out isCrit);
+
+    /// <summary>
+    /// 맞은 위치를 아는 공격용 (EnemyHitbox). 확정 치명타 조건(칼끝 일격 등)에 맞으면 무조건 치명타
+    /// </summary>
+    public int DamageReturn(Vector2 hitPoint, out bool isCrit)
+    {
+        bool forceCrit = false;
+        foreach (var rule in _critRules)
+            if (rule(hitPoint)) { forceCrit = true; break; }
+        return CalcDamage(forceCrit, out isCrit);
+    }
+
+    int CalcDamage(bool forceCrit, out bool isCrit)
     {
         float base_ = Random.Range(_atk * 0.9f, _atk * 1.1f);
-        isCrit = Random.Range(0, 100f) < _critRate;
+        isCrit = forceCrit || Random.Range(0, 100f) < _critRate;
         float damage = isCrit ? base_ * _critDamageRate : base_;
         damage *= (1f + _atkMultiplierBonus);
         return (int)(damage * _damageMultiplier * _attackEmpowerRate * _basicHitRate);

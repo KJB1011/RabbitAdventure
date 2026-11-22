@@ -39,6 +39,12 @@ public class IngameManagerEditor : Editor
         // 스킬 숙련도 (전투 중에 가득 차면 전투가 끝난 뒤 강화 선택 창이 열린다)
         EditorGUILayout.Space(4);
         EditorGUILayout.LabelField("스킬 숙련도", EditorStyles.miniBoldLabel);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("모든 숙련도 +25%"))
+            manager.DebugAddMasteryAll(0.25f);
+        if (GUILayout.Button("모든 숙련도 가득"))
+            manager.DebugAddMasteryAll(1f);
+        EditorGUILayout.EndHorizontal();
         MasteryButtons(manager, Defines.SKILL.MAIN, 20);
         MasteryButtons(manager, Defines.SKILL.SUB, MasteryAmount);
         MasteryButtons(manager, Defines.SKILL.SUPER, 2);

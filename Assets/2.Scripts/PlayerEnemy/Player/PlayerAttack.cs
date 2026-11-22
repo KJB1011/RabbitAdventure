@@ -69,6 +69,9 @@ public class PlayerAttack : MonoBehaviour
         _owner = GetComponentInParent<PlayerController>();
     }
     public void SetAttackRange(float multiplier) => _rangeMultiplier = multiplier;
+
+    /// <summary>마지막으로 휘두른 공격이 닿는 가장 먼 거리 (플레이어 중심부터 판정 앞쪽 끝까지). 칼끝 일격 판정용</summary>
+    public float LastReach { get; private set; }
     public void SetBasicStyle(BasicStyle style) => _basicStyle = style;
 
 
@@ -148,6 +151,7 @@ public class PlayerAttack : MonoBehaviour
         _attackAreaPos.position = transform.position + transform.right * distance;
         _attackArea.offset = new Vector2(distance, 0f);
         _attackArea.size = size;
+        LastReach = distance + size.x * 0.5f;
         _attackArea.enabled = true; // 끄고 다시 켜면 같은 적도 다시 맞는다 (3연타)
 
         SoundManager.Instance.PlaySFX(sfx);
@@ -174,6 +178,7 @@ public class PlayerAttack : MonoBehaviour
         _attackAreaPos2.position = transform.position + transform.right * (_baseSuperDistance * multiplier);
         _attackArea2.offset = new Vector2(_baseSuperDistance * multiplier, 0f); // 범위가 커지면 판정도 앞으로
         _attackArea2.size = _defaultColSize2 * multiplier;
+        LastReach = _baseSuperDistance * multiplier + _attackArea2.size.x * 0.5f;
 
         SoundManager.Instance.PlaySFX("SFX/Player_StrongSword");
         var vfx = VFXManager.Instance.Play("SwordVFX2", (Vector2)_attackAreaPos2.position, transform.rotation);

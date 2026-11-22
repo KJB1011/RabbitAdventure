@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f99926f6328320d47931d49d4c017ecc, type: 3}
+  m_Name: BladeTip
+  m_EditorClassIdentifier: Assembly-CSharp::BladeTipSO
+  artifactName: "\uCE7C\uB05D \uC77C\uACA9"
+  description: "\uAE30\uBCF8\uAE30\xB7\uD2B9\uC218\uAE30\uB97C \uBC94\uC704\uC758
+    \uBC14\uAE65\uCABD 40%\uB85C \uB9DE\uD788\uBA74\n\uD655\uC815 \uCE58\uBA85\uD0C0"
+  icon: {fileID: 21300000, guid: 50fec6f8e8651144bbd37fd3673b04fb, type: 3}
+  price: 30
+  _tipRatio: 0.4

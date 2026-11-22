@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f07afc12781ff14783df993e2bd7593, type: 3}
+  m_Name: GiantGlove
+  m_EditorClassIdentifier: Assembly-CSharp::GiantGloveSO
+  artifactName: "\uAC70\uC778\uC758 \uC7A5\uAC11"
+  description: "\uACF5\uACA9\uBC94\uC704 +40%\n\uB300\uC2E0 \uAE30\uBCF8\uAE30 \uCFE8\uD0C0\uC784
+    +0.1\uCD08"
+  icon: {fileID: 21300000, guid: 71a78d05afe08f743836443924a73220, type: 3}
+  price: 30
+  _rangeBonus: 0.4
+  _mainCooldownAdd: 0.1

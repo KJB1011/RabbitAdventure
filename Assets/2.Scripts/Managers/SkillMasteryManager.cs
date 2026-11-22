@@ -118,6 +118,9 @@ public class SkillMasteryManager : MonoBehaviour
 
     public SkillUpgradeSO GetChosen(SKILL skill) => GetTrack(skill)?.chosen;
 
+    /// <summary>가득 차는 데 필요한 숙련도 (숙련도가 없는 스킬은 0)</summary>
+    public int GetRequired(SKILL skill) => GetTrack(skill)?.required ?? 0;
+
     /// <summary>숙련도 시스템이 있는 스킬인지 (없으면 상점에서 '준비 중')</summary>
     public bool HasTrack(SKILL skill) => GetTrack(skill) != null;
 

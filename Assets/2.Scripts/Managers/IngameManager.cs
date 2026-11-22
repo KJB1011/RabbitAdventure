@@ -231,8 +231,9 @@ public class IngameManager : MonoBehaviour
             yield return StartCoroutine(mastery.ResolvePendingChoices());
         }
 
-        // 중간 결과창 표시
-        _countdownPanel.Show();
+        // 중간 결과창 표시 (전투 노드만. 상자·상점 같은 비전투 노드는 보여줄 기록이 없으므로 생략)
+        if (isBattle)
+            _countdownPanel.Show();
 
         if (_maxDamageText != null && isBattle)
         {
@@ -263,8 +264,9 @@ public class IngameManager : MonoBehaviour
         }
 
         // 중간 결과창은 플레이어가 이동하는 동안 함께 닫는다
-        bool hideDone = false;
-        _countdownPanel.Hide(() => hideDone = true);
+        bool hideDone = !isBattle; // 띄우지 않았으면 닫을 것도 없다
+        if (isBattle)
+            _countdownPanel.Hide(() => hideDone = true);
 
         // 플레이어: 오른쪽 화면 밖으로 퇴장 → 왼쪽 화면 밖에서 다음 구역으로 등장
         if (_player != null)
@@ -425,6 +427,22 @@ public class IngameManager : MonoBehaviour
         Debug.Log($"[Debug] {SkillMasteryManager.SkillName(skill)} 숙련도 +{amount} → {mastery.GetProgress(skill) * 100f:0}%");
 
         // 전투 중이면 전투가 끝날 때, 아니면 바로 선택 창
+        if (!_isBattle && !_isTransitioning) mastery.TryResolveNow();
+    }
+
+    // 모든 스킬 숙련도를 필요량의 ratio만큼 올린다 (1 = 전부 가득 → 선택 창이 차례로 열린다)
+    public void DebugAddMasteryAll(float ratio)
+    {
+        var mastery = SkillMasteryManager.Instance;
+        if (mastery == null) { Debug.LogWarning("[Debug] SkillMasteryManager가 씬에 없습니다"); return; }
+
+        foreach (Defines.SKILL skill in System.Enum.GetValues(typeof(Defines.SKILL)))
+        {
+            int amount = Mathf.CeilToInt(mastery.GetRequired(skill) * ratio);
+            if (amount > 0) mastery.AddPoints(skill, amount, ignoreBattleCheck: true);
+        }
+        Debug.Log($"[Debug] 모든 숙련도 +{ratio * 100f:0}%");
+
         if (!_isBattle && !_isTransitioning) mastery.TryResolveNow();
     }
 #endif

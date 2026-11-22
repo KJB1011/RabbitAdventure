@@ -17,6 +17,8 @@ public class EnemyHitbox : MonoBehaviour
     // 모든 적이 공유하는 값: 마지막으로 기본 공격 적중음을 낸 프레임 (중복 재생 방지)
     static int _lastSwordHitFrame = -1;
 
+    Collider2D _body; // 이 히트박스의 콜라이더
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("PlayerAttack")) return;
@@ -25,7 +27,10 @@ public class EnemyHitbox : MonoBehaviour
         var player = other.GetComponentInParent<PlayerController>();
         if (player == null) return;
 
-        int damage = player.DamageReturn(out bool isCrit);
+        // 이 적의 몸에서 플레이어와 가장 가까운 점 = 칼날이 닿은 곳 (칼끝 일격처럼 맞은 위치를 보는 효과용)
+        if (_body == null) _body = GetComponent<Collider2D>();
+        Vector2 hitPoint = _body != null ? _body.ClosestPoint(player.transform.position) : (Vector2)transform.position;
+        int damage = player.DamageReturn(hitPoint, out bool isCrit);
         owner.DamageTaken(damage);
 
         // 아티팩트 발동 알림 — 맞은 적과 공격 종류를 함께 전달
