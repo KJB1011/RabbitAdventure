@@ -15,7 +15,9 @@ public class PlayerHitbox : MonoBehaviour
         // 무적 · 게임오버면 false — 이펙트 없이 무시
         if (!owner.DamageTaken()) return;
 
-        VFXManager.Instance.Play("PlayerHit", transform.position);
+        // 받아치기로 막았으면 "맞은" 이펙트는 띄우지 않는다 (받아치기 쪽에서 따로 연출)
+        if (!owner.LastHitParried)
+            VFXManager.Instance.Play("PlayerHit", transform.position);
 
         // 맞은 탄환은 즉시 풀로 반납
         if (other.TryGetComponent(out PooledBullet bullet))

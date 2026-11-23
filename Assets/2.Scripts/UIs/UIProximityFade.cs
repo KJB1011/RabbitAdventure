@@ -16,6 +16,8 @@ public class UIProximityFade : MonoBehaviour
     [SerializeField] float _fadeTime = 0.15f;
     [Tooltip("UI 영역을 바깥으로 몇 픽셀 넓혀서 판정할지 (클수록 더 멀리서부터 흐려짐)")]
     [SerializeField] float _margin = 20f;
+    [Tooltip("체크하면 전투 중에는 플레이어 위치와 상관없이 항상 반투명 (화면 아래 넓은 UI가 적을 가리지 않게)")]
+    [SerializeField] bool _alwaysFadeInBattle = false;
 
     RectTransform _rect;
     Transform _player;
@@ -37,7 +39,8 @@ public class UIProximityFade : MonoBehaviour
     {
         if (_player == null && !TryFindPlayer()) return;
 
-        bool near = IsPlayerNear();
+        bool inBattle = _alwaysFadeInBattle && IngameManager.Instance != null && IngameManager.Instance._isBattle;
+        bool near = inBattle || IsPlayerNear();
         if (near != _isFaded)
         {
             _isFaded = near;

@@ -113,21 +113,52 @@ public class IngameManager : MonoBehaviour
         SpawnPlayer();
         AddGold(_startGold);
 
-        // 인트로 연출(UI 페이드 + 플레이어 등장)과 "동시에" 이펙트·효과음을 미리 준비한다
-        StartCoroutine(PrewarmRoutine());
-        StartCoroutine(IntroRoutine());
+        StartCoroutine(StartupRoutine());
+    }
+
+    // 로딩 화면 뒤에서 준비 → 준비가 끝나면 로딩 화면을 걷고 → 인트로 연출
+    private IEnumerator StartupRoutine()
+    {
+        // 인트로 전 상태로 먼저 숨겨 둔다 (UI 투명, 플레이어 화면 밖)
+        if (_gameUICanvas != null) _gameUICanvas.alpha = 0f;
+        if (_player != null)
+        {
+            _player.transform.position = _playerOffscreen;
+            _player.SetControllable(false);
+            _player.SetBoundary(false);
+        }
+
+        yield return StartCoroutine(PrewarmRoutine());
+
+        // 로비에서 넘어왔다면 검은 로딩 화면을 걷는다 (에디터에서 인게임 씬을 바로 실행했다면 없음)
+        if (RememberManager.Instance != null)
+            yield return StartCoroutine(RememberManager.Instance.HideLoadingRoutine());
+
+        yield return StartCoroutine(IntroRoutine());
     }
 
     // ── 미리 준비 (Prewarm) ─────────────────────────────────
-    // 전투 중 처음 나오는 이펙트·효과음에서 렉이 걸리지 않도록,
-    // 플레이어가 아직 조작하지 않는 인트로 동안 미리 불러와 둔다.
+    // 전투 중 처음 나오는 이펙트·효과음에서 렉이 걸리지 않도록, 로딩 화면 뒤에서 미리 불러와 둔다.
     private IEnumerator PrewarmRoutine()
     {
+        // 로딩 화면이 화면을 덮고 있을 때만, 준비한 이펙트를 화면 가운데에서 한 번씩 실제로 그려 본다
+        // (덮여 있지 않으면 플레이어 눈에 이펙트가 번쩍 보이므로 만들어 두기만 한다)
+        bool hidden = RememberManager.Instance != null && RememberManager.Instance.IsLoadingScreenVisible;
+        Vector3? renderAt = null;
+        if (hidden && Camera.main != null)
+        {
+            Vector3 c = Camera.main.transform.position;
+            renderAt = new Vector3(c.x, c.y, 0f);
+        }
+
         if (VFXManager.Instance != null)
-            yield return VFXManager.Instance.PrewarmRoutine();
+            yield return VFXManager.Instance.PrewarmRoutine(renderAt);
 
         if (SoundManager.Instance != null)
             yield return SoundManager.Instance.PreloadRoutine();
+
+        // 실제로 그려 본 이펙트의 카메라 흔들림 등이 끝날 시간을 조금 준다
+        if (hidden) yield return new WaitForSecondsRealtime(0.3f);
     }
     private void SpawnPlayer()
     {

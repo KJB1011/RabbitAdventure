@@ -96,33 +96,34 @@ public class PlayerAttack : MonoBehaviour
 
         switch (_basicStyle)
         {
+            // 소리는 같은 칼 소리라도 음높이(pitch)를 바꿔서 기술마다 다르게 들리게 한다
             case BasicStyle.Thrust:
                 yield return Swing(_thrustDistance * m, _thrustSize * m, _thrustDamageRate,
-                                   "ThrustVFX", m, "SFX/Player_Sword");
+                                   "ThrustVFX", m, "SFX/Player_Sword", 1.35f);   // 높고 날카롭게
                 break;
 
             case BasicStyle.TripleSlash:
-                // 스슥 (1·2타: 기본 범위, 낮은 피해)
+                // 스슥 (1·2타: 기본 범위, 낮은 피해. 두 번째가 조금 더 높게)
                 yield return Swing(_baseAttackDistance * m, _defaultColSize * m, _tripleDamageRate,
-                                   "SwordVFX", m, "SFX/Player_Sword");
+                                   "SwordVFX", m, "SFX/Player_Sword", 1.1f);
                 yield return new WaitForSeconds(_tripleGap);
                 yield return Swing(_baseAttackDistance * m, _defaultColSize * m, _tripleDamageRate,
-                                   "SwordVFX", m, "SFX/Player_Sword");
+                                   "SwordVFX", m, "SFX/Player_Sword", 1.22f);
                 // -삭! (3타: 넓은 범위, 높은 피해. 커진 만큼 살짝 앞에서 벤다)
                 yield return new WaitForSeconds(_tripleFinishDelay);
                 float s = _tripleFinishScale;
                 yield return Swing(_baseAttackDistance * m * (1f + (s - 1f) * 0.6f), _defaultColSize * m * s,
-                                   _tripleFinishDamageRate, "SwordVFX", m * s, "SFX/Player_SwordOneSlash");
+                                   _tripleFinishDamageRate, "SwordVFX", m * s, "SFX/Player_SwordOneSlash", 1f);
                 break;
 
             case BasicStyle.Crescent:
                 yield return Swing(_crescentDistance * m, _crescentSize * m, _crescentDamageRate,
-                                   "CrescentVFX", m, "SFX/Player_StrongSword");
+                                   "CrescentVFX", m, "SFX/Player_StrongSword", 0.85f); // 묵직하게
                 break;
 
             case BasicStyle.SwordWave:
                 // 근접 판정 없이 검기만 날린다 (판정은 PlayerProjectile이 직접)
-                SoundManager.Instance.PlaySFX("SFX/Player_Sword");
+                SoundManager.Instance.PlaySFXPitch("SFX/Player_SwordOneSlash", 1.25f);
                 var wave = VFXManager.Instance.Play("SwordWaveVFX", transform.position + transform.right * (0.6f * m), transform.rotation);
                 if (wave != null && wave.TryGetComponent(out PlayerProjectile proj))
                 {
@@ -134,7 +135,7 @@ public class PlayerAttack : MonoBehaviour
 
             default:
                 yield return Swing(_baseAttackDistance * m, _defaultColSize * m, 1f,
-                                   "SwordVFX", m, "SFX/Player_Sword");
+                                   "SwordVFX", m, "SFX/Player_Sword", UnityEngine.Random.Range(0.95f, 1.05f)); // 매번 살짝 다르게
                 break;
         }
 
@@ -142,7 +143,7 @@ public class PlayerAttack : MonoBehaviour
     }
 
     // 한 번 베기: 판정을 잠깐 켜고 이펙트·소리를 낸다. 켜져 있는 동안의 데미지 배율을 플레이어에게 알려준다
-    IEnumerator Swing(float distance, Vector2 size, float damageRate, string vfxId, float vfxScale, string sfx)
+    IEnumerator Swing(float distance, Vector2 size, float damageRate, string vfxId, float vfxScale, string sfx, float pitch)
     {
         if (_owner != null) _owner.SetBasicHitRate(damageRate);
 
@@ -154,7 +155,7 @@ public class PlayerAttack : MonoBehaviour
         LastReach = distance + size.x * 0.5f;
         _attackArea.enabled = true; // 끄고 다시 켜면 같은 적도 다시 맞는다 (3연타)
 
-        SoundManager.Instance.PlaySFX(sfx);
+        SoundManager.Instance.PlaySFXPitch(sfx, pitch);
         var vfx = VFXManager.Instance.Play(vfxId, (Vector2)_attackAreaPos.position, transform.rotation);
         if (vfx != null) vfx.transform.localScale = Vector3.one * vfxScale;
 
@@ -180,7 +181,8 @@ public class PlayerAttack : MonoBehaviour
         _attackArea2.size = _defaultColSize2 * multiplier;
         LastReach = _baseSuperDistance * multiplier + _attackArea2.size.x * 0.5f;
 
-        SoundManager.Instance.PlaySFX("SFX/Player_StrongSword");
+        // 범위가 클수록(모아베기 3단계 등) 낮고 묵직하게
+        SoundManager.Instance.PlaySFXPitch("SFX/Player_StrongSword", Mathf.Clamp(1f / Mathf.Pow(scale, 0.4f), 0.75f, 1.2f));
         var vfx = VFXManager.Instance.Play("SwordVFX2", (Vector2)_attackAreaPos2.position, transform.rotation);
         if (vfx != null) vfx.transform.localScale = Vector3.one * _superRangeMultiplier * scale;
 

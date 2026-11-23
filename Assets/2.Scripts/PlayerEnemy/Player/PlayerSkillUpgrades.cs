@@ -96,6 +96,9 @@ public class PlayerSkillUpgrades : MonoBehaviour
     Coroutine _moonBuffRoutine;
     bool _isMoonBuffActive;
 
+    GameObject _moonAura;   // 달의 가호 동안 몸에 붙는 오라
+    GameObject _chargeGlow; // 모아베기 중 몸에 붙는 빛
+
     readonly HashSet<EnemyBase> _galeHitEnemies = new();
     readonly HashSet<ChestObject> _galeHitChests = new();
     readonly List<PooledBullet> _bulletBuffer = new();
@@ -183,6 +186,26 @@ public class PlayerSkillUpgrades : MonoBehaviour
         _moonBuffRoutine = null;
         _isParrying = false;
         EndMoonBuff();
+        ClearAttached(ref _chargeGlow);
+    }
+
+    // ══ 몸에 붙는 지속 이펙트 (오라 등) ════════════════════════
+    // VFXManager 풀은 3초 뒤 자동으로 거둬 가므로, 오래 유지할 이펙트는 직접 만들고 지운다
+
+    GameObject SpawnAttached(string id, float scale = 1f)
+    {
+        var prefab = Resources.Load<GameObject>($"VFX/{id}");
+        if (prefab == null) return null;
+        var go = Instantiate(prefab, transform);
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localScale = Vector3.one * scale;
+        return go;
+    }
+
+    static void ClearAttached(ref GameObject go)
+    {
+        if (go != null) Destroy(go);
+        go = null;
     }
 
     /// <summary>노드 재시작 시 (PlayerController.ResetState)</summary>
@@ -265,6 +288,13 @@ public class PlayerSkillUpgrades : MonoBehaviour
     {
         _galeHitEnemies.Clear();
         _galeHitChests.Clear();
+
+        // 질풍베기: 바람 소리 + 굵고 밝은 꼬리(잔상)
+        if (_hasGale)
+        {
+            SoundManager.Instance.PlaySFXVaried("SFX/Gen_Wind", 0.05f);
+            _player.SetTrailBoost(true);
+        }
     }
 
     /// <summary>대쉬로 움직이는 매 프레임 (질풍: 지나가는 자리의 적을 벤다)</summary>
@@ -298,6 +328,7 @@ public class PlayerSkillUpgrades : MonoBehaviour
     /// <summary>대쉬가 끝난 순간 (도약의 일격: 다음 공격 강화 준비)</summary>
     public void OnDashFinished()
     {
+        _player.SetTrailBoost(false);
         if (_hasDashEmpower) SetDashEmpowerReady(true);
     }
 
@@ -327,12 +358,12 @@ public class PlayerSkillUpgrades : MonoBehaviour
         float dist = Mathf.Min(_player.DashDistance, toMouse.magnitude);
         Vector2 target = _player.ClampToMap(start + (toMouse.sqrMagnitude > 0.0001f ? toMouse.normalized : Vector2.right) * dist);
 
-        SoundManager.Instance.PlaySFX("SFX/Player_Dash");
-        VFXManager.Instance.Play("Hit", start);
+        SoundManager.Instance.PlaySFXVaried("SFX/Gen_Blink", 0.05f);
+        VFXManager.Instance.Play("BlinkStartVFX", start);   // 펑 하고 사라지고
         _player.TeleportTo(target);
 
         VFXManager.Instance.ClearBulletsInRadius(target, _blinkClearRadius);
-        VFXManager.Instance.Play("SpringShockwave", target);
+        VFXManager.Instance.Play("LightHitVFX", target);    // 반짝 하고 나타난다
         OnDashFinished();
         _player.RaiseDashEnded();
 
@@ -369,6 +400,11 @@ public class PlayerSkillUpgrades : MonoBehaviour
         _player.PlayAnim("isSuper");
         _player.SetMoveSpeedRate(_player.SuperChargeSpeedRate);
 
+        // 모으기 시작: "띵" + 몸에 작은 빛 (단계가 오를수록 소리는 높게, 빛은 크게)
+        SoundManager.Instance.PlaySFXPitch("SFX/Gen_ChargeStep", 0.9f, 0.7f);
+        ClearAttached(ref _chargeGlow);
+        _chargeGlow = SpawnAttached("ChargeGlow", 0.6f);
+
         float held = 0f, blinkTimer = 0f;
         int stage = 1;
         bool white = false;
@@ -379,7 +415,8 @@ public class PlayerSkillUpgrades : MonoBehaviour
             if (next != stage)
             {
                 stage = next;
-                SoundManager.Instance.PlaySFX("SFX/Telegraph");
+                SoundManager.Instance.PlaySFXPitch("SFX/Gen_ChargeStep", 0.9f + 0.3f * (stage - 1));
+                if (_chargeGlow != null) _chargeGlow.transform.localScale = Vector3.one * (0.6f + 0.35f * (stage - 1));
                 FloatingTextManager.Instance.ShowItemEffect($"{stage}단계", new Color(1f, 0.85f, 0.3f), transform.position);
             }
 
@@ -396,6 +433,7 @@ public class PlayerSkillUpgrades : MonoBehaviour
 
         _player.SetFlash(0f);
         _player.SetMoveSpeedRate(1f);
+        ClearAttached(ref _chargeGlow);
         if (_player.IsGameOver)
         {
             _player.EndAttack();
@@ -418,7 +456,6 @@ public class PlayerSkillUpgrades : MonoBehaviour
     {
         _player.IsAttacking = true;
         _player.BeginEmpoweredAttack();
-        SoundManager.Instance.PlaySFX("SFX/Player_StrongSword");
 
         float m = _player.RangeMultiplier;
         for (int i = 0; i < _spinCount; i++)
@@ -426,7 +463,8 @@ public class PlayerSkillUpgrades : MonoBehaviour
             Vector2 c = transform.position;
             var vfx = VFXManager.Instance.Play("SpinVFX", c, Quaternion.Euler(0f, 0f, i * 120f));
             if (vfx != null) vfx.transform.localScale = Vector3.one * m;
-            if (i > 0) SoundManager.Instance.PlaySFX("SFX/Player_Sword");
+            // 바퀴마다 조금씩 높아지는 칼 소리 (슝-슝-슝↑)
+            SoundManager.Instance.PlaySFXPitch(i == 0 ? "SFX/Player_StrongSword" : "SFX/Player_Sword", 1.1f + 0.12f * i);
 
             VFXManager.Instance.ClearBulletsInRadius(c, _spinBulletClearRadius * m);
             HitArea(c, _spinRadius * m, _spinDamageRate, AttackType.Super);
@@ -444,7 +482,7 @@ public class PlayerSkillUpgrades : MonoBehaviour
         _parrySucceeded = false;
         _player.SetMoveSpeedRate(_parryMoveRate);
         _player.SetFlash(0.6f);
-        SoundManager.Instance.PlaySFX("SFX/Telegraph");
+        SoundManager.Instance.PlaySFXPitch("SFX/Gen_ChargeStep", 0.75f, 0.7f); // 낮은 "띵" = 자세를 잡았다
 
         float t = 0f;
         while (t < _parryWindow && !_parrySucceeded && !_player.IsGameOver)
@@ -462,6 +500,9 @@ public class PlayerSkillUpgrades : MonoBehaviour
             // 반격: 잠깐 무적 + 주변 탄환 정리 + 앞쪽 크게 베기
             _player.StartInvincible(_parryInvincibleTime);
             VFXManager.Instance.ClearBulletsInRadius(transform.position, 2f);
+            SoundManager.Instance.PlaySFX("SFX/Gen_Parry");                 // "챙!"
+            VFXManager.Instance.Play("ParryVFX", transform.position);       // 칼끼리 부딪히는 X자 섬광
+            VFXManager.Instance.Play("FlashVFX", transform.position);
             FloatingTextManager.Instance.ShowItemEffect("받아치기!", new Color(1f, 0.85f, 0.3f), transform.position);
             IngameManager.Instance.ShakeCamera(0.12f, 0.15f);
 
@@ -497,7 +538,8 @@ public class PlayerSkillUpgrades : MonoBehaviour
         _player.IsAttacking = true;
         _player.BeginEmpoweredAttack();
         _player.PlayAnim("isSuper");
-        SoundManager.Instance.PlaySFX("SFX/HeavyHit");
+        SoundManager.Instance.PlaySFX("SFX/Gen_SwordPlant");               // "쿵-징"
+        VFXManager.Instance.Play("GroundHitVFX", transform.position);       // 땅이 갈라지는 먼지
         IngameManager.Instance.ShakeCamera(0.1f, 0.1f);
 
         var prefab = Resources.Load<GameObject>("VFX/PlantedSword");
@@ -542,6 +584,7 @@ public class PlayerSkillUpgrades : MonoBehaviour
         for (int i = 1; i < _multiSlashCount; i++)
         {
             yield return new WaitForSecondsRealtime(_multiSlashInterval);
+            SoundManager.Instance.PlaySFXPitch("SFX/Player_SwordOneSlash", 1f + 0.08f * i); // 벨 때마다 조금씩 높게
             _player.DealSpecialHit(_multiSlashRate);
             IngameManager.Instance.ShakeCamera(0.06f, 0.1f);
         }
@@ -556,6 +599,8 @@ public class PlayerSkillUpgrades : MonoBehaviour
             _isMoonBuffActive = true;
         }
         FloatingTextManager.Instance.ShowItemEffect("달의 가호!", new Color(0.75f, 0.85f, 1f), transform.position);
+        SoundManager.Instance.PlaySFX("SFX/Gen_Buff");
+        if (_moonAura == null) _moonAura = SpawnAttached("MoonAura"); // 버프가 끝날 때까지 몸에 오라
 
         yield return new WaitForSeconds(_moonBuffTime);
 
@@ -568,6 +613,7 @@ public class PlayerSkillUpgrades : MonoBehaviour
     {
         if (_moonBuffRoutine != null) StopCoroutine(_moonBuffRoutine);
         _moonBuffRoutine = null;
+        ClearAttached(ref _moonAura);
         if (!_isMoonBuffActive) return;
         _player.RemoveAtkMultiplier(_moonAtkBonus);
         _isMoonBuffActive = false;
@@ -578,12 +624,18 @@ public class PlayerSkillUpgrades : MonoBehaviour
     {
         VFXManager.Instance.GetActiveBullets(_bulletBuffer);
         var enemies = FindObjectsByType<EnemyBase>(FindObjectsSortMode.None);
+        if (_bulletBuffer.Count > 0) SoundManager.Instance.PlaySFX("SFX/Gen_Reflect");
 
         int sent = 0;
         foreach (var bullet in _bulletBuffer)
         {
             Vector2 from = bullet.transform.position;
             bullet.ReleaseSelf();
+            if (sent < _reflectMax)
+            {
+                var poof = VFXManager.Instance.Play("BlinkStartVFX", from); // 탄환이 펑 하고 검기로 바뀐다
+                if (poof != null) poof.transform.localScale = Vector3.one * 0.5f;
+            }
             if (sent >= _reflectMax) continue;
 
             EnemyBase target = null;
@@ -616,6 +668,13 @@ public class PlayerSkillUpgrades : MonoBehaviour
         if (!UsesSpiritGauge || _spiritGauge >= _spiritRequiredHits) return;
         _spiritGauge++;
         _player.RefreshSkillUI(SKILL.SPECIAL);
+
+        // 가득 찬 순간 "딩-딩!" + 반짝
+        if (_spiritGauge >= _spiritRequiredHits)
+        {
+            SoundManager.Instance.PlaySFX("SFX/Gen_GaugeReady");
+            VFXManager.Instance.PlayAttached("GaugeReadyVFX", transform);
+        }
     }
 
     /// <summary>게이지가 가득이면 비우고 true (필살기 사용)</summary>

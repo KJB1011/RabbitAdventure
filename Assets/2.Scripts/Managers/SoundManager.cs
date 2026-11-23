@@ -35,6 +35,8 @@ public class SoundManager : MonoBehaviour
         "SFX/AreaDamage", "SFX/Player_SpecialCharge", "SFX/Player_SwordOneSlash", "SFX/GlassBreaking",
         "SFX/DropCoin", "SFX/CoinDropping", "SFX/PhaseChange", "SFX/Scratch",
     };
+    [Tooltip("위 목록에 없는 Resources/Sounds/SFX 효과음도 전부 미리 불러온다")]
+    [SerializeField] private bool _preloadAllSfx = true;
 
     public float BGMVolume => _bgmVolume;
     public float SFXVolume => _sfxVolume;
@@ -68,6 +70,18 @@ public class SoundManager : MonoBehaviour
             if (clip != null && clip.loadState == AudioDataLoadState.Unloaded)
                 clip.LoadAudioData();
 
+            yield return null;
+        }
+
+        // 목록에 없는 효과음도 전부 (새 효과음을 추가할 때마다 목록에 넣는 걸 잊어도 괜찮게)
+        if (_preloadAllSfx)
+        {
+            foreach (var clip in Resources.LoadAll<AudioClip>("Sounds/SFX"))
+            {
+                string key = $"SFX/{clip.name}";            // PlaySFX에 넘기는 경로와 같은 모양
+                if (!_clipCache.ContainsKey(key)) _clipCache[key] = clip;
+                if (clip.loadState == AudioDataLoadState.Unloaded) clip.LoadAudioData();
+            }
             yield return null;
         }
     }
@@ -174,6 +188,27 @@ public class SoundManager : MonoBehaviour
         source.PlayOneShot(clip, volume);
     }
 
+    /// <summary>
+    /// SFX를 음높이(pitch)를 바꿔서 재생합니다. 1 = 원래 소리, 1.3 = 더 높고 짧게, 0.8 = 더 낮고 길게.
+    /// 같은 소리도 음높이를 바꾸면 다른 기술처럼 들린다 (예: 찌르기 = 기본 칼 소리를 높게).
+    /// </summary>
+    public void PlaySFXPitch(string path, float pitch, float volumeScale = 1f)
+    {
+        var clip = LoadClip(path);
+        if (clip == null) return;
+
+        AudioSource source = GetAvailableSFXSource();
+        source.volume = _sfxVolume;
+        source.pitch = pitch;
+        source.PlayOneShot(clip, volumeScale);
+    }
+
+    /// <summary>
+    /// 재생할 때마다 음높이를 ±variation만큼 무작위로 흔든다. (같은 타격음이 반복돼도 덜 지루하게)
+    /// </summary>
+    public void PlaySFXVaried(string path, float variation = 0.06f, float basePitch = 1f)
+        => PlaySFXPitch(path, basePitch + Random.Range(-variation, variation));
+
     public void SetSFXVolume(float volume)
     {
         _sfxVolume = Mathf.Clamp01(volume);
@@ -204,7 +239,15 @@ public class SoundManager : MonoBehaviour
     }
     // ── 유틸 ─────────────────────────────────────────────────
 
+    // 소스를 꺼낼 때 음높이는 항상 원래대로 (PlaySFXPitch가 바꿔 둔 값이 다음 소리에 남지 않게)
     private AudioSource GetAvailableSFXSource()
+    {
+        var source = FindSFXSource();
+        source.pitch = 1f;
+        return source;
+    }
+
+    private AudioSource FindSFXSource()
     {
         // 재생 중이지 않은 소스 우선 선택
         foreach (var src in _sfxPool)

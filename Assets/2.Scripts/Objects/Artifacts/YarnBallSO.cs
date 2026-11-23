@@ -52,6 +52,7 @@ public class Artifact_YarnBall : ArtifactEffect
         _hitCount = 0;
         _stacks++;
         Player.AddRange(_rangePerStack);
+        SoundManager.Instance.PlaySFXPitch("SFX/Gen_Buff", 1.3f, 0.6f); // 짧고 높은 "띠링"
         FloatingTextManager.Instance.ShowItemEffect($"공격범위 +{_rangePerStack * 100f:0}%",
                                                     new Color(0.95f, 0.55f, 0.7f), Player.transform.position);
     }

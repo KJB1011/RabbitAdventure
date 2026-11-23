@@ -53,6 +53,9 @@ public class VFXManager : MonoBehaviour
         new PrewarmEntry("AreaHit", 2),
     };
 
+    [Tooltip("위 목록에 없는 Resources/VFX 이펙트도 1개씩 미리 만들어 둔다")]
+    [SerializeField] private bool _prewarmAllVfx = true;
+
     [Tooltip("미리 만들어 둘 탄환. FireBullet()에 넘기는 이름과 같아야 한다.")]
     [SerializeField] private PrewarmEntry[] _prewarmBullets =
     {
@@ -81,14 +84,34 @@ public class VFXManager : MonoBehaviour
     /// 목록에 있는 이펙트·탄환을 미리 불러와 풀에 채워 둔다.
     /// 한 프레임에 몰아서 하면 그 프레임이 끊기므로, 종류마다 한 프레임씩 나눠서 진행한다.
     /// </summary>
-    public IEnumerator PrewarmRoutine()
+    /// <param name="renderAt">
+    /// 값이 있으면 준비한 이펙트를 그 위치에서 한 번씩 실제로 재생해 본다 (로딩 화면이 가리고 있을 때만 넘길 것).
+    /// 풀에 만들어 두기만 하면 처음 화면에 그려질 때 그래픽 준비(셰이더)로 한 번 더 끊기기 때문.
+    /// </param>
+    public IEnumerator PrewarmRoutine(Vector3? renderAt = null)
     {
         if (!_usePooling) yield break; // 풀을 안 쓰면 채워 둘 곳이 없다
 
+        var ids = new List<string>();
         foreach (var entry in _prewarmVfx)
         {
             FillPool(GetOrCreateVFXPool(entry.id), entry.count);
+            ids.Add(entry.id);
             yield return null; // 다음 프레임으로 넘겨서 부담을 나눈다
+        }
+
+        // 목록에 없는 Resources/VFX 이펙트도 1개씩 (새 이펙트를 추가할 때마다 목록에 넣는 걸 잊어도 괜찮게)
+        var others = new List<GameObject>(); // 풀을 쓰지 않는 이펙트 (꽂힌 검, 오라 등)
+        if (_prewarmAllVfx)
+        {
+            foreach (var prefab in Resources.LoadAll<GameObject>("VFX"))
+            {
+                if (prefab.GetComponent<PooledBullet>() != null || ids.Contains(prefab.name)) continue;
+                if (prefab.GetComponent<PooledVFX>() == null) { others.Add(prefab); continue; }
+                FillPool(GetOrCreateVFXPool(prefab.name), 1);
+                ids.Add(prefab.name);
+                yield return null;
+            }
         }
 
         foreach (var entry in _prewarmBullets)
@@ -96,6 +119,27 @@ public class VFXManager : MonoBehaviour
             FillPool(GetOrCreateBulletPool(entry.id), entry.count);
             yield return null;
         }
+
+        if (!renderAt.HasValue) yield break;
+
+        // 한 번씩 실제로 그려 보기 (몇 개씩 묶어서 한 프레임에)
+        var played = new List<PooledVFX>();
+        var spawned = new List<GameObject>();
+        for (int i = 0; i < ids.Count; i++)
+        {
+            var vfx = Play(ids[i], renderAt.Value);
+            if (vfx != null) played.Add(vfx);
+            if (i % 4 == 3) yield return null;
+        }
+        foreach (var prefab in others)
+            spawned.Add(Instantiate(prefab, renderAt.Value, Quaternion.identity));
+
+        yield return null; // 최소 두 프레임은 그려야 준비가 끝난다
+        yield return null;
+
+        // 바로 정리 (반복 이펙트가 로딩 화면이 걷힌 뒤까지 남아 보이지 않게)
+        foreach (var vfx in played) if (vfx != null && vfx.gameObject.activeSelf) vfx.ReturnNow();
+        foreach (var go in spawned) Destroy(go);
     }
 
     // 풀에서 count개를 한꺼번에 꺼냈다가 다시 넣는다.

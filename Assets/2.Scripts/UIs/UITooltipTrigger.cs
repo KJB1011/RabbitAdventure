@@ -22,10 +22,19 @@ public class UITooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExi
     // EventSystem이 "마우스가 들어왔다/나갔다"를 알려준다 (인터페이스를 구현하면 자동으로 불림)
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (IsInBattle) return; // 전투 중에는 설명창을 띄우지 않는다 (전투에 방해되지 않게)
         if (string.IsNullOrEmpty(_title) && string.IsNullOrEmpty(_description)) return;
         UITooltip.Show(_title, _description);
         _isShowing = true;
     }
+
+    // 설명창을 띄워 둔 채 전투가 시작되면 바로 닫는다
+    void Update()
+    {
+        if (_isShowing && IsInBattle) HideIfShowing();
+    }
+
+    static bool IsInBattle => IngameManager.Instance != null && IngameManager.Instance._isBattle;
 
     public void OnPointerExit(PointerEventData eventData)
     {

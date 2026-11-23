@@ -104,6 +104,8 @@ public class PlayerController : MonoBehaviour
     public void RemoveCritRule(System.Func<Vector2, bool> rule) => _critRules.Remove(rule);
 
     public bool IsInvincible => _invincibleCount > 0;
+    /// <summary>바로 전 DamageTaken이 받아치기로 막은 것인지 (PlayerHitbox가 피격 이펙트를 건너뛸 때 사용)</summary>
+    public bool LastHitParried { get; private set; }
     public int CurrentHp => _hp;
     public int MaxHp => _maxHp;
     public float Atk => _atk;
@@ -150,6 +152,10 @@ public class PlayerController : MonoBehaviour
     public void NotifyAttackHit(EnemyBase target, AttackType type)
     {
         _upgrades.OnEnemyHit(); // 필살기 강화(투지 충전): 적을 맞힐 때마다 게이지
+
+        // 회피기 강화(도약의 일격)로 강해진 공격이 맞으면 노란 타격 이펙트를 하나 더
+        if (_attackEmpowerRate > 1f && target != null)
+            VFXManager.Instance.Play("EmpowerHitVFX", target.transform.position);
         OnAttackHit?.Invoke(target, type);
     }
     public AttackType GetAttackType(Collider2D attackCollider) => _playerAttack.GetAttackType(attackCollider);
@@ -214,6 +220,8 @@ public class PlayerController : MonoBehaviour
         }
 
         _trailRenderer = GetComponent<TrailRenderer>();
+        _trailBaseWidth = _trailRenderer.widthMultiplier;   // 질풍베기 후 되돌릴 원래 값
+        _trailBaseColor = _trailRenderer.startColor;
         _spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         _trailRenderer.enabled = false;
         _spriteRenderer.flipX = true;
@@ -650,6 +658,13 @@ public class PlayerController : MonoBehaviour
         bool forceCrit = false;
         foreach (var rule in _critRules)
             if (rule(hitPoint)) { forceCrit = true; break; }
+
+        // 확정 치명타 조건으로 터졌다면 맞은 자리에서 "칭!" (일반 치명타와 구분되게)
+        if (forceCrit)
+        {
+            VFXManager.Instance.Play("LightHitVFX", hitPoint);
+            SoundManager.Instance.PlaySFXPitch("SFX/Gen_TipPing", 1f, 0.7f);
+        }
         return CalcDamage(forceCrit, out isCrit);
     }
 
@@ -667,8 +682,13 @@ public class PlayerController : MonoBehaviour
 
     public bool DamageTaken()
     {
+        LastHitParried = false;
         if (IsInvincible || _isGameOver) return false;
-        if (_upgrades.TryParry()) return true; // 특수기 강화(받아치기): 자세 중이면 피해 대신 반격 (탄환은 사라진다)
+        if (_upgrades.TryParry()) // 특수기 강화(받아치기): 자세 중이면 피해 대신 반격 (탄환은 사라진다)
+        {
+            LastHitParried = true;
+            return true;
+        }
 
         _hp--;
         _hpTxt.text = _hp.ToString();
@@ -829,6 +849,16 @@ public class PlayerController : MonoBehaviour
         transform.position = new Vector3(target.x, target.y, transform.position.z);
         _trailRenderer.Clear();
     }
+
+    /// <summary>회피기 꼬리(Trail)를 굵고 밝게 / 원래대로 (질풍베기의 잔상 연출)</summary>
+    public void SetTrailBoost(bool on)
+    {
+        if (_trailRenderer == null) return;
+        _trailRenderer.widthMultiplier = on ? _trailBaseWidth * 2.2f : _trailBaseWidth;
+        _trailRenderer.startColor = on ? new Color(0.85f, 0.95f, 1f, 1f) : _trailBaseColor;
+    }
+    float _trailBaseWidth = 1f;
+    Color _trailBaseColor = Color.white;
 
     public void RaiseDashStarted() => OnDashStarted?.Invoke();
     public void RaiseDashEnded() => OnDashEnded?.Invoke();

@@ -51,7 +51,7 @@ public class EnemyHitbox : MonoBehaviour
             if (atkType == AttackType.Basic && _lastSwordHitFrame != Time.frameCount)
             {
                 _lastSwordHitFrame = Time.frameCount;
-                SoundManager.Instance.PlaySFX("SFX/Player_SwordHit");
+                SoundManager.Instance.PlaySFXVaried("SFX/Player_SwordHit", 0.07f); // 매번 음높이를 살짝 흔들어 덜 지루하게
             }
         }
         VFXManager.Instance.Play("Hit", transform.position);
