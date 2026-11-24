@@ -19,6 +19,23 @@ public class RememberManager : MonoBehaviour
 
     public string _nickname { get; set; }
 
+    const string NicknameKey = "Nickname";
+    const string DefaultNickname = "토끼";
+
+    /// <summary>지금 닉네임. 아직 정하지 않았으면 이 컴퓨터에 저장해 둔 닉네임(없으면 "토끼")</summary>
+    public string Nickname => string.IsNullOrWhiteSpace(_nickname) ? PlayerPrefs.GetString(NicknameKey, DefaultNickname) : _nickname;
+
+    /// <summary>닉네임을 정하고 이 컴퓨터에 저장한다 (다음에 게임을 켜도 유지)</summary>
+    public void SaveNickname(string nickname)
+    {
+        _nickname = nickname;
+        PlayerPrefs.SetString(NicknameKey, nickname);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>연습방에서 고른 캐릭터 (CharacterSO.characterId). 비어 있으면 기본 캐릭터</summary>
+    public string SelectedCharacterId { get; set; }
+
     /// <summary>씬을 불러오고 인게임이 준비를 마치기 전까지 true</summary>
     public bool IsLoading { get; private set; }
 
@@ -81,6 +98,8 @@ public class RememberManager : MonoBehaviour
     /// </summary>
     public void GameStart(string userName)
     {
+        if (_isStarting) return; // 버튼을 여러 번 눌러도 한 번만
+        _isStarting = true;
         _nickname = userName;
         _uiBlackOut.SetActive(true);
         _blackOutCanvas.alpha = 0f;
@@ -107,7 +126,10 @@ public class RememberManager : MonoBehaviour
         SetLoadingText(false);
         yield return _blackOutCanvas.DOFade(0f, _blackOutDuration).WaitForCompletion();
         _uiBlackOut.SetActive(false);
+        _isStarting = false;
     }
+
+    bool _isStarting;
 
     void SetLoadingText(bool on)
     {

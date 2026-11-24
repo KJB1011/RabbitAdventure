@@ -43,6 +43,7 @@ public class ExitPortal : MonoBehaviour
     float _ringScale;   // 테두리를 _radius 크기로 맞추는 배율
     float _fillScale;   // 게이지가 가득 찼을 때의 배율
 
+    TextMeshPro _label;  // 포털 위 안내 글씨
     Transform _player;
     System.Action _onEntered;
     float _progress;    // 0 ~ 1
@@ -54,6 +55,15 @@ public class ExitPortal : MonoBehaviour
 
         // 처음에는 보이지 않게 (오브젝트는 켜둔 채 크기만 0 → Open에서 커진다)
         transform.localScale = Vector3.zero;
+    }
+
+    /// <summary>포털 판정 반경 (이 안에 있으면 "안에 있음")</summary>
+    public float Radius => _radius;
+
+    /// <summary>포털 위 안내 문구를 바꾼다. null이면 인스펙터에 적은 원래 문구로 되돌린다</summary>
+    public void SetLabel(string text)
+    {
+        if (_label != null) _label.text = string.IsNullOrEmpty(text) ? _labelText : text;
     }
 
     // ── 열기 / 닫기 ───────────────────────────────────────────
@@ -156,6 +166,7 @@ public class ExitPortal : MonoBehaviour
         go.transform.localPosition = new Vector3(0f, _radius + _labelGap, 0f);
 
         var tmp = go.AddComponent<TextMeshPro>();
+        _label = tmp;
         if (_labelFont != null) tmp.font = _labelFont;
         tmp.text = _labelText;
         tmp.fontSize = _labelFontSize;

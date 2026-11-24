@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,8 @@ public class IngameManager : MonoBehaviour
     public static IngameManager Instance { get; private set; }
 
     [SerializeField] NodeBase[] _nodes;
+    [Tooltip("고를 수 있는 캐릭터 (첫 번째가 기본 캐릭터)")]
+    [SerializeField] CharacterSO[] _characters = new CharacterSO[0];
 
     [Header("노드 전환")]
     [SerializeField] ExitPortal _exitPortal;            // 클리어 후 오른쪽에 나타나는 출구 포털
@@ -160,33 +163,92 @@ public class IngameManager : MonoBehaviour
         // 실제로 그려 본 이펙트의 카메라 흔들림 등이 끝날 시간을 조금 준다
         if (hidden) yield return new WaitForSecondsRealtime(0.3f);
     }
+    // ── 플레이어 · 캐릭터 ─────────────────────────────────────
+
+    /// <summary>지금 조종 중인 플레이어 (캐릭터를 바꾸면 새 오브젝트로 바뀐다)</summary>
+    public PlayerController Player => _player;
+
+    /// <summary>고를 수 있는 캐릭터 목록 (연습방 캐릭터 선택 창에 나온다)</summary>
+    public IReadOnlyList<CharacterSO> Characters => _characters;
+    public CharacterSO CurrentCharacter { get; private set; }
+
+    /// <summary>캐릭터를 바꿔서 플레이어 오브젝트가 새로 만들어졌을 때</summary>
+    public event System.Action<PlayerController> OnPlayerChanged;
+
+    /// <summary>지금 닉네임 (로비에서 정한 것, 없으면 저장된 값)</summary>
+    public string Nickname => RememberManager.Instance != null ? RememberManager.Instance.Nickname : "토끼";
+
     private void SpawnPlayer()
     {
-        var prefab = Resources.Load<GameObject>("Player");
+        // 로비(또는 전에 고른) 캐릭터 → 없으면 목록의 첫 캐릭터 → 그것도 없으면 Resources/Player
+        string savedId = RememberManager.Instance != null ? RememberManager.Instance.SelectedCharacterId : null;
+        CharacterSO character = null;
+        foreach (var c in _characters)
+            if (c != null && c.characterId == savedId) { character = c; break; }
+        if (character == null && _characters.Length > 0) character = _characters[0];
+
+        var prefab = character != null && character.playerPrefab != null ? character.playerPrefab : Resources.Load<GameObject>("Player");
         if (prefab == null)
         {
-            Debug.LogError("[IngameManager] Resources/Player 프리팹을 찾을 수 없습니다.");
+            Debug.LogError("[IngameManager] 플레이어 프리팹을 찾을 수 없습니다.");
             return;
         }
 
-        var go = Instantiate(prefab, _playerOffscreen, Quaternion.identity);
-        _player = go.GetComponent<PlayerController>();
+        CurrentCharacter = character;
+        _player = CreatePlayer(prefab, _playerOffscreen);
+    }
 
-        if (_player == null)
+    /// <summary>
+    /// 캐릭터 교체 (연습방에서 사용). 지금 자리에 새 캐릭터를 만들고 예전 플레이어는 지운다.
+    /// 플레이어를 붙잡고 있는 매니저들(아티팩트·숙련도)은 새 플레이어로 다시 연결한다.
+    /// </summary>
+    public void ChangeCharacter(CharacterSO character)
+    {
+        if (character == null || character.playerPrefab == null || character == CurrentCharacter) return;
+
+        Vector3 pos = _player != null ? _player.transform.position : (Vector3)_playerStartPos;
+        var old = _player;
+
+        CurrentCharacter = character;
+        if (RememberManager.Instance != null) RememberManager.Instance.SelectedCharacterId = character.characterId;
+
+        // 새 플레이어를 먼저 만들고 연결한 뒤 예전 것을 지운다 (아티팩트 해제가 예전 플레이어에게 제대로 되도록)
+        _player = CreatePlayer(character.playerPrefab, pos);
+        if (old != null) Destroy(old.gameObject);
+
+        VFXManager.Instance.Play("BlinkStartVFX", pos); // 펑 하고 바뀐다
+        OnPlayerChanged?.Invoke(_player);
+    }
+
+    /// <summary>닉네임 변경 (연습방 캐릭터 선택 창에서). 저장해 두고 머리 위 이름도 바꾼다</summary>
+    public void SetNickname(string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname)) return;
+        if (RememberManager.Instance != null) RememberManager.Instance.SaveNickname(nickname.Trim());
+        if (_player != null) _player.SetNameText(Nickname);
+    }
+
+    // 플레이어 프리팹을 만들고 매니저들에 연결
+    PlayerController CreatePlayer(GameObject prefab, Vector3 pos)
+    {
+        var go = Instantiate(prefab, pos, Quaternion.identity);
+        var player = go.GetComponent<PlayerController>();
+        if (player == null)
         {
             Debug.LogError("[IngameManager] Player 프리팹에 PlayerController가 없습니다.");
-            return;
+            return null;
         }
 
         // ArtifactManager에도 플레이어 연결
         if (ArtifactManager.Instance != null)
-            ArtifactManager.Instance.SetPlayer(_player);
+            ArtifactManager.Instance.SetPlayer(player);
 
         // 스킬 숙련도도 플레이어의 스킬 사용을 지켜보도록 연결
         if (SkillMasteryManager.Instance != null)
-            SkillMasteryManager.Instance.SetPlayer(_player);
+            SkillMasteryManager.Instance.SetPlayer(player);
 
-        _player.SetInitChar(RememberManager.Instance._nickname);
+        player.SetInitChar(Nickname);
+        return player;
     }
 
     // ── 인트로 연출 ───────────────────────────────────────────
@@ -282,7 +344,11 @@ public class IngameManager : MonoBehaviour
         if (_countdownText != null)
             _countdownText.text = string.Empty;
 
-        if (_exitPortal != null && _player != null)
+        if (_nodes[_currentIndex].UsesOwnExitPortal)
+        {
+            // 연습방처럼 노드 안에서 이미 포털로 나왔다면 바로 이동
+        }
+        else if (_exitPortal != null && _player != null)
         {
             bool entered = false;
             _exitPortal.Open(_player.transform, () => entered = true);

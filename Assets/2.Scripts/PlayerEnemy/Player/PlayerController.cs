@@ -381,6 +381,12 @@ public class PlayerController : MonoBehaviour
         _specialSkillEffect = GameObject.FindWithTag("SpecialEffect").GetComponent<SpecialSkillEffect>();
         _specialSkillEffect.Close();
     }
+
+    /// <summary>머리 위 이름만 바꾼다 (연습방에서 닉네임을 바꿨을 때)</summary>
+    public void SetNameText(string name)
+    {
+        if (_nameTxt != null) _nameTxt.text = name;
+    }
     public IEnumerator MoveToPositionRoutine(Vector2 target)
     {
         // 진행 중인 스킬 강제 중단 + 상태 초기화

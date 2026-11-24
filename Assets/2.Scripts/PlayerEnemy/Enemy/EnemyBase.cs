@@ -52,7 +52,8 @@ public abstract class EnemyBase : MonoBehaviour
         _enemySprite.flipX = targetIsRight != _spriteFacesRight;
     }
 
-    public void DamageTaken(int damage) 
+    // virtual: 허수아비(TrainingDummy)처럼 체력 대신 다른 처리를 하는 적이 재정의한다
+    public virtual void DamageTaken(int damage)
     {
         if (IsDead || damage <= 0) return;
 

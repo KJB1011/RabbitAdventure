@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2cfbedbce2233d439cd404ae3ef1fd5, type: 3}
+  m_Name: RabbitSword
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSO
+  characterId: rabbit_sword
+  displayName: "\uD1A0\uB07C \uAC80\uC0AC"
+  description: "\uBE60\uB978 \uAC80\uACFC \uBB34\uC801 \uD68C\uD53C\uB85C\n\uD0C4\uB9C9\uC744
+    \uD5E4\uCCD0 \uB098\uAC00\uB294 \uAC80\uC0AC"
+  portrait: {fileID: 4153391862663518808, guid: a82a49d607ebdea47a744071d36f19ad, type: 3}
+  playerPrefab: {fileID: 3795670308001565551, guid: ffc8b9bd7e546fd47b9992aaf3564536, type: 3}
+  skillDescriptions:
+  - "\uB9C8\uC6B0\uC2A4 \uBC29\uD5A5\uC73C\uB85C \uAC80\uC744 \uD718\uB450\uB978\uB2E4"
+  - "\uBE60\uB974\uAC8C \uC774\uB3D9, \uC774\uB3D9 \uC911 \uBB34\uC801"
+  - "\uD798\uC744 \uBAA8\uC544 \uC55E\uC744 \uD06C\uAC8C \uBCA4\uB2E4"
+  - "\uD654\uBA74\uC758 \uBAA8\uB4E0 \uC801\uC744 \uBCA4\uB2E4"

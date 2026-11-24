@@ -111,19 +111,33 @@ public class UIPlayerStatusPanel : MonoBehaviour
 
         if (_isExpanded)
             RefreshStats(force: false);
+
+        if (!inBattle) RefreshName(); // 연습방에서 닉네임을 바꿀 수 있으므로 (전투 중에는 바뀔 일이 없다)
     }
 
+    // 캐릭터를 바꾸면 예전 플레이어가 지워져 _player가 비므로, 그때마다 다시 찾는다
     bool TryFindPlayer()
     {
-        var go = GameObject.FindWithTag("Player");
-        if (go == null) return false;
-
-        _player = go.GetComponent<PlayerController>();
+        if (IngameManager.Instance != null && IngameManager.Instance.Player != null)
+            _player = IngameManager.Instance.Player;
+        else
+        {
+            var go = GameObject.FindWithTag("Player");
+            if (go == null) return false;
+            _player = go.GetComponent<PlayerController>();
+        }
         if (_player == null) return false;
 
-        if (_nameText != null && RememberManager.Instance != null)
-            _nameText.text = RememberManager.Instance._nickname;
+        RefreshName();
         return true;
+    }
+
+    // 닉네임 표시 (연습방에서 닉네임을 바꾸면 다음 프레임에 반영)
+    void RefreshName()
+    {
+        if (_nameText == null || IngameManager.Instance == null) return;
+        string nick = IngameManager.Instance.Nickname;
+        if (_nameText.text != nick) _nameText.text = nick;
     }
 
     void SetCooldown(int index, float ratio, float secondsLeft)

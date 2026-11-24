@@ -11,7 +11,8 @@ public class UILobbyTitle : MonoBehaviour
 
     [SerializeField] GameObject _uiStart;
     [SerializeField] GameObject _uiOptionWindow;
-    [SerializeField] GameObject _uiCharSelectWindow;
+    [SerializeField] GameObject _uiModeSelectWindow;   // 싱글플레이 / 멀티플레이 고르는 창
+    [SerializeField] TMPro.TMP_Text _modeNoticeText;    // "준비 중이에요" 같은 안내 (비워 둬도 됨)
 
     [Header("페이지 전환 설정")]
     [SerializeField] float _slideOffset = 800f;
@@ -28,7 +29,8 @@ public class UILobbyTitle : MonoBehaviour
 
         _uiStart.SetActive(false);
         _uiOptionWindow.SetActive(false);
-        _uiCharSelectWindow.SetActive(false);
+        _uiModeSelectWindow.SetActive(false);
+        if (_modeNoticeText != null) _modeNoticeText.alpha = 0f;
 
         SoundManager.Instance.FadeInBGM("BGM/LobbyBGM", 3f);
         StartEffect();
@@ -112,15 +114,35 @@ public class UILobbyTitle : MonoBehaviour
 
     // ── 버튼 이벤트 ──────────────────────────────────────────
 
+    // 게임 시작 → 모드 선택 창 (옵션 창처럼 위로 빠지고 아래에서 올라온다)
     public void ClickPlayButton()
     {
         PlayButtonSFX();
-        SlideOutToUp(_uiStart, () => SlideInFromDown(_uiCharSelectWindow));
+        SlideOutToUp(_uiStart, () => SlideInFromDown(_uiModeSelectWindow));
     }
-    public void ClickCharCancelButton()
+
+    // 싱글플레이: 캐릭터·닉네임은 인게임 연습방의 왼쪽 포털에서 고르므로 바로 인게임으로 간다
+    // (닉네임은 이 컴퓨터에 저장해 둔 값, 처음이면 "토끼")
+    public void ClickSinglePlayButton()
     {
         PlayButtonSFX();
-        SlideOutToDown(_uiCharSelectWindow, () => SlideInFromUp(_uiStart));
+        RememberManager.Instance.GameStart(RememberManager.Instance.Nickname);
+    }
+
+    // 멀티플레이: 아직 준비 중
+    public void ClickMultiPlayButton()
+    {
+        PlayButtonSFX();
+        if (_modeNoticeText == null) return;
+        _modeNoticeText.DOKill();
+        _modeNoticeText.alpha = 1f;
+        _modeNoticeText.DOFade(0f, 0.6f).SetDelay(1.2f);
+    }
+
+    public void ClickModeBackButton()
+    {
+        PlayButtonSFX();
+        SlideOutToDown(_uiModeSelectWindow, () => SlideInFromUp(_uiStart));
     }
     public void ClickOptionButton()
     {

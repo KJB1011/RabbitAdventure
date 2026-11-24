@@ -7,7 +7,13 @@
 public abstract class NodeBase : MonoBehaviour
 {
     protected System.Action _onComplete;
-    
+
+    /// <summary>
+    /// true면 이 노드가 끝날 때 IngameManager가 공용 출구 포털을 다시 열지 않는다.
+    /// (연습방처럼 노드 안에서 이미 포털로 나가기를 끝낸 경우)
+    /// </summary>
+    public virtual bool UsesOwnExitPortal => false;
+
     public void StartNode(System.Action onComplete)
     {
         _onComplete = onComplete;
