@@ -41,11 +41,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _invisibleTime = 1.5f;
     [SerializeField] float _blinkInterval = 0.1f;
 
-    [Header("필살기 (Special)")]
-    [SerializeField] float _specialDamageMultiplier = 30f;
-    [SerializeField] float _specialInvincibleDelay = 1.0f;
-    [SerializeField] SpecialSkillEffect _specialSkillEffect;
-
     [Header("노드 이동")]
     [SerializeField] float _nodeMoveDuration = 1f; // 이동 시간
 
@@ -57,6 +52,7 @@ public class PlayerController : MonoBehaviour
     SpriteRenderer _spriteRenderer;
     Animator _animController;
     PlayerSkillUpgrades _upgrades;
+    CharacterSkills _skills;   // 캐릭터마다 다른 기본기·특수기·필살기
 
     // 흰색 플래시 (PlayerShaderGraph의 _FlashAmount 제어)
     static readonly int FlashAmountId = Shader.PropertyToID("_FlashAmount");
@@ -229,6 +225,8 @@ public class PlayerController : MonoBehaviour
         _flashBlock = new MaterialPropertyBlock();
         _upgrades = GetComponent<PlayerSkillUpgrades>();
         if (_upgrades == null) _upgrades = gameObject.AddComponent<PlayerSkillUpgrades>(); // 프리팹에 없으면 기본값으로 추가
+        _skills = GetComponent<CharacterSkills>();
+        if (_skills == null) _skills = gameObject.AddComponent<RabbitSwordSkills>();     // 없으면 토끼 검사로
 
         _playerAttack.SetAttackRange(_rangeMultiplier);
     }
@@ -313,11 +311,12 @@ public class PlayerController : MonoBehaviour
         if (_mainSkillCooldown > 0) return;
         if (_isDashing) return;
         if (_isAttack) return;
+        if (!_skills.CanUseBasic) return; // 총잡이: 총알이 없거나 재장전 중
 
-        _mainSkillCooldown = _mainSkillCooldownDuration;
+        _mainSkillCooldown = _mainSkillCooldownDuration * _skills.BasicCooldownScale;
         _isAttack = true;
         BeginEmpoweredAttack();
-        _playerAttack.AttackStart(EndAttack);
+        _skills.StartBasic(EndAttack);
         OnSkillUsed?.Invoke(SKILL.MAIN);
     }
 
@@ -344,10 +343,10 @@ public class PlayerController : MonoBehaviour
         if (!_isControllable) return;
         if (_superSkillCooldown > 0) return;
         if (_isAttack) return;
+        if (!_skills.CanUseSuper) return;
 
         _superSkillCooldown = _superSkillCooldownDuration;
-        // 특수기 강화가 있으면 강화된 동작, 없으면 기본 동작
-        StartCoroutine(_upgrades.HasSuperUpgrade ? _upgrades.SuperRoutine() : SuperSkillRoutine());
+        StartCoroutine(_skills.SuperRoutine()); // 캐릭터별 특수기 (강화가 있으면 그 안에서 강화 동작)
         OnSkillUsed?.Invoke(SKILL.SUPER);
     }
 
@@ -368,7 +367,7 @@ public class PlayerController : MonoBehaviour
             _specialSkillCooldown = _specialSkillCooldownDuration;
         }
 
-        StartCoroutine(SpecialSkillRoutine());
+        StartCoroutine(_skills.SpecialRoutine()); // 캐릭터별 필살기
         OnSkillUsed?.Invoke(SKILL.SPECIAL);
     }
 
@@ -377,9 +376,7 @@ public class PlayerController : MonoBehaviour
     {
         _hpTxt.text = _maxHp.ToString();
         _nameTxt.text = name;
-
-        _specialSkillEffect = GameObject.FindWithTag("SpecialEffect").GetComponent<SpecialSkillEffect>();
-        _specialSkillEffect.Close();
+        _skills.OnInit(); // 캐릭터별 준비 (토끼 검사: 필살기 연출 캔버스 찾기)
     }
 
     /// <summary>머리 위 이름만 바꾼다 (연습방에서 닉네임을 바꿨을 때)</summary>
@@ -393,6 +390,7 @@ public class PlayerController : MonoBehaviour
         StopAllCoroutines(); // 특수기, 대쉬 등 모든 코루틴 중단
         _playerAttack.ForceStop();
         _upgrades.OnNodeMove(); // 강화 쪽 코루틴·버프도 정리
+        _skills.OnNodeMove();
 
         _isAttack = false;
         _isDashing = false;
@@ -476,6 +474,7 @@ public class PlayerController : MonoBehaviour
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SUPER, 0f);
         _uiPlayerSkill.SetCoolDown(Defines.SKILL.SPECIAL, 0f);
         _upgrades.ResetStates(); // 받아치기 자세, 투지 게이지, 다음 공격 강화 등
+        _skills.OnResetState();  // 캐릭터별 (총잡이: 탄창 채우기, 쌍권총 끝내기)
 
         // HP 텍스트 갱신
         if (_hpTxt != null)
@@ -507,139 +506,7 @@ public class PlayerController : MonoBehaviour
         _critRate += amount;
     }
 
-    // ── 필살기 ───────────────────────────────────────────────
-    IEnumerator SpecialSkillRoutine()
-    {
-        _isAttack = true;
-        BeginEmpoweredAttack();
-
-        _animController.SetTrigger("isSpecial");
-        SoundManager.Instance.PlaySFX("SFX/Player_SpecialCharge");
-        VFXManager.Instance.PlayAttached("SpecialCharge", transform);
-        yield return new WaitForSecondsRealtime(_specialInvincibleDelay);
-
-        // 차징 중에 맞아서 죽었다면 연출을 발동하지 않음
-        if (_isGameOver)
-        {
-            EndAttack();
-            yield break;
-        }
-
-        // 차징이 끝나고 연출이 발동되는 순간부터 무적
-        _invincibleCount++;
-        _playerHitBox.enabled = false;
-
-        // PlayerController(항상 활성)에서 스냅샷 찍기
-        yield return new WaitForEndOfFrame();
-        Texture2D screenshot = ScreenCapture.CaptureScreenshotAsTexture();
-
-        if (_specialSkillEffect != null)
-            yield return StartCoroutine(
-                _specialSkillEffect.PlayRoutine(screenshot, () => DealSpecialDamage())
-            );
-        else
-        {
-            Destroy(screenshot);
-            DealSpecialDamage();
-        }
-
-        _invincibleCount--;
-        if (_invincibleCount <= 0)
-            _playerHitBox.enabled = true;
-
-        EndAttack();
-    }
-
-    private void DealSpecialDamage()
-    {
-        DealSpecialHit(_upgrades.SpecialDamageRate(_specialDamageMultiplier)); // 강화가 있으면 강화된 배율
-        _upgrades.OnSpecialDamageDealt(); // 필살기 강화별 추가 효과 (연속 일섬, 달의 가호, 탄막 반사)
-    }
-
-    /// <summary>화면의 모든 적·상자에 한 번 피해 (필살기 강화 "연속 일섬"이 여러 번 부른다)</summary>
-    public void DealSpecialHit(float rate)
-    {
-        float totalMultiplier = rate * (1f + _specialDamageBonus);
-        int damage = Mathf.RoundToInt(DamageReturn() * totalMultiplier);
-        bool hitAny = false; // 하나라도 맞았는지 (적중 사운드용)
-
-        // 적 데미지
-        var enemies = FindObjectsByType<EnemyBase>(FindObjectsSortMode.None);
-        foreach (var enemy in enemies)
-        {
-            if (!enemy.gameObject.activeSelf || enemy.IsDead) continue;
-            enemy.DamageTaken(damage);
-            IngameManager.Instance.Flash(enemy.CharSprite, 0.5f);
-            DamageTextManager.Instance.ShowSpecial(damage, enemy.transform.position);
-            VFXManager.Instance.Play("SpecialHit", enemy.transform.position);
-            hitAny = true;
-        }
-
-        // 상자 데미지 (ChestObject는 EnemyBase 미상속)
-        var chests = FindObjectsByType<ChestObject>(FindObjectsSortMode.None);
-        foreach (var chest in chests)
-        {
-            if (!chest.gameObject.activeSelf) continue;
-            chest.TakeDamage(damage);
-            hitAny = true;
-        }
-
-        // 적중 사운드는 맞은 대상 수와 상관없이 한 번만 (여러 번 겹쳐 재생되면 소리가 뭉개짐)
-        // (화면 흔들림은 화면이 드러나는 유리 깨짐 순간에 SpecialSkillEffect가 담당)
-        if (hitAny)
-            SoundManager.Instance.PlaySFX("SFX/Player_SwordHit");
-    }
-
-    // ── 특수기 (기본 동작) ───────────────────────────────────
-    IEnumerator SuperSkillRoutine()
-    {
-        _isAttack = true;
-        BeginEmpoweredAttack();
-        _animController.SetTrigger("isSuper");
-
-        // 누른 순간부터 이펙트가 나가기 전까지 이동속도 감소
-        _moveSpeedRate = _superChargeSpeedRate;
-
-        // 차징
-        Coroutine blinkRoutine = StartCoroutine(BlinkCharge(0.4f));
-        yield return new WaitForSeconds(0.5f);
-        StopCoroutine(blinkRoutine);
-
-        // 깜빡임 끝나면 원래 색으로 복구 (흰색 상태에서 멈췄을 수도 있으므로)
-        SetFlash(0f);
-
-        // 이펙트가 발동하는 순간 이동속도 원래대로
-        _moveSpeedRate = 1f;
-
-        _damageMultiplier = 8f;
-        bool attackDone = false;
-        _playerAttack.SuperAttackStart(() => attackDone = true);
-
-        yield return new WaitUntil(() => attackDone);
-        _damageMultiplier = 1f;
-        _attackEmpowerRate = 1f;
-
-        yield return new WaitForSeconds(0.5f);
-        _isAttack = false;
-    }
-
-    IEnumerator BlinkCharge(float duration)
-    {
-        float elapsed = 0f;
-        float blinkInterval = 0.08f; // 깜빡임 간격 (작을수록 빠름)
-        bool isWhite = false;
-
-        while (elapsed < duration)
-        {
-            isWhite = !isWhite;
-            SetFlash(isWhite ? 1f : 0f); // 1 = 완전 흰색, 0 = 원래 그림
-
-            yield return new WaitForSeconds(blinkInterval);
-            elapsed += blinkInterval;
-        }
-
-        SetFlash(0f);
-    }
+    // 기본기·특수기·필살기의 실제 동작은 캐릭터별 CharacterSkills(RabbitSwordSkills, RabbitGunnerSkills)에 있다
 
     // 머티리얼 에셋은 그대로 두고, 이 SpriteRenderer에만 _FlashAmount 값을 적용 (1 = 완전 흰색, 0 = 원래 그림)
     public void SetFlash(float amount)
@@ -777,6 +644,21 @@ public class PlayerController : MonoBehaviour
     // (강화 컴포넌트가 플레이어 상태를 바꿀 때는 private 변수를 직접 건드리지 않고 이 함수들을 거친다)
 
     public PlayerAttack Attack => _playerAttack;
+    public CharacterSkills Skills => _skills;
+    public float SpecialDamageBonus => _specialDamageBonus;
+
+    /// <summary>무적 시작 (필살기 연출처럼 끝나는 시점을 직접 정할 때). 반드시 PopInvincible과 짝으로</summary>
+    public void PushInvincible()
+    {
+        _invincibleCount++;
+        _playerHitBox.enabled = false;
+    }
+
+    public void PopInvincible()
+    {
+        _invincibleCount = Mathf.Max(0, _invincibleCount - 1);
+        if (_invincibleCount <= 0) _playerHitBox.enabled = true;
+    }
     public SpriteRenderer CharSprite => _spriteRenderer;
     public bool IsGameOver => _isGameOver;
     public bool IsAttacking { get => _isAttack; set => _isAttack = value; }
@@ -876,6 +758,7 @@ public class PlayerController : MonoBehaviour
         if (_upgrades.HasBlink)
         {
             yield return StartCoroutine(_upgrades.BlinkRoutine());
+            _skills.OnDashFinished();
             yield break;
         }
 
@@ -927,6 +810,7 @@ public class PlayerController : MonoBehaviour
         _trailRenderer.enabled = false;
         _isDashing = false;
         _upgrades.OnDashFinished(); // 도약의 일격: 다음 공격 강화 준비
+        _skills.OnDashFinished();   // 캐릭터별 (총잡이: 재장전)
         OnDashEnded?.Invoke();
 
         if (_extraDashInvincibleTime > 0)

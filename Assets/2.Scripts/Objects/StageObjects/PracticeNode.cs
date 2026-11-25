@@ -5,7 +5,7 @@ using UnityEngine;
 /// 연습방 (게임 시작 전 준비하는 곳, 노드 0).
 /// - 가운데: 허수아비 (때리면 DPS 측정)
 /// - 오른쪽 포털: 머무르면 게임 시작 (= 이 노드 완료)
-/// - 왼쪽 포털: 머무르면 캐릭터 선택 창
+/// - 왼쪽 포털: 머무르면 캐릭터 선택 창 (인게임에 처음 들어왔을 때는 포털 없이 바로 열린다)
 /// 전투가 아니므로 숙련도·골드는 쌓이지 않는다.
 /// </summary>
 public class PracticeNode : NodeBase
@@ -15,6 +15,10 @@ public class PracticeNode : NodeBase
     [SerializeField] ExitPortal _characterPortal;   // 왼쪽
     [SerializeField] UICharacterSelect _characterSelect;
     [SerializeField] string _startLabel = "머무르면 게임 시작";
+    [Tooltip("인게임에 처음 들어왔을 때 캐릭터 선택 창부터 띄울지")]
+    [SerializeField] bool _openSelectOnFirstStart = true;
+
+    bool _firstSelectShown;
 
     // 오른쪽 포털로 이미 나가기를 끝냈으므로 IngameManager가 포털을 또 열지 않게
     public override bool UsesOwnExitPortal => true;
@@ -29,6 +33,19 @@ public class PracticeNode : NodeBase
             _dummy.gameObject.SetActive(true);
             _dummy.ResetRecord();
         }
+        // 인게임에 처음 들어왔을 때는 캐릭터 선택 창부터 띄운다 (닫으면 포털이 열린다)
+        if (_openSelectOnFirstStart && !_firstSelectShown && _characterSelect != null)
+        {
+            _firstSelectShown = true;
+            _characterSelect.Open(() =>
+            {
+                if (!_isRunning) return;
+                OpenStartPortal();
+                OpenCharacterPortal();
+            });
+            return;
+        }
+
         OpenStartPortal();
         OpenCharacterPortal();
     }

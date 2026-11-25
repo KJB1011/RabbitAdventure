@@ -16823,6 +16823,7 @@ MonoBehaviour:
   - {fileID: 356209111}
   _characters:
   - {fileID: 11400000, guid: 09ab4ed5fee5af4409f4f214fb8ce444, type: 2}
+  - {fileID: 11400000, guid: ab633c2f82775c74da71483c56123e15, type: 2}
   _exitPortal: {fileID: 478700707}
   _bgScroller: {fileID: 1028938755}
   _resultUI: {fileID: 2064387268}

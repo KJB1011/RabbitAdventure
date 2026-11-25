@@ -217,6 +217,8 @@ public class SkillMasteryManager : MonoBehaviour
     Track GetTrack(SKILL skill)
     {
         if (_tracks == null) return null;
+        // 지금 강화 목록은 토끼 검사 전용 → 숙련도를 쓰지 않는 캐릭터(총잡이)면 숙련도가 없는 것처럼 (상점은 "준비 중")
+        if (_player != null && _player.Skills != null && !_player.Skills.SupportsMastery) return null;
         foreach (var track in _tracks)
             if (track.skill == skill) return track;
         return null;

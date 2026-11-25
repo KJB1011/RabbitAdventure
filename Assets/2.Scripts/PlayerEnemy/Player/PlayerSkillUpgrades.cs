@@ -585,7 +585,7 @@ public class PlayerSkillUpgrades : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(_multiSlashInterval);
             SoundManager.Instance.PlaySFXPitch("SFX/Player_SwordOneSlash", 1f + 0.08f * i); // 벨 때마다 조금씩 높게
-            _player.DealSpecialHit(_multiSlashRate);
+            if (_player.Skills is RabbitSwordSkills sword) sword.DealSpecialHit(_multiSlashRate); // 연속 일섬은 토끼 검사 필살기 강화
             IngameManager.Instance.ShakeCamera(0.06f, 0.1f);
         }
     }

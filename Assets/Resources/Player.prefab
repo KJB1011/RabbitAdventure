@@ -1155,6 +1155,7 @@ GameObject:
   - component: {fileID: 719717138890193289}
   - component: {fileID: 7367704878811313906}
   - component: {fileID: 8979028212160673700}
+  - component: {fileID: 4915839244256637684}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1247,9 +1248,6 @@ MonoBehaviour:
   _specialSkillCooldownDuration: 20
   _invisibleTime: 1.5
   _blinkInterval: 0.1
-  _specialDamageMultiplier: 30
-  _specialInvincibleDelay: 1.5
-  _specialSkillEffect: {fileID: 0}
   _nodeMoveDuration: 1
   _mapMin: {x: -9, y: -5}
   _mapMax: {x: 9, y: 5}
@@ -1488,6 +1486,22 @@ MonoBehaviour:
   _reflectMax: 20
   _spiritRate: 25
   _spiritRequiredHits: 40
+--- !u!114 &4915839244256637684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3795670308001565551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a603599327fcb34cbb242a92fe2879f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RabbitSwordSkills
+  _superChargeTime: 0.5
+  _superDamageRate: 8
+  _specialDamageMultiplier: 30
+  _specialInvincibleDelay: 1.5
 --- !u!1 &4119697982759677859
 GameObject:
   m_ObjectHideFlags: 0
