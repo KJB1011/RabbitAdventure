@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "\uD1A0\uB07C \uCD1D\uC7A1\uC774"
   description: "\uCEE4\uC11C \uAC00\uAE4C\uC774\uC758 \uC801\uC744\n\uC815\uD655\uD788
     \uC3D8\uB294 \uAD8C\uCD1D \uC0AC\uC218"
-  portrait: {fileID: 4153391862663518808, guid: a82a49d607ebdea47a744071d36f19ad, type: 3}
+  portrait: {fileID: 4153391862663518808, guid: 2f28a5d7409f4a0fa9bee2513015edd3, type: 3}
   playerPrefab: {fileID: 5327949538377802890, guid: 247c180fdae413e40a8d6839bac5cbb6, type: 3}
   skillDescriptions:
   - "\uCEE4\uC11C\uC640 \uAC00\uC7A5 \uAC00\uAE4C\uC6B4 \uC801\uC744 \uC3DC\uB2E4

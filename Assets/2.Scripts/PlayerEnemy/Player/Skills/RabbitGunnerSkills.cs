@@ -6,7 +6,7 @@ using static Defines;
 
 /// <summary>
 /// 토끼 총잡이의 스킬.
-///   기본기 : 커서 방향으로 일직선으로 쏜다. 처음 맞은 적 1명만 (사거리 무제한, 80%). 탄창 6발, 다 쓰면 2초 재장전
+///   기본기 : 커서 방향으로 일직선으로 쏜다. 처음 맞은 적 1명만 (사거리 무제한, 100%). 탄창 6발, 다 쓰면 2초 재장전
 ///   회피기 : 공통 구르기 + 끝나면 즉시 재장전
 ///   특수기 : 남은 총알을 0.15초 간격으로 빠르게 전부 쏜다 (기본기와 같은 방식, 쌍권총 중에는 2배 빠르게)
 ///   필살기 : 쌍권총 — 즉시 재장전 + 10초 동안 탄창 2배, 기본기 쿨타임 절반
@@ -17,7 +17,7 @@ public class RabbitGunnerSkills : CharacterSkills
     [Header("기본기 (권총)")]
     [SerializeField] int _magazineSize = 6;
     [SerializeField] float _reloadTime = 2f;
-    [SerializeField] float _damageRate = 0.8f;         // 80%
+    [SerializeField] float _damageRate = 1f;           // 100%
     [SerializeField] float _maxRange = 40f;            // 사실상 무제한 (화면 끝까지)
 
     [Header("특수기 (속사)")]
@@ -34,6 +34,7 @@ public class RabbitGunnerSkills : CharacterSkills
     [SerializeField] SpriteRenderer _offhandGun;       // 쌍권총일 때만 보이는 두 번째 총
     [SerializeField] TextMeshPro _ammoText;            // 플레이어 아래 탄창 표시
     [SerializeField] float _muzzleOffset = 0.35f;      // 총 위치에서 총구까지 거리
+    [SerializeField] ParticleSystem _dualAura;         // 쌍권총 지속 중 몸에서 나오는 파티클
 
     int _bullets;
     bool _isReloading;
@@ -49,7 +50,12 @@ public class RabbitGunnerSkills : CharacterSkills
     {
         base.Awake();
         _bullets = _magazineSize;
-        if (_offhandGun != null) _offhandGun.enabled = false;
+        if (_gun != null) _gunRestPos = _gun.transform.localPosition;
+        if (_offhandGun != null)
+        {
+            _offhandRestPos = _offhandGun.transform.localPosition;
+            _offhandGun.enabled = false;
+        }
 
         // 예전 "6 / 6" 글자 대신 스킬칸 옆 탄환 줄로 보여준다
         if (_ammoText != null) _ammoText.gameObject.SetActive(false);
@@ -85,7 +91,8 @@ public class RabbitGunnerSkills : CharacterSkills
         UpdateAmmoBar();
 
         Vector2 cursor = Utils.GetMousePos();
-        Vector2 muzzle = MuzzlePosition;
+        var gun = NextGun();
+        Vector2 muzzle = MuzzleOf(gun);
         Vector2 aim = cursor - (Vector2)transform.position; // 몸 → 커서 방향 (총구가 커서보다 앞에 있어도 방향이 뒤집히지 않게)
         if (aim.sqrMagnitude < 0.0001f) aim = Player.Attack.transform.right;
         aim.Normalize();
@@ -117,11 +124,7 @@ public class RabbitGunnerSkills : CharacterSkills
         // 총알 궤적 + 총구 불꽃 + 소리
         ShowTracer(muzzle, hitPos);
         SoundManager.Instance.PlaySFXVaried("SFX/Gen_Gunshot", 0.06f);
-        if (_gun != null)
-        {
-            _gun.transform.localPosition = GunRestPos - Vector3.right * 0.08f; // 반동
-            StartCoroutine(RecoverGun());
-        }
+        if (gun != null) StartCoroutine(RecoilRoutine(gun.transform, gun == _offhandGun ? _offhandRestPos : _gunRestPos));
 
         if (target != null)
         {
@@ -140,32 +143,38 @@ public class RabbitGunnerSkills : CharacterSkills
         if (_bullets <= 0) StartReload();
     }
 
+    // 총의 원래 자리 (반동 후 돌아올 위치, Awake에서 저장)
     Vector3 _gunRestPos;
-    bool _gunRestSaved;
-    Vector3 GunRestPos
+    Vector3 _offhandRestPos;
+    bool _offhandTurn; // 쌍권총일 때 이번 발은 두 번째 총 차례인지
+
+    // 이번에 쏠 총: 평소엔 손에 든 총, 쌍권총일 때는 두 총이 번갈아 쏜다
+    SpriteRenderer NextGun()
     {
-        get
-        {
-            if (!_gunRestSaved && _gun != null) { _gunRestPos = _gun.transform.localPosition; _gunRestSaved = true; }
-            return _gunRestPos;
-        }
+        if (!_isDual || _offhandGun == null) return _gun;
+        _offhandTurn = !_offhandTurn;
+        return _offhandTurn ? _offhandGun : _gun;
     }
 
-    IEnumerator RecoverGun()
+    // 뒤로 살짝 밀렸다가 돌아오는 반동
+    IEnumerator RecoilRoutine(Transform gun, Vector3 rest)
     {
+        gun.localPosition = rest - Vector3.right * 0.08f;
         yield return new WaitForSeconds(0.06f);
-        if (_gun != null) _gun.transform.localPosition = GunRestPos;
+        if (gun != null) gun.localPosition = rest;
     }
 
-    Vector2 MuzzlePosition => _gun != null
-        ? (Vector2)_gun.transform.position + (Vector2)Player.Attack.transform.right * _muzzleOffset
+    Vector2 MuzzleOf(SpriteRenderer gun) => gun != null
+        ? (Vector2)gun.transform.position + (Vector2)Player.Attack.transform.right * _muzzleOffset
         : (Vector2)transform.position;
 
     void ShowTracer(Vector2 from, Vector2 to)
     {
         var vfx = VFXManager.Instance.Play("BulletTracerVFX", from);
         if (vfx != null && vfx.TryGetComponent(out TracerVFX tracer)) tracer.Show(from, to);
-        VFXManager.Instance.Play("LightHitVFX", from); // 총구 섬광
+        // 총구 섬광 (짧게 번쩍하고 사라지는 총 전용 이펙트)
+        var flash = VFXManager.Instance.Play("MuzzleFlashVFX", from);
+        if (flash != null && flash.TryGetComponent(out MuzzleFlashVFX muzzleFlash)) muzzleFlash.Show(from, to - from);
     }
 
     // ── 재장전 ───────────────────────────────────────────────
@@ -241,28 +250,40 @@ public class RabbitGunnerSkills : CharacterSkills
         _isDual = true;
         FinishReload();                                  // 재장전 중이었어도 즉시 12발로 가득
         if (_offhandGun != null) _offhandGun.enabled = true;
+        if (_dualAura != null) _dualAura.Play();         // 지속되는 동안 몸에서 금빛 불씨가 피어오름
         SoundManager.Instance.PlaySFX("SFX/Gen_Buff");
         SoundManager.Instance.PlaySFXPitch("SFX/Gen_Reload", 0.9f);
         FloatingTextManager.Instance.ShowItemEffect("쌍권총!", new Color(1f, 0.85f, 0.35f), transform.position);
 
         yield return new WaitForSeconds(_dualDuration);
-        EndDual();
+        EndDual(true);
     }
 
-    void EndDual()
+    /// <param name="natural">시간이 다 돼서 끝났는지 (노드 재시작 등으로 정리할 때는 소리를 내지 않는다)</param>
+    void EndDual(bool natural)
     {
+        bool wasDual = _isDual;
         _isDual = false;
         _dualRoutine = null;
-        if (_offhandGun != null) _offhandGun.enabled = false;
+        _offhandTurn = false;
+        if (_offhandGun != null)
+        {
+            _offhandGun.enabled = false;
+            _offhandGun.transform.localPosition = _offhandRestPos;
+        }
+        if (_dualAura != null) _dualAura.Stop(true, ParticleSystemStopBehavior.StopEmitting); // 남은 불씨는 자연스럽게 사라짐
         _bullets = Mathf.Min(_bullets, MagazineSize); // 12발 → 6발로
         UpdateAmmoBar();
+
+        if (natural && wasDual)
+            SoundManager.Instance.PlaySFX("SFX/Gen_BuffEnd"); // 힘이 빠지는 소리
     }
 
     // ── 상태 정리 ────────────────────────────────────────────
     public override void OnResetState()
     {
         if (_dualRoutine != null) StopCoroutine(_dualRoutine);
-        EndDual();
+        EndDual(false);
         FinishReload();
     }
 

@@ -216,6 +216,13 @@ public class IngameManager : MonoBehaviour
         _player = CreatePlayer(character.playerPrefab, pos);
         if (old != null) Destroy(old.gameObject);
 
+        // 인트로 전(첫 캐릭터 선택)이라면 새 플레이어도 화면 밖에 그대로 대기 (경계에 끌려 들어오지 않게)
+        if (!_introFinished && _player != null)
+        {
+            _player.SetBoundary(false);
+            _player.SetControllable(false);
+        }
+
         VFXManager.Instance.Play("BlinkStartVFX", pos); // 펑 하고 바뀐다
         OnPlayerChanged?.Invoke(_player);
     }
@@ -252,6 +259,8 @@ public class IngameManager : MonoBehaviour
     }
 
     // ── 인트로 연출 ───────────────────────────────────────────
+    bool _introFinished; // 플레이어가 걸어 들어와 조작을 받은 뒤부터 true
+
     private IEnumerator IntroRoutine()
     {
         if (_player != null)
@@ -272,6 +281,24 @@ public class IngameManager : MonoBehaviour
         else
             yield return new WaitForSeconds(_uiFadeDuration);
 
+        // 첫 노드가 연습방이면 캐릭터부터 고르고, 고른 캐릭터가 걸어 들어온다
+        if (_nodes.Length > 0 && _nodes[0] is PracticeNode practice)
+        {
+            bool closed = false;
+            if (practice.TryOpenFirstSelect(() => closed = true))
+            {
+                yield return new WaitUntil(() => closed);
+
+                // 캐릭터를 바꿨다면 새 플레이어이므로, 창이 닫히며 풀린 조작·경계를 다시 막고 화면 밖에 둔다
+                if (_player != null)
+                {
+                    _player.SetControllable(false);
+                    _player.SetBoundary(false);
+                    _player.transform.position = _playerOffscreen;
+                }
+            }
+        }
+
         // 플레이어 등장
         if (_player != null)
             yield return StartCoroutine(
@@ -284,6 +311,7 @@ public class IngameManager : MonoBehaviour
             _player.SetControllable(true);
         }
 
+        _introFinished = true;
         ActivateNode(0);
     }
 

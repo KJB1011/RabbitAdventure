@@ -5,7 +5,7 @@ using UnityEngine;
 /// 연습방 (게임 시작 전 준비하는 곳, 노드 0).
 /// - 가운데: 허수아비 (때리면 DPS 측정)
 /// - 오른쪽 포털: 머무르면 게임 시작 (= 이 노드 완료)
-/// - 왼쪽 포털: 머무르면 캐릭터 선택 창 (인게임에 처음 들어왔을 때는 포털 없이 바로 열린다)
+/// - 왼쪽 포털: 머무르면 캐릭터 선택 창 (인게임에 처음 들어왔을 때는 플레이어가 등장하기 전에 바로 열린다)
 /// 전투가 아니므로 숙련도·골드는 쌓이지 않는다.
 /// </summary>
 public class PracticeNode : NodeBase
@@ -33,21 +33,20 @@ public class PracticeNode : NodeBase
             _dummy.gameObject.SetActive(true);
             _dummy.ResetRecord();
         }
-        // 인게임에 처음 들어왔을 때는 캐릭터 선택 창부터 띄운다 (닫으면 포털이 열린다)
-        if (_openSelectOnFirstStart && !_firstSelectShown && _characterSelect != null)
-        {
-            _firstSelectShown = true;
-            _characterSelect.Open(() =>
-            {
-                if (!_isRunning) return;
-                OpenStartPortal();
-                OpenCharacterPortal();
-            });
-            return;
-        }
-
         OpenStartPortal();
         OpenCharacterPortal();
+    }
+
+    /// <summary>
+    /// 인게임에 처음 들어왔을 때 캐릭터 선택 창을 띄울지 (IngameManager 인트로에서 플레이어가 등장하기 전에 확인).
+    /// 이 노드는 아직 꺼져 있을 때 불리므로 코루틴 없이 창만 연다.
+    /// </summary>
+    public bool TryOpenFirstSelect(System.Action onClosed)
+    {
+        if (!_openSelectOnFirstStart || _firstSelectShown || _characterSelect == null) return false;
+        _firstSelectShown = true;
+        _characterSelect.Open(onClosed);
+        return true;
     }
 
     Transform PlayerTF => IngameManager.Instance.Player != null ? IngameManager.Instance.Player.transform : null;
