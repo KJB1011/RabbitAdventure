@@ -13,7 +13,10 @@ public class TracerVFX : MonoBehaviour
     [SerializeField] float _fadeTime = 0.12f;
     [SerializeField] Color _color = new Color(1f, 0.95f, 0.7f, 1f);
 
-    public void Show(Vector2 from, Vector2 to)
+    public void Show(Vector2 from, Vector2 to) => Show(from, to, 1f, _color, 1f);
+
+    /// <summary>굵기·색·남는 시간을 바꿔서 (차지샷처럼 강한 한 발)</summary>
+    public void Show(Vector2 from, Vector2 to, float thicknessScale, Color color, float fadeScale)
     {
         Vector2 diff = to - from;
         float length = diff.magnitude;
@@ -22,10 +25,10 @@ public class TracerVFX : MonoBehaviour
         transform.localScale = Vector3.one; // 풀에서 꺼낼 때 다른 크기가 남아 있지 않게
 
         if (_line == null) return;
-        _line.transform.localScale = new Vector3(length, _thickness, 1f);
+        _line.transform.localScale = new Vector3(length, _thickness * thicknessScale, 1f);
         _line.DOKill();
-        _line.color = _color;
-        _line.DOFade(0f, _fadeTime).SetEase(Ease.InQuad);
+        _line.color = color;
+        _line.DOFade(0f, _fadeTime * fadeScale).SetEase(Ease.InQuad);
     }
 
     void OnDisable()

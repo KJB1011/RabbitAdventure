@@ -522,6 +522,8 @@ public class PlayerController : MonoBehaviour
         return DamageReturn(out _);
     }
     public int DamageReturn(out bool isCrit) => CalcDamage(false, out isCrit);
+    /// <summary>forceCrit이면 확정 치명타 (총잡이 퀵 드로우)</summary>
+    public int DamageReturn(bool forceCrit, out bool isCrit) => CalcDamage(forceCrit, out isCrit);
 
     /// <summary>
     /// 맞은 위치를 아는 공격용 (EnemyHitbox). 확정 치명타 조건(칼끝 일격 등)에 맞으면 무조건 치명타
@@ -637,8 +639,15 @@ public class PlayerController : MonoBehaviour
     }
 
     // ── 스킬 강화 (숙련도) ──────────────────────────────────
-    /// <summary>SkillMasteryManager에서 고른 강화를 켠다 (실제 처리는 PlayerSkillUpgrades)</summary>
-    public void ApplySkillUpgrade(SkillUpgradeType type) => _upgrades.Apply(type);
+    /// <summary>
+    /// SkillMasteryManager에서 고른 강화를 켠다.
+    /// 캐릭터 전용 강화(총잡이 등)는 CharacterSkills가, 나머지(토끼 검사)는 PlayerSkillUpgrades가 처리
+    /// </summary>
+    public void ApplySkillUpgrade(SkillUpgradeType type)
+    {
+        if (_skills != null && _skills.ApplyUpgrade(type)) return;
+        _upgrades.Apply(type);
+    }
 
     // ── PlayerSkillUpgrades가 쓰는 함수들 ────────────────────
     // (강화 컴포넌트가 플레이어 상태를 바꿀 때는 private 변수를 직접 건드리지 않고 이 함수들을 거친다)
@@ -663,6 +672,8 @@ public class PlayerController : MonoBehaviour
     public bool IsGameOver => _isGameOver;
     public bool IsAttacking { get => _isAttack; set => _isAttack = value; }
     public bool IsSuperKeyHeld => _superSkillAction != null && _superSkillAction.IsPressed();
+    public bool IsAttackKeyHeld => _attackAction != null && _attackAction.IsPressed(); // 총잡이 차지샷
+    public bool IsDashKeyHeld => _dashAction != null && _dashAction.IsPressed();       // 차지 중 구르기로 취소
     public float SuperChargeSpeedRate => _superChargeSpeedRate;
     public float DashDistance => _dashDistance;
     public float ExtraDashInvincibleTime => _extraDashInvincibleTime;
@@ -779,7 +790,15 @@ public class PlayerController : MonoBehaviour
         Vector2 dirToMouse = mouseWorldPos - startPos;
         Vector2 dashDirection = dirToMouse.normalized;
         float finalDashDistance = Mathf.Min(maxDistance, dirToMouse.magnitude);
+
+        // 캐릭터별: 커서 반대쪽으로 끝까지 (총잡이 백스텝 산탄)
+        if (_skills.DashAwayFromCursor)
+        {
+            dashDirection = dirToMouse.sqrMagnitude > 0.0001f ? -dashDirection : (_lockedFaceLeft ? Vector2.right : Vector2.left);
+            finalDashDistance = maxDistance;
+        }
         Vector2 targetPos = startPos + dashDirection * finalDashDistance;
+        _skills.OnDashStarted(startPos); // 캐릭터별 (총잡이: 산탄, 탄피 폭탄)
 
         _animController.SetTrigger("isDash");
         SoundManager.Instance.PlaySFX("SFX/Player_Dash");

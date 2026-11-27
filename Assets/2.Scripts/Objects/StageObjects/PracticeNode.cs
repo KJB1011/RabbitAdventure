@@ -45,7 +45,7 @@ public class PracticeNode : NodeBase
     {
         if (!_openSelectOnFirstStart || _firstSelectShown || _characterSelect == null) return false;
         _firstSelectShown = true;
-        _characterSelect.Open(onClosed);
+        _characterSelect.Open(onClosed, mustChoose: true); // 골라야만 닫힌다
         return true;
     }
 

@@ -22,7 +22,6 @@ public class RabbitSwordSkills : CharacterSkills
     PlayerSkillUpgrades _upgrades;
     SpecialSkillEffect _specialSkillEffect;
 
-    public override bool SupportsMastery => true;
 
     protected override void Awake()
     {

@@ -269,19 +269,9 @@ public class IngameManager : MonoBehaviour
             _player.SetControllable(false);
             _player.SetBoundary(false); // ← 경계 끄기
         }
+        if (_gameUICanvas != null) _gameUICanvas.alpha = 0f;
 
-        // UI 페이드 인
-        if (_gameUICanvas != null)
-        {
-            _gameUICanvas.alpha = 0f;
-            yield return _gameUICanvas.DOFade(1f, _uiFadeDuration)
-                                      .SetUpdate(true)
-                                      .WaitForCompletion();
-        }
-        else
-            yield return new WaitForSeconds(_uiFadeDuration);
-
-        // 첫 노드가 연습방이면 캐릭터부터 고르고, 고른 캐릭터가 걸어 들어온다
+        // 첫 노드가 연습방이면 (UI가 나오기 전에) 캐릭터부터 고른다 → 그다음 UI가 나오고 고른 캐릭터가 걸어 들어온다
         if (_nodes.Length > 0 && _nodes[0] is PracticeNode practice)
         {
             bool closed = false;
@@ -298,6 +288,16 @@ public class IngameManager : MonoBehaviour
                 }
             }
         }
+
+        // UI 페이드 인
+        if (_gameUICanvas != null)
+        {
+            yield return _gameUICanvas.DOFade(1f, _uiFadeDuration)
+                                      .SetUpdate(true)
+                                      .WaitForCompletion();
+        }
+        else
+            yield return new WaitForSeconds(_uiFadeDuration);
 
         // 플레이어 등장
         if (_player != null)
@@ -683,4 +683,4 @@ public class IngameManager : MonoBehaviour
         Time.timeScale = 1f;
         RestartCurrentNode();
     }
-}
+}

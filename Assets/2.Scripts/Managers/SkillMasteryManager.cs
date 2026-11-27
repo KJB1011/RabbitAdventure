@@ -18,6 +18,8 @@ public class SkillMasteryManager : MonoBehaviour
     [Serializable]
     public class Track
     {
+        [Tooltip("이 트랙을 쓰는 캐릭터 (CharacterSO.characterId). 비워 두면 토끼 검사(rabbit_sword)")]
+        public string characterId;
         public SKILL skill;
         [Tooltip("가득 차는 데 필요한 숙련도 (전투 중 스킬 한 번 사용 = 1)")]
         public int required = 20;
@@ -214,14 +216,28 @@ public class SkillMasteryManager : MonoBehaviour
         }, onClosed);
     }
 
+    const string DefaultCharacterId = "rabbit_sword";
+
+    // 지금 캐릭터의 그 스킬 트랙 (그 캐릭터용 트랙이 없으면 null → 상점에서 "준비 중")
     Track GetTrack(SKILL skill)
     {
         if (_tracks == null) return null;
-        // 지금 강화 목록은 토끼 검사 전용 → 숙련도를 쓰지 않는 캐릭터(총잡이)면 숙련도가 없는 것처럼 (상점은 "준비 중")
-        if (_player != null && _player.Skills != null && !_player.Skills.SupportsMastery) return null;
+        string current = CurrentCharacterId;
         foreach (var track in _tracks)
-            if (track.skill == skill) return track;
+        {
+            string id = string.IsNullOrEmpty(track.characterId) ? DefaultCharacterId : track.characterId;
+            if (track.skill == skill && id == current) return track;
+        }
         return null;
+    }
+
+    static string CurrentCharacterId
+    {
+        get
+        {
+            var c = IngameManager.Instance != null ? IngameManager.Instance.CurrentCharacter : null;
+            return c != null && !string.IsNullOrEmpty(c.characterId) ? c.characterId : DefaultCharacterId;
+        }
     }
 
     public static string SkillName(SKILL skill) => skill switch

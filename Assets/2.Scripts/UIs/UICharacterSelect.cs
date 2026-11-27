@@ -9,6 +9,8 @@ using UnityEngine.UI;
 /// 닉네임 입력 + 캐릭터 카드. 캐릭터 카드를 누르면 그 캐릭터로 바뀌고 창이 닫힌다.
 /// 카드 수보다 캐릭터가 적으면 남는 카드는 "준비 중"으로 보인다.
 /// 이 컴포넌트가 붙은 오브젝트는 항상 켜 두고, 실제로 보이는 부분(_panel)만 켜고 끈다.
+/// 인게임 UI(UIOverlayCanvas)와 따로 있는 캔버스(UISelectCanvas)에 둔다
+/// → 처음 시작할 때 인게임 UI가 아직 투명한 상태에서도 이 창은 보인다.
 /// </summary>
 public class UICharacterSelect : MonoBehaviour
 {
@@ -28,6 +30,8 @@ public class UICharacterSelect : MonoBehaviour
 
     public bool IsOpen => _isOpen;
 
+    bool _mustChoose; // 처음 시작할 때: 캐릭터를 골라야만 닫힌다 (닫기 버튼·ESC 없음)
+
     void Awake()
     {
         if (_panel != null) _panel.gameObject.SetActive(false);
@@ -39,11 +43,14 @@ public class UICharacterSelect : MonoBehaviour
         }
     }
 
-    public void Open(Action onClosed)
+    /// <param name="mustChoose">처음 시작할 때: 고른 캐릭터 표시 없이 열고, 캐릭터 카드를 눌러야만 닫힌다</param>
+    public void Open(Action onClosed, bool mustChoose = false)
     {
         if (_isOpen || _panel == null) return;
         _isOpen = true;
         _onClosed = onClosed;
+        _mustChoose = mustChoose;
+        if (_closeButton != null) _closeButton.gameObject.SetActive(!mustChoose);
 
         var player = IngameManager.Instance.Player;
         if (player != null) player.SetControllable(false);
@@ -67,7 +74,7 @@ public class UICharacterSelect : MonoBehaviour
     void RefreshCards()
     {
         var list = IngameManager.Instance.Characters;
-        var current = IngameManager.Instance.CurrentCharacter;
+        var current = _mustChoose ? null : IngameManager.Instance.CurrentCharacter; // 처음엔 아무것도 고르지 않은 상태로
         for (int i = 0; i < _cards.Length; i++)
         {
             if (i < list.Count && list[i] != null)
@@ -99,6 +106,7 @@ public class UICharacterSelect : MonoBehaviour
     {
         if (!_isOpen) return;
         _isOpen = false;
+        _mustChoose = false;
 
         // 입력 중이던 닉네임도 저장
         if (_nicknameInput != null && !string.IsNullOrWhiteSpace(_nicknameInput.text))
@@ -122,7 +130,7 @@ public class UICharacterSelect : MonoBehaviour
     void Update()
     {
         // ESC로도 닫기 (닉네임 입력 중에는 입력 칸이 먼저 받는다)
-        if (_isOpen && UnityEngine.InputSystem.Keyboard.current != null &&
+        if (_isOpen && !_mustChoose && UnityEngine.InputSystem.Keyboard.current != null &&
             UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame &&
             (_nicknameInput == null || !_nicknameInput.isFocused))
             Close();

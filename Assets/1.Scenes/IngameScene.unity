@@ -3678,7 +3678,6 @@ RectTransform:
   - {fileID: 68211339}
   - {fileID: 108854871}
   - {fileID: 487303674}
-  - {fileID: 1126613330}
   - {fileID: 986270397}
   - {fileID: 846789360}
   - {fileID: 1017407334}
@@ -17158,6 +17157,108 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 827065681}
   m_CullTransparentMesh: 1
+--- !u!1 &833996056
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 833996057}
+  - component: {fileID: 833996060}
+  - component: {fileID: 833996059}
+  - component: {fileID: 833996058}
+  m_Layer: 5
+  m_Name: UISelectCanvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &833996057
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833996056}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1126613330}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!114 &833996058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833996056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &833996059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833996056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
+--- !u!223 &833996060
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833996056}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 5
+  m_TargetDisplay: 0
 --- !u!1 &846789359
 GameObject:
   m_ObjectHideFlags: 0
@@ -17224,34 +17325,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillMasteryManager
   _tracks:
-  - skill: 0
+  - characterId: 
+    skill: 0
     required: 100
     upgrades:
     - {fileID: 11400000, guid: 3079f6dd05a173e44a32eea52479bcbb, type: 2}
     - {fileID: 11400000, guid: ada3bde1dc8ce6f46a4a1f2016cab8d9, type: 2}
     - {fileID: 11400000, guid: 60e52fd739b3ce04dad58b7ccce40230, type: 2}
     - {fileID: 11400000, guid: 122c19d4b1de53545a7db3a448c6edcd, type: 2}
-  - skill: 1
+  - characterId: 
+    skill: 1
     required: 20
     upgrades:
     - {fileID: 11400000, guid: 8499689be7f64207974e2c614f19e687, type: 2}
     - {fileID: 11400000, guid: b7f528ea95384a639b81f1d0216a87d0, type: 2}
     - {fileID: 11400000, guid: f93d540733854a0c8f8743ab5cb0e019, type: 2}
     - {fileID: 11400000, guid: f5bf1f621c1e5214a84d9caf372b5074, type: 2}
-  - skill: 2
+  - characterId: 
+    skill: 2
     required: 10
     upgrades:
     - {fileID: 11400000, guid: 4b843cc1831df10449c4891a1825dff2, type: 2}
     - {fileID: 11400000, guid: 56d77f6698b080f47bd360146153c687, type: 2}
     - {fileID: 11400000, guid: 5bf449281f6d2e94db2bf669798e9f31, type: 2}
     - {fileID: 11400000, guid: 7e4100c6c39360342a46a24cb5ced75f, type: 2}
-  - skill: 3
+  - characterId: 
+    skill: 3
     required: 5
     upgrades:
     - {fileID: 11400000, guid: fd04b12599540db43ad3099d78a7c647, type: 2}
     - {fileID: 11400000, guid: f4a216055424bd242a7ae79fe2dc8873, type: 2}
     - {fileID: 11400000, guid: 8d2b1bc1e9b0aa947a467f200b570240, type: 2}
     - {fileID: 11400000, guid: e7c0ace5276232c41b4c4a82327cf313, type: 2}
+  - characterId: rabbit_gunner
+    skill: 0
+    required: 100
+    upgrades:
+    - {fileID: 11400000, guid: eea8173c97292a9418b7fd33211acf7d, type: 2}
+    - {fileID: 11400000, guid: dd22ade1ab843834ebbc108b4c721f81, type: 2}
+    - {fileID: 11400000, guid: 6b6e1707ab4e9014996c8b593fdc2d5e, type: 2}
+    - {fileID: 11400000, guid: 48c30ea7d5c75b94ea1ec81cefec0d82, type: 2}
+  - characterId: rabbit_gunner
+    skill: 1
+    required: 20
+    upgrades:
+    - {fileID: 11400000, guid: 73c57f41f119f5c499248158e55baf08, type: 2}
+    - {fileID: 11400000, guid: ad2e6e363d1bba949b5c695074991b8b, type: 2}
+    - {fileID: 11400000, guid: 3361134bd51683540bdcf18be63c9f5a, type: 2}
+    - {fileID: 11400000, guid: 10a06318291e1e84fbd8d954520c5688, type: 2}
   _purchaseFillRatio: 1
   _choiceTitleFormat: "{0} \uAC15\uD654\uB97C \uD558\uB098 \uC120\uD0DD\uD558\uC138\uC694"
   _choiceCount: 3
@@ -20314,7 +20435,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1274445885}
-  m_Father: {fileID: 422598786}
+  m_Father: {fileID: 833996057}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -27291,6 +27412,7 @@ MonoBehaviour:
   _characterPortal: {fileID: 342255672}
   _characterSelect: {fileID: 1126613331}
   _startLabel: "\uBA38\uBB34\uB974\uBA74 \uAC8C\uC784 \uC2DC\uC791"
+  _openSelectOnFirstStart: 1
 --- !u!4 &2103233999
 Transform:
   m_ObjectHideFlags: 0
@@ -32558,6 +32680,7 @@ SceneRoots:
   - {fileID: 1509682886}
   - {fileID: 1958180742}
   - {fileID: 422598786}
+  - {fileID: 833996057}
   - {fileID: 513966650}
   - {fileID: 1011866965}
   - {fileID: 1847572465}

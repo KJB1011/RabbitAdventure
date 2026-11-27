@@ -52,7 +52,10 @@ public class UIShop : MonoBehaviour
 
             var skill = (SKILL)i;
             string skillName = SkillMasteryManager.SkillName(skill);
-            Sprite icon = i < _skillIcons.Length ? _skillIcons[i] : null;
+            // 캐릭터 전용 아이콘이 있으면 그것 (총잡이 권총 등), 없으면 기본 아이콘
+            var character = IngameManager.Instance != null ? IngameManager.Instance.CurrentCharacter : null;
+            Sprite icon = character != null ? character.GetSkillIcon(i) : null;
+            if (icon == null) icon = i < _skillIcons.Length ? _skillIcons[i] : null;
 
             _skillSlots[i].SetupMastery(
                 skill, icon,

@@ -16,6 +16,7 @@ public class UIAmmoBar : MonoBehaviour
     static readonly Color FullColor = new Color(0.85f, 0.66f, 0.38f);      // 황갈색
     static readonly Color EmptyColor = new Color(0.27f, 0.27f, 0.29f);     // 어두운 회색
     static readonly Color ReloadColor = new Color(0.85f, 0.66f, 0.38f, 0.45f); // 재장전으로 차오르는 중
+    static readonly Color SpecialColor = new Color(1f, 0.42f, 0.18f);      // 특수탄 (소이탄)
 
     const float ColumnHeight = 190f; // 스킬칸 4개 높이와 비슷하게 (월드 캔버스 단위)
     const float BulletWidth = 26f;
@@ -52,18 +53,20 @@ public class UIAmmoBar : MonoBehaviour
     /// <param name="bullets">남은 총알</param>
     /// <param name="size">탄창 크기</param>
     /// <param name="reloadProgress">재장전 중이면 0~1, 아니면 음수</param>
-    public void Set(int bullets, int size, float reloadProgress = -1f)
+    /// <param name="special">남은 탄 중 맨 위 몇 발이 특수탄인지 (총잡이 소이탄 → 주황색)</param>
+    public void Set(int bullets, int size, float reloadProgress = -1f, int special = 0)
     {
         if (_bullets.Count != size) Rebuild(size);
 
         // 재장전 중이면 아래에서부터 진행도만큼 흐리게 차오름
         int reloaded = reloadProgress >= 0f ? Mathf.FloorToInt(reloadProgress * size) : 0;
+        special = Mathf.Clamp(special, 0, bullets);
 
         for (int i = 0; i < size; i++)
         {
             int fromBottom = size - 1 - i;   // i=0이 맨 위 → 위에서부터 비워진다
             Color c;
-            if (fromBottom < bullets) c = FullColor;
+            if (fromBottom < bullets) c = fromBottom >= bullets - special ? SpecialColor : FullColor; // 남은 탄의 맨 위 = 다음에 나갈 탄
             else if (fromBottom < reloaded) c = ReloadColor;
             else c = EmptyColor;
             _bullets[i].color = c;

@@ -34,6 +34,19 @@ public enum SkillUpgradeType
     SpecialMoonBlessing = 14, // 달의 가호: 피해↓ 쿨타임↓ + 공격력 버프
     SpecialReflect = 15,      // 탄막 반사: 적 탄환을 검기로 되돌림
     SpecialSpirit = 16,       // 투지 충전: 쿨타임 대신 적중 게이지
+
+    // ══ 토끼 총잡이 (RabbitGunnerSkills에서 처리) ══
+    // ── 기본기 ──
+    GunExtendedMag = 17,      // 확장 탄창: 6발 → 10발, 재장전 2초 → 2.5초
+    GunCritRefund = 18,       // 탄 회수: 치명타 확률 +10%, 치명타가 터지면 총알 1발 회수
+    GunPrecision = 19,        // 정밀 사격: 피격 원 가운데를 맞히면 +30% 추가 피해
+    GunChargeShot = 20,       // 차지샷: 누르고 있다가 놓으면 3발을 쓰는 관통 500% 저격탄
+
+    // ── 회피기 ──
+    GunIncendiary = 21,       // 특수탄 장전: 구르기로 장전하면 맨 위 3발이 소이탄 (2초 화상)
+    GunBackstep = 22,         // 백스텝 산탄: 커서 반대쪽으로 구르며 커서 쪽으로 산탄 5발
+    GunCasingBomb = 23,       // 탄피 폭탄: 구른 자리에 1초 뒤 터지는 폭탄
+    GunQuickDraw = 24,        // 퀵 드로우: 구르기 후 3초 안의 첫 발은 확정 치명타 + 관통
 }
 
 /// <summary>

@@ -5797,9 +5797,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundManager
   _bgmSource: {fileID: 1842192894}
-  _bgmVolume: 0.5
+  _bgmVolume: 0.3
   _sfxSource: {fileID: 1842192893}
-  _sfxVolume: 0.5
+  _sfxVolume: 0.3
   _sfxPoolSize: 5
   _preloadSfx:
   - SFX/Player_Sword

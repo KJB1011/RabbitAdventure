@@ -18,4 +18,10 @@ public class CharacterSO : ScriptableObject
 
     [Tooltip("스킬 설명 4개 (순서: 기본기, 회피기, 특수기, 필살기)")]
     [TextArea] public string[] skillDescriptions = new string[4];
+
+    [Tooltip("스킬 아이콘 4개 (순서: 기본기, 회피기, 특수기, 필살기). 상점 숙련도 칸에 쓰인다. 비워 두면 기본(토끼 검사) 아이콘")]
+    public Sprite[] skillIcons = new Sprite[4];
+
+    /// <summary>이 캐릭터의 스킬 아이콘 (없으면 null)</summary>
+    public Sprite GetSkillIcon(int index) => skillIcons != null && index >= 0 && index < skillIcons.Length ? skillIcons[index] : null;
 }

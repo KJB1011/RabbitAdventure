@@ -39,12 +39,20 @@ public abstract class CharacterSkills : MonoBehaviour
     public abstract IEnumerator SpecialRoutine();
 
     // ── 회피기 (공통 동작 + 캐릭터별 추가 효과) ──
+    /// <summary>true면 회피기가 커서 반대쪽으로 최대 거리만큼 (총잡이 백스텝 산탄)</summary>
+    public virtual bool DashAwayFromCursor => false;
+    /// <summary>회피기가 출발하는 순간 (총잡이: 산탄 발사, 탄피 폭탄 설치)</summary>
+    public virtual void OnDashStarted(Vector2 startPos) { }
     /// <summary>회피기가 끝난 순간 (총잡이: 재장전)</summary>
     public virtual void OnDashFinished() { }
 
-    // ── 숙련도 ──
-    /// <summary>스킬 숙련도·강화 시스템을 쓰는 캐릭터인지 (지금 강화 16종은 토끼 검사 전용)</summary>
-    public virtual bool SupportsMastery => false;
+    // ── 숙련도 강화 ──
+    /// <summary>
+    /// 이 캐릭터 전용 강화를 켠다. 처리했으면 true
+    /// (false면 PlayerController가 공통 강화 컴포넌트 PlayerSkillUpgrades로 넘긴다 — 토끼 검사의 강화들)
+    /// 어떤 캐릭터가 어떤 강화를 고를 수 있는지는 SkillMasteryManager의 트랙(characterId)에서 정한다.
+    /// </summary>
+    public virtual bool ApplyUpgrade(SkillUpgradeType type) => false;
 
     // ── 상태 정리 ──
     /// <summary>노드 이동 시작 (진행 중인 스킬 정리)</summary>
