@@ -271,7 +271,8 @@ public class PlayerController : MonoBehaviour
         Vector2 mousePos = Utils.GetMousePos();
         Vector2 dir = (mousePos - (Vector2)_playerAttack.transform.position).normalized;
 
-        if (!_isAttack)
+        // 공격 중에는 방향 고정 (검사가 휘두르는 도중 방향이 바뀌지 않게). 총잡이는 공격 중에도 계속 조준
+        if (!_isAttack || _skills.KeepAimingWhileAttacking)
             _playerAttack.transform.right = dir;
 
         if (!_isDashing && _isControllable && !_isGameOver)

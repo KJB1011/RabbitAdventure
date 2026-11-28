@@ -26,6 +26,12 @@ using static Defines;
 ///   백스텝 산탄 : 커서 반대쪽으로 최대 거리만큼 구르며, 출발할 때 커서 쪽으로 산탄 5발 (각 40%, 총알 안 씀)
 ///   탄피 폭탄   : 구르기 출발 자리에 탄피를 떨어뜨리고 1초 뒤 폭발 (150%)
 ///   퀵 드로우   : 구르기가 끝나고 3초 안에 쏘는 첫 발은 확정 치명타 + 관통
+///
+/// 특수기 숙련도 강화 (하나만, 특수기 동작이 바뀐다)
+///   오버드라이브     : 속사 그대로 + 처음 1초는 총알을 쓰지 않음 (탄이 없거나 재장전 중이어도 사용 가능)
+///   탄창 비우기 일격 : 1초 조준(느리게 이동) 후 남은 탄 × 120% 관통 저격, 이후 재장전
+///   포탑             : 플레이어 발밑에 6초 설치, 가장 가까운 적에게 0.4초마다 유도탄 (각 50%)
+///   수류탄           : 커서 위치로 던져 1초 뒤 폭발 (반경 2, 500%)
 /// </summary>
 public class RabbitGunnerSkills : CharacterSkills
 {
@@ -83,6 +89,29 @@ public class RabbitGunnerSkills : CharacterSkills
     [Header("회피기 강화: 퀵 드로우")]
     [SerializeField] float _quickDrawWindow = 3f;      // 구르기가 끝나고 이 시간 안의 첫 발
 
+    [Header("특수기 강화: 오버드라이브")]
+    [SerializeField] float _overdriveFreeTime = 1f;    // 속사의 처음 1초는 총알을 쓰지 않는다
+
+    [Header("특수기 강화: 탄창 비우기 일격")]
+    [SerializeField] float _dumpChargeTime = 1f;       // 조준(차징) 시간
+    [SerializeField] float _dumpRatePerBullet = 1.2f;  // 남은 탄 1발당 120%
+    [SerializeField] float _dumpMoveRate = 0.3f;       // 조준 중 이동속도
+
+    [Header("특수기 강화: 포탑")]
+    [SerializeField] float _turretDuration = 6f;
+    [SerializeField] float _turretInterval = 0.4f;
+    [SerializeField] float _turretDamageRate = 0.5f;   // 유도탄 한 발당 50%
+    [SerializeField] Sprite _turretSprite;
+    [SerializeField] Vector2 _turretSpawnOffset = new Vector2(0f, -0.35f); // 플레이어 위치 기준 (발밑)
+
+    [Header("특수기 강화: 수류탄")]
+    [SerializeField] float _grenadeFlightTime = 0.4f;  // 커서 위치까지 날아가는 시간
+    [SerializeField] float _grenadeFuse = 1f;          // 던진 뒤 터지기까지 (날아가는 시간 포함)
+    [SerializeField] float _grenadeRadius = 2f;
+    [SerializeField] float _grenadeDamageRate = 5f;    // 500%
+    [SerializeField] Sprite _grenadeSprite;
+    [SerializeField] Sprite _circleSprite;             // 폭발 범위 표시용 원
+
     [Header("연결")]
     [SerializeField] SpriteRenderer _gun;              // 손에 든 총 (커서 쪽을 향함, AttackArea의 자식)
     [SerializeField] SpriteRenderer _offhandGun;       // 쌍권총일 때만 보이는 두 번째 총
@@ -111,6 +140,10 @@ public class RabbitGunnerSkills : CharacterSkills
     bool _hasBackstep;
     bool _hasCasingBomb;
     bool _hasQuickDraw;
+
+    // 고른 특수기 강화 (하나만 고를 수 있으므로 종류 하나로)
+    enum SuperStyle { Rapid, Overdrive, DumpShot, Turret, Grenade }
+    SuperStyle _superStyle = SuperStyle.Rapid;
 
     int _incendiaryRounds;    // 남은 탄 중 맨 위 몇 발이 소이탄인지
     float _quickDrawUntil;    // 이 시각까지 쏘는 첫 발이 퀵 드로우
@@ -159,6 +192,11 @@ public class RabbitGunnerSkills : CharacterSkills
                 _hasChargeShot = true;
                 return true;
 
+            case SkillUpgradeType.GunOverdrive: _superStyle = SuperStyle.Overdrive; return true;
+            case SkillUpgradeType.GunDumpShot: _superStyle = SuperStyle.DumpShot; return true;
+            case SkillUpgradeType.GunTurret: _superStyle = SuperStyle.Turret; return true;
+            case SkillUpgradeType.GunGrenade: _superStyle = SuperStyle.Grenade; return true;
+
             case SkillUpgradeType.GunIncendiary: _hasIncendiary = true; return true;
             case SkillUpgradeType.GunBackstep: _hasBackstep = true; return true;
             case SkillUpgradeType.GunCasingBomb: _hasCasingBomb = true; return true;
@@ -183,6 +221,9 @@ public class RabbitGunnerSkills : CharacterSkills
     float FireRateScale => 1f / Mathf.Max(0.1f, Player.RangeMultiplier);
 
     public override float BasicCooldownScale => (_isDual ? _dualCooldownScale : 1f) * FireRateScale;
+
+    // 차지샷 모으는 중·특수기 속사 중에도 총이 커서를 따라간다
+    public override bool KeepAimingWhileAttacking => true;
 
     public override void StartBasic(Action onDone)
     {
@@ -217,14 +258,15 @@ public class RabbitGunnerSkills : CharacterSkills
     /// 커서 방향으로 일직선으로 한 발.
     /// 일반 탄: 처음 맞은 적(또는 상자) 1명에게만 / 차지샷·퀵 드로우: 길 위의 모든 적을 관통
     /// </summary>
-    void Fire(bool charged)
+    /// <param name="free">총알을 쓰지 않는 발 (오버드라이브의 처음 1초)</param>
+    void Fire(bool charged, bool free = false)
     {
-        if (_bullets <= 0) return;
-        int used = charged ? Mathf.Min(_chargeBulletCost, _bullets) : 1;
+        if (!free && _bullets <= 0) return;
+        int used = free ? 0 : (charged ? Mathf.Min(_chargeBulletCost, _bullets) : 1);
         _bullets -= used;
 
         // 맨 위 탄이 소이탄이면 이번 발은 소이탄 (위에서부터 쓰므로 쓴 만큼 줄어든다)
-        bool incendiary = _incendiaryRounds > 0;
+        bool incendiary = !free && _incendiaryRounds > 0;
         _incendiaryRounds = Mathf.Max(0, _incendiaryRounds - used);
 
         // 퀵 드로우: 구르기 후 3초 안의 첫 발
@@ -268,7 +310,7 @@ public class RabbitGunnerSkills : CharacterSkills
         }
         if (gun != null) StartCoroutine(RecoilRoutine(gun.transform, gun == _offhandGun ? _offhandRestPos : _gunRestPos, charged ? 0.18f : 0.08f));
 
-        if (_bullets <= 0) StartReload();
+        if (!free && _bullets <= 0) StartReload();
     }
 
     /// <summary>한 방향으로 판정만 한다 (궤적·소리는 부르는 쪽에서). 총알이 멈춘 지점을 돌려준다</summary>
@@ -667,19 +709,276 @@ public class RabbitGunnerSkills : CharacterSkills
         if (_ammoBar != null) _ammoBar.Set(_bullets, MagazineSize, _isReloading ? 0f : -1f, _incendiaryRounds);
     }
 
-    // ── 특수기: 속사 ─────────────────────────────────────────
-    public override bool CanUseSuper => _bullets > 0 && !_isReloading;
+    // ── 특수기 ───────────────────────────────────────────────
+    // 기본: 속사 / 강화: 오버드라이브(속사 + 처음 1초 무료), 탄창 비우기 일격, 포탑, 수류탄
+    public override bool CanUseSuper => _superStyle switch
+    {
+        SuperStyle.Overdrive => true,                                // 탄이 없거나 재장전 중이어도 (처음 1초는 무료)
+        SuperStyle.Turret or SuperStyle.Grenade => true,             // 총알과 상관없음
+        _ => _bullets > 0 && !_isReloading,                          // 속사, 탄창 비우기 일격
+    };
 
-    public override IEnumerator SuperRoutine()
+    public override IEnumerator SuperRoutine() => _superStyle switch
+    {
+        SuperStyle.Overdrive => RapidRoutine(true),
+        SuperStyle.DumpShot => DumpShotRoutine(),
+        SuperStyle.Turret => TurretRoutine(),
+        SuperStyle.Grenade => GrenadeRoutine(),
+        _ => RapidRoutine(false),
+    };
+
+    float RapidInterval => _rapidInterval * (_isDual ? _dualRapidScale : 1f) * FireRateScale;
+
+    PooledVFX _overdriveFx;
+
+    /// <summary>
+    /// 속사: 남은 총알을 빠르게 전부 쏜다.
+    /// 오버드라이브면 처음 1초는 총알을 쓰지 않고 쏘고, 그 뒤로는 원래 속사처럼 남은 총알을 다 쓸 때까지 쏜다.
+    /// </summary>
+    IEnumerator RapidRoutine(bool overdrive)
     {
         Player.IsAttacking = true;
         Player.BeginEmpoweredAttack();
-        while (_bullets > 0 && !Player.IsGameOver)
+
+        float freeUntil = 0f;
+        if (overdrive)
         {
-            Fire(false);
-            yield return new WaitForSeconds(_rapidInterval * (_isDual ? _dualRapidScale : 1f) * FireRateScale);
+            freeUntil = Time.time + _overdriveFreeTime;
+            CancelReload(); // 재장전 중이었다면 멈추고 바로 쏜다 (무료 구간이 끝난 뒤 탄이 없으면 다시 재장전)
+            if (_gun != null) _overdriveFx = VFXManager.Instance.PlayAttached("ChargeGlow", _gun.transform, Vector3.right * _muzzleOffset);
+            SoundManager.Instance.PlaySFXPitch("SFX/Gen_Buff", 1.3f);
         }
+
+        while (!Player.IsGameOver)
+        {
+            bool free = Time.time < freeUntil;
+            if (!free)
+            {
+                ReturnFx(ref _overdriveFx); // 무료 구간 끝 → 총구 빛 끄기
+                if (_bullets <= 0) break;
+            }
+            Fire(false, free);
+            yield return new WaitForSeconds(RapidInterval);
+        }
+
+        ReturnFx(ref _overdriveFx);
+        if (_bullets <= 0) StartReload();
         Player.EndAttack();
+    }
+
+    // 재장전을 멈춘다 (총알 수는 그대로)
+    void CancelReload()
+    {
+        if (_reloadRoutine != null) StopCoroutine(_reloadRoutine);
+        _reloadRoutine = null;
+        _isReloading = false;
+        UpdateAmmoBar();
+    }
+
+    // ── 특수기 강화: 탄창 비우기 일격 ────────────────────────
+    PooledVFX _dumpGlow;
+
+    // 1초 동안 느리게 걸으며 조준(가늘어지는 조준선) → 남은 탄 전부를 한 발로 모아 관통 저격
+    IEnumerator DumpShotRoutine()
+    {
+        Player.IsAttacking = true;
+        Player.BeginEmpoweredAttack();
+        Player.SetMoveSpeedRate(_dumpMoveRate);
+        if (_gun != null) _dumpGlow = VFXManager.Instance.PlayAttached("ChargeGlow", _gun.transform, Vector3.right * _muzzleOffset);
+        SoundManager.Instance.PlaySFXPitch("SFX/Gen_ChargeStep", 0.8f);
+
+        float t = 0f, nextLine = 0f;
+        while (t < _dumpChargeTime && !Player.IsGameOver)
+        {
+            t += Time.deltaTime;
+            // 조준선: 점점 가늘고 진해진다
+            if (t >= nextLine && _gun != null)
+            {
+                nextLine = t + 0.06f;
+                float p = t / _dumpChargeTime;
+                Vector2 m = MuzzleOf(_gun);
+                ShowTracer(m, m + AimDirection() * _maxRange, Mathf.Lerp(0.9f, 0.15f, p),
+                           new Color(1f, 0.35f, 0.3f, Mathf.Lerp(0.25f, 0.8f, p)), 0.6f, withFlash: false);
+            }
+            yield return null;
+        }
+
+        Player.SetMoveSpeedRate(1f);
+        ReturnFx(ref _dumpGlow);
+        if (!Player.IsGameOver && _bullets > 0) FireDumpShot();
+
+        yield return new WaitForSeconds(0.2f);
+        Player.EndAttack();
+    }
+
+    void FireDumpShot()
+    {
+        int count = _bullets;
+        bool incendiary = _incendiaryRounds > 0;
+        _bullets = 0;
+        _incendiaryRounds = 0;
+        UpdateAmmoBar();
+
+        Vector2 muzzle = MuzzleOf(_gun);
+        Vector2 aim = AimDirection();
+        var shot = new Shot
+        {
+            rate = _damageRate * _dumpRatePerBullet * count,  // 남은 탄 × 120%
+            pierce = true,
+            incendiary = incendiary,
+            type = AttackType.Super,
+        };
+        Vector2 end = CastShot(muzzle, aim, _maxRange, shot);
+
+        ShowTracer(muzzle, end, 3.5f, new Color(1f, 0.95f, 0.8f, 1f), 3f); // 아주 굵고 하얀 저격탄
+        SoundManager.Instance.PlaySFXPitch("SFX/Gen_Gunshot", 0.55f);
+        SoundManager.Instance.PlaySFX("SFX/HeavyHit", 0.7f);
+        IngameManager.Instance.ShakeCamera(0.15f, 0.12f);
+        if (_gun != null) StartCoroutine(RecoilRoutine(_gun.transform, _gunRestPos, 0.25f));
+        StartReload();
+    }
+
+    // ── 특수기 강화: 포탑 ────────────────────────────────────
+    GunTurret _turret;
+
+    // 플레이어 발밑에 포탑 설치 (하나만, 새로 놓으면 예전 것은 사라짐)
+    IEnumerator TurretRoutine()
+    {
+        if (_turret != null) _turret.Despawn();
+        Vector2 pos = (Vector2)transform.position + _turretSpawnOffset;
+        _turret = GunTurret.Spawn(pos, Player, _turretSprite, Resources.Load<Sprite>("UI/AmmoBullet"), EffectMaterial,
+                                  _gun != null ? _gun.sortingLayerID : 0, _turretDuration, _turretInterval, _turretDamageRate);
+        yield break;
+    }
+
+    // 총알 궤적과 같은 그리기 설정 (빛나는 이펙트용, 조명 영향 없음)
+    Material _effectMaterial;
+    Material EffectMaterial
+    {
+        get
+        {
+            if (_effectMaterial == null)
+            {
+                var tracer = Resources.Load<GameObject>("VFX/BulletTracerVFX");
+                var sr = tracer != null ? tracer.GetComponentInChildren<SpriteRenderer>(true) : null;
+                _effectMaterial = sr != null ? sr.sharedMaterial : (_gun != null ? _gun.sharedMaterial : null);
+            }
+            return _effectMaterial;
+        }
+    }
+
+    // ── 특수기 강화: 수류탄 ──────────────────────────────────
+    IEnumerator GrenadeRoutine()
+    {
+        Vector2 from = MuzzleOf(_gun);
+        Vector2 to = Player.ClampToMap(Utils.GetMousePos());
+        StartCoroutine(GrenadeFlight(from, to)); // 던지고 나면 플레이어는 바로 다른 행동 가능
+        SoundManager.Instance.PlaySFXPitch("SFX/Player_Dash", 1.4f, 0.6f); // 휙
+        yield break;
+    }
+
+    // 총잡이(파란 토끼) 색 — 적 공격 예고의 빨간색과 구분
+    static Color GrenadeAreaColor(float alpha) => new Color(0.45f, 0.82f, 1f, alpha);
+
+    // 바닥에 까는 범위 표시 그림 (반지름 _grenadeRadius에 맞춘 크기)
+    SpriteRenderer MakeAreaSprite(string name, Sprite sprite, Vector2 pos, int sortingLayerId, int order, Color color)
+    {
+        if (sprite == null) return null;
+        var sr = new GameObject(name).AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        if (EffectMaterial != null) sr.sharedMaterial = EffectMaterial; // 조명 영향 없이 선명하게
+        sr.sortingLayerID = sortingLayerId;
+        sr.sortingOrder = order;
+        sr.color = color;
+        sr.transform.position = pos;
+        float size = Mathf.Max(0.01f, sprite.bounds.size.x);
+        sr.transform.localScale = Vector3.one * (_grenadeRadius * 2f / size);
+        return sr;
+    }
+
+    IEnumerator GrenadeFlight(Vector2 from, Vector2 to)
+    {
+        int layer = _gun != null ? _gun.sortingLayerID : 0;
+
+        // 터질 범위 표시: 적 공격 예고(빨간 원)와 헷갈리지 않게
+        //   하늘색 점선 고리가 천천히 돌고, 안쪽이 가운데서부터 차오르다가 가득 차는 순간 터진다
+        SpriteRenderer ring = MakeAreaSprite("GrenadeRing", Resources.Load<Sprite>("UI/GrenadeRing"), to, layer, 2, GrenadeAreaColor(0.9f));
+        SpriteRenderer fill = MakeAreaSprite("GrenadeFill", _circleSprite, to, layer, 1, GrenadeAreaColor(0.22f));
+        Vector3 fillFullScale = fill != null ? fill.transform.localScale : Vector3.zero;
+        if (fill != null) fill.transform.localScale = Vector3.zero;
+
+        float elapsed = 0f;
+        void UpdateArea()
+        {
+            float p = Mathf.Clamp01(elapsed / Mathf.Max(0.01f, _grenadeFuse));
+            if (ring != null) ring.transform.Rotate(0f, 0f, -90f * Time.deltaTime);
+            if (fill != null) fill.transform.localScale = fillFullScale * p;
+        }
+
+        var nade = new GameObject("Grenade").AddComponent<SpriteRenderer>();
+        nade.sprite = _grenadeSprite;
+        if (_gun != null) nade.sharedMaterial = _gun.sharedMaterial;
+        nade.sortingLayerID = layer;
+        nade.sortingOrder = 6;
+
+        // 포물선으로 날아감 (빙글빙글)
+        float t = 0f;
+        while (t < _grenadeFlightTime)
+        {
+            t += Time.deltaTime;
+            elapsed += Time.deltaTime;
+            float p = Mathf.Clamp01(t / _grenadeFlightTime);
+            Vector2 pos = Vector2.Lerp(from, to, p) + Vector2.up * (Mathf.Sin(p * Mathf.PI) * 1.2f);
+            nade.transform.position = pos;
+            nade.transform.rotation = Quaternion.Euler(0f, 0f, -p * 540f);
+            UpdateArea();
+            yield return null;
+        }
+        nade.transform.position = to;
+        SoundManager.Instance.PlaySFXPitch("SFX/Gen_TipPing", 0.6f, 0.5f); // 툭
+
+        // 바닥에서 깜빡이다가 펑
+        float fuse = Mathf.Max(0f, _grenadeFuse - _grenadeFlightTime);
+        t = 0f;
+        while (t < fuse)
+        {
+            t += Time.deltaTime;
+            elapsed += Time.deltaTime;
+            float blink = Mathf.Lerp(8f, 26f, t / Mathf.Max(0.01f, fuse));
+            nade.color = Mathf.Sin(t * blink) > 0f ? new Color(0.6f, 0.9f, 1f) : Color.white;
+            UpdateArea();
+            yield return null;
+        }
+        Destroy(nade.gameObject);
+        if (ring != null) Destroy(ring.gameObject);
+        if (fill != null) Destroy(fill.gameObject);
+
+        // 펑!
+        VFXManager.Instance.Play("GroundHitVFX", to);
+        VFXManager.Instance.Play("SpringShockwave", to);
+        SoundManager.Instance.PlaySFX("SFX/AreaDamage");
+        SoundManager.Instance.PlaySFX("SFX/HeavyHit", 0.6f);
+        IngameManager.Instance.ShakeCamera(0.2f, 0.18f);
+
+        var hitEnemies = new HashSet<EnemyBase>();
+        var hitChests = new HashSet<ChestObject>();
+        foreach (var col in Physics2D.OverlapCircleAll(to, _grenadeRadius))
+        {
+            if (col.TryGetComponent(out EnemyHitbox _))
+            {
+                var enemy = col.GetComponentInParent<EnemyBase>();
+                if (enemy == null || enemy.IsDead || !hitEnemies.Add(enemy)) continue;
+                int damage = Mathf.Max(1, Mathf.RoundToInt(Player.DamageReturn(out bool isCrit) * _grenadeDamageRate));
+                enemy.DamageTaken(damage);
+                IngameManager.Instance.Flash(enemy.CharSprite, 0.1f);
+                DamageTextManager.Instance.Show(damage, isCrit, enemy.transform.position);
+                Player.NotifyAttackHit(enemy, AttackType.Super);
+                continue;
+            }
+            var chest = col.GetComponentInParent<ChestObject>();
+            if (chest != null && chest.gameObject.activeInHierarchy && hitChests.Add(chest))
+                chest.TakeDamage(Mathf.Max(1, Mathf.RoundToInt(Player.DamageReturn() * _grenadeDamageRate)));
+        }
     }
 
     // ── 필살기: 쌍권총 ───────────────────────────────────────
@@ -726,11 +1025,26 @@ public class RabbitGunnerSkills : CharacterSkills
     }
 
     // ── 상태 정리 ────────────────────────────────────────────
-    public override void OnNodeMove() => CancelCharge();
+    public override void OnNodeMove()
+    {
+        CancelCharge();
+        CleanupSuper();
+    }
+
+    // 노드 이동·재시작으로 특수기가 도중에 끊겼을 때 남는 것 정리 (빛, 감속, 포탑)
+    void CleanupSuper()
+    {
+        ReturnFx(ref _overdriveFx);
+        ReturnFx(ref _dumpGlow);
+        Player.SetMoveSpeedRate(1f);
+        if (_turret != null) _turret.Despawn();
+        _turret = null;
+    }
 
     public override void OnResetState()
     {
         CancelCharge();
+        CleanupSuper();
         if (_dualRoutine != null) StopCoroutine(_dualRoutine);
         EndDual(false);
         FinishReload();

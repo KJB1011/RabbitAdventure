@@ -6975,6 +6975,20 @@ MonoBehaviour:
   _bombRadius: 1.6
   _bombDamageRate: 1.5
   _quickDrawWindow: 3
+  _overdriveFreeTime: 1
+  _dumpChargeTime: 1
+  _dumpRatePerBullet: 1.2
+  _dumpMoveRate: 0.3
+  _turretDuration: 6
+  _turretInterval: 0.4
+  _turretDamageRate: 0.5
+  _turretSprite: {fileID: 21300000, guid: 8efc0a7066012dc48b13094737d3776f, type: 3}
+  _grenadeFlightTime: 0.4
+  _grenadeFuse: 1
+  _grenadeRadius: 2
+  _grenadeDamageRate: 5
+  _grenadeSprite: {fileID: 21300000, guid: 84b8db0bdb4773c4eb3963eccefed96a, type: 3}
+  _circleSprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   _gun: {fileID: 4449986830421543831}
   _offhandGun: {fileID: 4870689426440739503}
   _ammoText: {fileID: 5448141399664997405}

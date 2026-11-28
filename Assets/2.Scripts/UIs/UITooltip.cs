@@ -69,7 +69,8 @@ public class UITooltip : MonoBehaviour
         FollowMouse();
     }
 
-    // 커서 오른쪽 위에 띄우고, 화면 밖으로 나가면 반대쪽(왼쪽/아래)으로 뒤집는다
+    // 커서 오른쪽 위에 띄우고, 화면 밖으로 나가면 반대쪽(왼쪽/아래)으로 뒤집는다.
+    // 뒤집어도 넘치면(화면 가장자리, 아주 긴 설명) 화면 안쪽으로 밀어 넣는다.
     void FollowMouse()
     {
         if (Mouse.current == null) return;
@@ -79,11 +80,16 @@ public class UITooltip : MonoBehaviour
         Vector2 size = _rect.rect.size * scale;     // 화면 픽셀 기준 크기
         Vector2 offset = _offset * scale;
 
-        // 기준점(Pivot)이 왼쪽 아래(0,0)라고 가정하고 위치를 계산
-        Vector2 pos = mouse + offset;
-        if (pos.x + size.x > Screen.width) pos.x = mouse.x - offset.x - size.x;
-        if (pos.y + size.y > Screen.height) pos.y = mouse.y - offset.y - size.y;
+        // 툴팁의 왼쪽 아래 모서리 위치를 먼저 정한다
+        Vector2 corner = mouse + offset;
+        if (corner.x + size.x > Screen.width) corner.x = mouse.x - offset.x - size.x;
+        if (corner.y + size.y > Screen.height) corner.y = mouse.y - offset.y - size.y;
 
-        _rect.position = pos; // Screen Space - Overlay Canvas에서는 화면 좌표 = 월드 좌표
+        // 화면 안에 가두기 (툴팁이 화면보다 크면 왼쪽·위를 맞춘다)
+        corner.x = Mathf.Clamp(corner.x, 0f, Mathf.Max(0f, Screen.width - size.x));
+        corner.y = Mathf.Clamp(corner.y, Mathf.Min(0f, Screen.height - size.y), Screen.height - size.y);
+
+        // 기준점(Pivot)이 어디든 왼쪽 아래 모서리가 corner에 오도록
+        _rect.position = corner + Vector2.Scale(_rect.pivot, size); // Screen Space - Overlay에서는 화면 좌표 = 월드 좌표
     }
 }

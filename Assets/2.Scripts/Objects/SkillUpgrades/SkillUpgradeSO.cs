@@ -47,6 +47,12 @@ public enum SkillUpgradeType
     GunBackstep = 22,         // 백스텝 산탄: 커서 반대쪽으로 구르며 커서 쪽으로 산탄 5발
     GunCasingBomb = 23,       // 탄피 폭탄: 구른 자리에 1초 뒤 터지는 폭탄
     GunQuickDraw = 24,        // 퀵 드로우: 구르기 후 3초 안의 첫 발은 확정 치명타 + 관통
+
+    // ── 특수기 ──
+    GunOverdrive = 25,        // 오버드라이브: 속사의 처음 1초는 총알을 쓰지 않음 (그 뒤는 원래 속사)
+    GunDumpShot = 26,         // 탄창 비우기 일격: 1초 조준 후 남은 탄 × 120% 관통 저격
+    GunTurret = 27,           // 포탑: 플레이어 발밑에 설치, 가까운 적에게 유도탄
+    GunGrenade = 28,          // 수류탄: 커서 위치로 던져 1초 뒤 500% 폭발
 }
 
 /// <summary>

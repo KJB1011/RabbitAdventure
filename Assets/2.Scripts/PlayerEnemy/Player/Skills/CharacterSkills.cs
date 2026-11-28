@@ -21,6 +21,12 @@ public abstract class CharacterSkills : MonoBehaviour
     /// <summary>플레이어가 생성되고 이름 등을 설정할 때 (PlayerController.SetInitChar)</summary>
     public virtual void OnInit() { }
 
+    /// <summary>
+    /// 공격 중에도 조준(공격 방향)이 커서를 계속 따라갈지.
+    /// 검사는 휘두르는 도중 방향이 바뀌면 안 되므로 false, 총잡이는 모으기·속사 중에도 총이 커서를 따라가야 하므로 true
+    /// </summary>
+    public virtual bool KeepAimingWhileAttacking => false;
+
     // ── 기본기 ──
     /// <summary>지금 기본기를 쓸 수 있는지 (총잡이: 총알이 있고 재장전 중이 아닐 때)</summary>
     public virtual bool CanUseBasic => true;

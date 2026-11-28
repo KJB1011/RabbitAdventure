@@ -17373,6 +17373,14 @@ MonoBehaviour:
     - {fileID: 11400000, guid: ad2e6e363d1bba949b5c695074991b8b, type: 2}
     - {fileID: 11400000, guid: 3361134bd51683540bdcf18be63c9f5a, type: 2}
     - {fileID: 11400000, guid: 10a06318291e1e84fbd8d954520c5688, type: 2}
+  - characterId: rabbit_gunner
+    skill: 2
+    required: 10
+    upgrades:
+    - {fileID: 11400000, guid: 67e32297226a556449be17a98d82473d, type: 2}
+    - {fileID: 11400000, guid: 5838de9f03ae2f94dbba8f350647ec15, type: 2}
+    - {fileID: 11400000, guid: 9b65408f142fd564c83b4126986773ff, type: 2}
+    - {fileID: 11400000, guid: 4171e6aba6c3dbf4fb55cebd36ea8b00, type: 2}
   _purchaseFillRatio: 1
   _choiceTitleFormat: "{0} \uAC15\uD654\uB97C \uD558\uB098 \uC120\uD0DD\uD558\uC138\uC694"
   _choiceCount: 3
